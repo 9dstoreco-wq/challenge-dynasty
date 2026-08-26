@@ -1,0 +1,28 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const required = [
+  'app/layout.tsx','app/loading.tsx','app/error.tsx','app/not-found.tsx',
+  'app/robots.ts','app/sitemap.ts','public/manifest.webmanifest','public/icon.svg',
+  'supabase/schema_master.sql','package.json'
+];
+const missing = required.filter(f => !fs.existsSync(f));
+if (missing.length) { console.error('Missing production files:', missing); process.exit(1); }
+
+const textFiles = ['app','components','lib','supabase','scripts'];
+const stack=[];
+function walk(dir){ for(const ent of fs.readdirSync(dir,{withFileTypes:true})){ const full=path.join(dir,ent.name); if(ent.name==='node_modules' || ent.name==='.next') continue; if(ent.isDirectory()) walk(full); else stack.push(full); } }
+for(const d of textFiles) if(fs.existsSync(d)) walk(d);
+const risky=[];
+for(const f of stack){
+  const ext=path.extname(f);
+  if(!['.ts','.tsx','.js','.mjs','.sql','.json','.css','.md'].includes(ext)) continue;
+  const s=fs.readFileSync(f,'utf8');
+  if(/(?:service_role_key\s*[:=]|SUPABASE_SERVICE_ROLE_KEY\s*[:=]|sk_live_[A-Za-z0-9]+)/.test(s)) risky.push(f);
+}
+if(risky.length){ console.error('Potential secret references:', risky); process.exit(1); }
+const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+for(const key of ['build','start','typecheck']) if(!pkg.scripts?.[key]){ console.error(`Missing npm script: ${key}`); process.exit(1); }
+const manifest=JSON.parse(fs.readFileSync('public/manifest.webmanifest','utf8'));
+if(manifest.start_url!=='/' || manifest.display!=='standalone') { console.error('Invalid web manifest'); process.exit(1); }
+console.log('Production structure check: PASS');
