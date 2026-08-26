@@ -1,0 +1,26 @@
+CHALLENGE DYNASTY — CORE FUNCTIONAL 6
+
+CONTINUACIÓN DESDE CORE FUNCTIONAL 5
+
+NUEVO
+1. Error boundary global para aislar fallos de UI sin tumbar toda la experiencia.
+2. Loading state global para navegación y consultas server-side.
+3. 404 real para retos/jugadores/rutas inexistentes.
+4. Metadata de producción, Open Graph básico, viewport oscuro y PWA manifest.
+5. robots.txt y sitemap dinámico para rutas públicas.
+6. Validación defensiva del formulario y server action de creación de retos.
+7. Hardening de partners contra bloqueos, parejas ya existentes y spam de notificaciones.
+8. Búsqueda preparada como RPC que respeta bloqueos y evita exponer el propio perfil.
+9. Rating history pasa a ser analítica privada del jugador; los rankings públicos siguen en sport_rankings.
+10. Policies para impedir que un usuario inserte/edite profile_sports de otra persona.
+11. Production structure check incorporado al proyecto.
+
+VALIDACIONES
+- Route check: PASS
+- SQL static check: PASS
+- CORE FLOW: PASS
+- Hardening check: PASS
+- Focused security scan: PASS
+- Production structure check: PASS
+- ZIP integrity: pendiente de empaquetado
+- next build/typecheck: no certificado; npm install excedió el límite del entorno.

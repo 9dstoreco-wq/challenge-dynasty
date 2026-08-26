@@ -1,0 +1,40 @@
+CHALLENGE DYNASTY — CORE FUNCTIONAL 4
+
+Base: CORE FUNCTIONAL 3
+
+OBJETIVO
+Atacar integridad de datos, estados inconsistentes, UX falsa y módulos que aún mostraban datos quemados.
+
+CAMBIOS
+1. INTEGRIDAD DE RETOS
+   - No se puede retar a un jugador que no tenga configurado el deporte.
+   - El retador también debe tener el deporte configurado.
+   - No se permite crear retos duplicados activos entre la misma pareja en el mismo deporte.
+   - Fecha máxima de reto: 90 días.
+   - Club inexistente rechazado.
+
+2. RESULTADOS
+   - No se puede cargar un resultado antes de 2 horas previas al partido.
+   - El frontend valida formato de sets.
+   - Una vez que uno de los jugadores confirma, la UI bloquea la edición.
+   - La confirmación queda separada de la edición del marcador.
+
+3. ONBOARDING
+   - Los deportes vienen de Supabase, no de una lista codificada.
+   - Se mantiene soporte multi-deporte.
+
+4. PERFIL / HOME
+   - Se corrige el enlace al perfil: usa username real en lugar del UUID del usuario.
+
+5. SKILL CHALLENGES
+   - Se eliminó la lista de tres trucos ficticios.
+   - La página consulta retos de habilidad reales y el usuario puede entrar por un CTA real.
+
+6. BASE DE DATOS
+   - Índice único case-insensitive para usernames.
+
+CHECKS PREVISTOS
+- Route check: PASS
+- SQL static check: PASS
+- CORE FLOW: PASS
+- Demo/fake core content scan: PASS

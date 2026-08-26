@@ -1,0 +1,44 @@
+CHALLENGE DYNASTY — EVOLUCIÓN CORE FUNCTIONAL 5
+
+Base: CORE FUNCTIONAL 4
+Objetivo: convertir el MVP en una base operativa más completa, coherente y resistente a abuso.
+
+1. PRODUCTO
+- Añadidos /settings para identidad y pasaporte deportivo.
+- Añadido /search para descubrimiento de jugadores por nombre, username y ciudad.
+- Añadido /history para historial competitivo real.
+- Añadido /tricks/new para crear Skill Challenges reales.
+- Añadido /tricks/[id] para submissions y votación.
+- Sidebar corregido: Retos, Historial y Mi perfil apuntan a rutas reales.
+
+2. COMPETICIÓN
+- Cancelación segura de retos PENDING/ACCEPTED.
+- Bloqueo de jugadores impide crear retos con ellos.
+- Resultados con sets suministrados deben coincidir con el ganador.
+- Rating protegido con actualización ELO-style en vez de delta fijo.
+- rating_history para trazabilidad de cambios.
+- Notificaciones al validar resultados.
+- Progresión automática de misiones después de un partido validado.
+
+3. SEGURIDAD / MODERACIÓN
+- blocked_profiles.
+- moderation_reports.
+- RPCs block_profile / unblock_profile / report_content.
+- Discovery y matchmaking excluyen bloqueos.
+- Posts limitados a 2000 caracteres.
+- Comentarios limitados a 600 caracteres.
+- No se permite seguirse a sí mismo.
+- Follow bloqueado si existe bloqueo en cualquiera de las dos direcciones.
+
+4. DATOS REALES
+- Skill Challenges muestran puntos y votos agregados de submissions reales.
+- No se añaden métricas ficticias como fuente de verdad.
+- Configuración de deportes utiliza sports/profile_sports reales.
+
+5. VERIFICACIÓN
+- Route check: PASS
+- SQL static check: PASS
+- CORE FLOW: PASS
+- Hardening check: PASS
+- ZIP integrity: pendiente de empaquetado final
+- next build/typecheck: NO CERTIFICADO EN ESTE ENTORNO porque las dependencias npm no pudieron instalarse dentro del límite de ejecución.

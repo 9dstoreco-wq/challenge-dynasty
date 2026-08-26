@@ -1,0 +1,40 @@
+CHALLENGE DYNASTY — CERTIFICACIÓN TÉCNICA 7
+
+BASE: CORE FUNCTIONAL 6
+
+RESULTADOS VERIFICABLES EN ESTE ENTORNO
+---------------------------------------
+[PASS] Route check
+[PASS] SQL static check
+[PASS] CORE FLOW check
+[PASS] Production structure check
+[PASS] Focused security / hardening checks heredados
+[PASS] ZIP integrity
+[PASS] 57 archivos TypeScript/TSX parseados sin errores de sintaxis
+[PASS] Auditoría de imports externos: no faltan paquetes externos declarados en package.json
+
+VALIDACIÓN NO CERTIFICADA
+-------------------------
+[BLOCKED BY ENVIRONMENT] npm install / dependency resolution
+[NOT RUN] next build
+[NOT RUN] tsc --noEmit con node_modules completos
+
+CAUSA
+-----
+El entorno de ejecución no pudo completar la descarga/instalación de las dependencias npm dentro del límite disponible. El proyecto sí contiene package.json con versiones explícitas para sus dependencias directas.
+
+IMPORTANTE
+----------
+"NOT RUN" no significa "FALLÓ".
+La única afirmación responsable en este punto es que el build de producción todavía no ha sido ejecutado con un árbol completo de dependencias.
+
+ORDEN RECOMENDADO PARA CERRAR PRODUCCIÓN
+----------------------------------------
+1. npm install
+2. npm run typecheck
+3. npm run build
+4. npm run check-routes
+5. npm run check-sql
+6. npm run check-core-flow
+7. npm run check-production
+8. Probar login, onboarding, crear reto, aceptar reto, registrar resultado y confirmar resultado con Supabase real.

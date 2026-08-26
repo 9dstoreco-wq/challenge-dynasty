@@ -1,0 +1,17 @@
+CHALLENGE DYNASTY — PASO 1
+
+1. Entra a https://supabase.com/
+2. Crea una cuenta.
+3. Pulsa New project.
+4. Ponle por ejemplo: challenge-dynasty
+5. Espera a que Supabase termine de crear el proyecto.
+6. Abre SQL Editor.
+7. Crea una consulta nueva.
+8. Copia TODO el contenido de:
+   supabase/schema_master.sql
+9. Pégalo completo.
+10. Pulsa RUN.
+
+Si Supabase muestra "Success", el paso 1 está listo.
+
+NO ejecutes SQL de versiones anteriores.

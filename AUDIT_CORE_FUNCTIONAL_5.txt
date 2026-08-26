@@ -1,0 +1,16 @@
+CHALLENGE DYNASTY — AUDIT CORE FUNCTIONAL 5
+
+Estado: iteración de endurecimiento y expansión.
+
+PASS
+- Todas las rutas nuevas existen.
+- Flujo central de reto -> resultado -> confirmación -> ranking conserva los RPC requeridos.
+- SQL contiene nuevas estructuras de rating, moderación y bloqueos.
+- Se elimina del núcleo la posibilidad de usar bloqueo para crear un reto.
+- Votación de Skill Challenge es por usuario y submission.
+- Creación de Skill Challenge requiere autenticación.
+
+LIMITACIONES REALES
+- No se pudo completar npm install dentro del entorno, por lo que TypeScript/Next no tienen dependencias disponibles y no es responsable declarar build certificado.
+- La aplicación requiere las variables de Supabase documentadas en .env.example.
+- El cron de auto-confirmación de partidos sigue necesitando configuración en Supabase según README.

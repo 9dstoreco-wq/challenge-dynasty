@@ -1,0 +1,23 @@
+CHALLENGE DYNASTY — PASO 2
+
+En Supabase abre:
+Project Settings → API
+
+Copia:
+
+Project URL
+→ NEXT_PUBLIC_SUPABASE_URL
+
+anon public key
+→ NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+Luego crea un archivo llamado:
+.env.local
+
+Con esto:
+
+NEXT_PUBLIC_SUPABASE_URL=PEGA_AQUI_TU_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=PEGA_AQUI_TU_ANON_KEY
+
+NO uses la service_role key.
+NO compartas .env.local.

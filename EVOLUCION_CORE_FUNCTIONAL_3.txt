@@ -1,0 +1,66 @@
+CHALLENGE DYNASTY — CORE FUNCTIONAL 3
+
+Base: CHALLENGE_DYNASTY_CORE_FUNCTIONAL_2
+
+Objetivo de esta iteración:
+Eliminar islas de UI/demo y conectar la capa social, perfiles, temporada y competición al estado real del sistema.
+
+Evolución:
+1. FEED SOCIAL REAL
+   - Home consulta posts reales.
+   - Likes reales con toggle y contadores mediante triggers.
+   - Comentarios reales.
+   - Follow/unfollow real.
+   - Resultados oficiales siguen generando AUTO_MATCH_RESULT.
+   - Se muestra CTA de revancha sobre resultados con match real.
+
+2. NOTIFICACIONES
+   - Lectura individual mediante RPC seguro.
+   - Marcar todas como leídas mediante RPC seguro.
+   - Mantiene consulta del usuario autenticado.
+
+3. PARTNERS
+   - Invitaciones recibidas visibles.
+   - Aceptar/rechazar mediante RPC.
+   - Aceptación crea pair_profile de forma idempotente.
+   - Notifica al solicitante.
+
+4. PERFIL
+   - Se elimina fallback de perfil ficticio.
+   - Perfil inexistente devuelve estado real.
+   - Follow real.
+   - Rivalidades/H2H consultadas desde matches validados.
+   - CTA de reto enlaza al jugador real.
+
+5. INTEGRIDAD DE PARTIDOS
+   - Un resultado no puede sobrescribirse después de que uno de los jugadores ya lo haya confirmado.
+   - Un partido validado continúa bloqueado.
+
+6. TEMPORADA / COMPETICIONES / CLUBES / MISIONES / RECOMPENSAS / DEPORTES
+   - Eliminadas tablas y listas demo del flujo principal.
+   - Temporada consulta seasons + sport_rankings.
+   - Competitions consulta seasons reales.
+   - Clubs consulta clubs reales.
+   - Missions consulta missions + user_missions.
+   - Rewards consulta rewards.
+   - Sports consulta sports y cuenta retos activos por deporte.
+
+7. CHALLENGE DISCOVERY
+   - challenge/new acepta deporte preseleccionado desde /sports.
+   - challenge/new conserva rival preseleccionado desde discovery.
+
+8. LIMPIEZA
+   - Eliminada /challenge/demo del producto.
+   - Eliminado PostCard ficticio heredado.
+   - ChallengeCard ya no tiene valores ficticios por defecto.
+   - No quedan enlaces primarios a /challenge/demo o /u/luis.
+
+Checks:
+- Route check: PASS
+- SQL static check: PASS
+- CORE FLOW: PASS
+- Demo route removed: PASS
+- Fictitious core href scan: PASS
+
+Limitación:
+- No se declara next build/typecheck certificado en este entorno porque el ZIP no trae node_modules y no se completó una instalación reproducible de dependencias.

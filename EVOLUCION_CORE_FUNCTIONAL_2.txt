@@ -1,0 +1,47 @@
+CHALLENGE DYNASTY — CORE FUNCTIONAL 2
+
+Base: CHALLENGE_DYNASTY_CORE_FUNCTIONAL
+
+Evolución realizada:
+1. Matchmaking / Discovery
+   - Nuevo RPC find_best_challenge_opponents.
+   - Recomendación por deporte, proximidad de ciudad y cercanía de rating.
+   - Ranking de compatibilidad (fit_score).
+
+2. Partners
+   - Nuevo action requestPartner.
+   - Invitaciones reales mediante RPC request_partner.
+   - Partners deja de depender de nombres/estadísticas ficticias.
+
+3. Ranking
+   - Ranking de pádel ahora consulta sport_rankings real.
+   - Perfiles enlazados a su ranking real.
+   - Estados vacíos manejados.
+
+4. Arena
+   - Arena lista retos existentes PENDING/ACCEPTED.
+   - Eliminado el falso escenario como vista principal.
+
+5. Notificaciones
+   - Consulta notifications del usuario autenticado.
+   - Distinción visual por tipo y estados no leídos.
+
+6. Crear reto
+   - Permite preseleccionar un rival desde discovery (/challenge/new?player=...).
+
+7. Integridad de resultados
+   - No se permite modificar un match ya validado.
+   - Marcadores deben respetar formato NN-NN / NN:NN básico.
+   - Mantiene confirmación bilateral y auto-confirmación existente.
+
+Checks ejecutados:
+- Route check: PASS
+- SQL static check: PASS
+- CORE FLOW: PASS
+- request_partner definition count: 1
+- MATCH_ALREADY_VALIDATED guard: PRESENT
+- Score validation guards: PRESENT
+
+Limitación de entorno:
+- No se pudo ejecutar next build/typecheck porque las dependencias npm no llegaron a instalarse dentro del límite de ejecución del entorno.
+- Por esa razón no se declara build certificado.
