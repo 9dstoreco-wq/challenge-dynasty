@@ -1,0 +1,21 @@
+{
+  "club": {
+    "organization_type": "club",
+    "country_code": "CO",
+    "city": "Cucuta",
+    "timezone": "America/Bogota",
+    "default_currency": "COP"
+  },
+  "coach": {
+    "provider_type": "coach",
+    "is_independent": true,
+    "accepts_in_person": true,
+    "default_currency": "COP"
+  },
+  "tournament": {
+    "participant_mode": "pairs",
+    "visibility": "public",
+    "currency_code": "COP"
+  },
+  "NOTE":"Owner/profile IDs, service prices, tournament dates and category rules must be supplied before import."
+}

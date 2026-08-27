@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import ChallengeActions from '@/components/ChallengeActions'

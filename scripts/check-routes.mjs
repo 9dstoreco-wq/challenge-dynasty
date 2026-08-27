@@ -1,7 +1,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const root=process.cwd()
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
+const root = path.resolve(SCRIPT_DIR, '..')
 const app=path.join(root,'app')
 const routes=[]
 function walk(dir, parts=[]){

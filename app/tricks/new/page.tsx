@@ -1,3 +1,10 @@
-import { createClient } from '@/lib/supabase/server'
+import Sidebar from '@/components/Sidebar'
+import BottomNav from '@/components/BottomNav'
 import CreateSkillChallengeForm from '@/components/CreateSkillChallengeForm'
-export default async function NewTrickPage(){const supabase=createClient();const {data:{user}}=await supabase.auth.getUser();if(!user)return <main className="min-h-screen bg-[#0B0F19] text-white grid place-items-center"><a href="/login" className="text-[#00F0FF] font-black">Inicia sesión para crear un challenge</a></main>;const {data:sports}=await supabase.from('sports').select('id,name,icon').order('name');return <main className="min-h-screen bg-[#0B0F19] text-white p-4 md:p-10"><div className="max-w-3xl mx-auto"><a href="/tricks" className="text-sm text-white/50">← Volver</a><div className="text-xs tracking-[.3em] text-[#00F0FF] font-black mt-7">SKILL ENGINE</div><h1 className="text-4xl md:text-6xl font-black mt-2">Crea el reto que todos quieran superar.</h1><p className="text-white/45 mt-3">La capa de habilidad sirve para demostrar técnica, creatividad y constancia más allá del partido.</p><CreateSkillChallengeForm sports={sports??[]}/></div></main>}
+import { createClient } from '@/lib/supabase/server'
+
+export default async function NewTrickPage(){
+  const supabase=createClient()
+  const {data:sports}=await supabase.from('sports').select('id,name,icon').order('name')
+  return <div className="min-h-screen bg-[#0B0F19] grid-bg text-white"><Sidebar/><main className="lg:pl-64 pb-20 lg:pb-8"><div className="max-w-4xl mx-auto px-4 md:px-8 py-8"><div className="text-xs tracking-[.3em] text-[#00F0FF] font-black">SKILL ENGINE</div><h1 className="text-4xl md:text-5xl font-black mt-2">Crear Skill Challenge</h1><p className="text-white/55 mt-3">Crea un reto de habilidad oficial y recibe votaciones de la comunidad.</p><CreateSkillChallengeForm sports={(sports??[]) as {id:string;name:string;icon:string|null}[]}/></div></main><BottomNav/></div>
+}

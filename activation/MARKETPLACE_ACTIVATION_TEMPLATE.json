@@ -1,0 +1,6 @@
+{
+  "seller_types": ["CLUB","COACH","SHOP","PLAYER","BUSINESS"],
+  "listing_types": ["PRODUCT","SERVICE","USED_EQUIPMENT","COURT_TIME","COACHING"],
+  "premium_placement": ["featured","boost","sponsor"],
+  "NOTE":"No seller or listing is seeded automatically. Real account ownership is required."
+}

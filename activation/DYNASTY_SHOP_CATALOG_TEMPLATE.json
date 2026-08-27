@@ -1,0 +1,11 @@
+{
+  "store": "DYNASTY SHOP by Padelito",
+  "currency_code": "COP",
+  "products": [
+    {"slug":"dynasty-jersey-01","title":"Dynasty Jersey 01","product_type":"merchandise","base_price":null,"featured":true,"inventory_tracking":true},
+    {"slug":"dynasty-jersey-05","title":"Dynasty Jersey 05 · Control The Chaos","product_type":"merchandise","base_price":null,"featured":true,"inventory_tracking":true},
+    {"slug":"dynasty-jersey-09","title":"Dynasty 09 · Play Different","product_type":"merchandise","base_price":null,"featured":true,"inventory_tracking":true},
+    {"slug":"dynasty-accessories","title":"Dynasty Accessories","product_type":"accessories","base_price":null,"featured":false,"inventory_tracking":true}
+  ],
+  "NOTE":"Prices, stock and imagery intentionally left for final commercial configuration."
+}

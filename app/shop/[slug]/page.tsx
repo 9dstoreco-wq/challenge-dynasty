@@ -1,0 +1,5 @@
+export const dynamic='force-dynamic'
+import Sidebar from '@/components/Sidebar'
+import { createClient } from '@/lib/supabase/server'
+import ShopProductClient from '@/components/ShopProductClient'
+export default async function ShopProductPage({params}:{params:{slug:string}}){const supabase=createClient(); const {data:product}=await supabase.from('shop_products').select('id,slug,title,description,product_type,base_price,currency_code,metadata').eq('slug',params.slug).eq('status','published').single(); if(!product) return <div className="p-10 text-white">Producto no encontrado.</div>; const {data:variants=[]}=await supabase.from('shop_product_variants').select('id,sku,title,price,attributes,is_active').eq('product_id',product.id).eq('is_active',true).order('title'); return <main className="min-h-screen bg-[#0B0F19] text-white grid-bg"><Sidebar/><section className="lg:pl-64 p-6 lg:p-12"><ShopProductClient product={product} variants={variants as any}/></section></main>}
