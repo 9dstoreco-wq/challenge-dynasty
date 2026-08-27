@@ -67,3 +67,9 @@ Esta iteración agrega settings/pasaporte, búsqueda, historial competitivo, Ski
 ## Certificación técnica
 
 Consulta `CERTIFICACION_TECNICA_7.txt` para ver qué validaciones fueron ejecutadas y cuáles permanecen bloqueadas por la disponibilidad del entorno de npm.
+
+## Release truth
+
+V17 is the only master source. The real Supabase project is the backend source of truth. This bundle does not contain service-role secrets. The final release gate must run in the connected GitHub/Vercel environment because this audit environment cannot complete npm dependency resolution.
+
+See `SUPABASE_REAL_CONTRACT.md` for the live backend contract and the distinction between production truth and bundled offline SQL.

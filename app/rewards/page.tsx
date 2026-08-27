@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import Sidebar from '@/components/Sidebar'
 import BottomNav from '@/components/BottomNav'
 import { Award } from 'lucide-react'

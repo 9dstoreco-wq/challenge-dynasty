@@ -1,0 +1,8 @@
+CHALLENGE DYNASTY — VERCEL ENV
+
+In Vercel Project Settings > Environment Variables, configure for Production and Preview:
+NEXT_PUBLIC_SUPABASE_URL=<Supabase project URL>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<Supabase anon/public key>
+
+Do not put the service_role key in NEXT_PUBLIC_* variables.
+After saving, redeploy.

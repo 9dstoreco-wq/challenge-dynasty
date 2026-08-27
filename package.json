@@ -6,20 +6,23 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "check-routes": "node scripts/check-routes.mjs",
     "check-sql": "node scripts/check-sql.mjs",
     "check-core-flow": "node scripts/check-core-flow.mjs",
     "check-production": "node scripts/check-production.mjs",
-    "check-hardening": "node scripts/check-hardening.mjs"
+    "check-hardening": "node scripts/check-hardening.mjs",
+    "verify-all": "npm run check-routes && npm run check-sql && npm run check-core-flow && npm run check-production && npm run check-hardening",
+    "check-env": "node scripts/check-env.mjs",
+    "verify:release": "npm run release-doctor",
+    "release-doctor": "node scripts/release-doctor.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.5.2",
     "@supabase/supabase-js": "2.47.10",
     "clsx": "2.1.1",
     "lucide-react": "0.468.0",
-    "next": "14.2.31",
+    "next": "15.5.24",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "tailwind-merge": "2.5.5"
