@@ -1,0 +1,13 @@
+{
+  "currency_code": "COP",
+  "interval": "month",
+  "plans": [
+    {"code":"PLAYER_FREE","name":"Dynasty Free","audience_type":"PLAYER","price":null,"features":[]},
+    {"code":"PLAYER_PREMIUM","name":"Dynasty Premium","audience_type":"PLAYER","price":null,"features":["premium_profile","advanced_stats","premium_badges"]},
+    {"code":"CLUB","name":"Club","audience_type":"ORGANIZATION","price":null,"features":["club_os","bookings","tournaments","coach_management","analytics_basic"]},
+    {"code":"COACH","name":"Coach","audience_type":"PROFILE","price":null,"features":["coach_profile","services","availability","students"]},
+    {"code":"ORGANIZER","name":"Organizer","audience_type":"PROFILE","price":null,"features":["tournament_os","promotion_tools","tournament_analytics"]},
+    {"code":"SELLER","name":"Seller","audience_type":"SELLER","price":null,"features":["marketplace_listing","inventory","seller_profile","premium_placement"]}
+  ],
+  "NOTE": "Prices intentionally left null until approved. Do not import this template directly into production."
+}

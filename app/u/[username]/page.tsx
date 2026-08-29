@@ -1,8 +1,10 @@
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import FollowButton from '@/components/FollowButton'
 
-export default async function ProfilePage({ params }: { params: { username: string } }) {
- const supabase=createClient(); const {data:{user}}=await supabase.auth.getUser(); const {data:pRaw}=await supabase.from('profiles').select('*').eq('username',params.username).maybeSingle(); const p:any=pRaw
+export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
+ const { username } = await params
+ const supabase=createClient(); const {data:{user}}=await supabase.auth.getUser(); const {data:pRaw}=await supabase.from('profiles').select('*').eq('username',username).maybeSingle(); const p:any=pRaw
  if(!p) return <main className="min-h-screen bg-[#0B0F19] text-white grid place-items-center"><div className="text-center"><h1 className="text-3xl font-black">Jugador no encontrado</h1><a href="/players" className="text-[#00F0FF] mt-4 inline-block">Explorar jugadores</a></div></main>
  const {data:follow}=user&&user.id!==p.id?await supabase.from('social_follows').select('id').eq('follower_profile_id',user.id).eq('followed_profile_id',p.id).maybeSingle():{data:null}; const {data:rivalsOne}=user?await supabase.from('player_rivalries').select('sport_id,player_one_id,player_two_id,matches_count,player_one_wins,player_two_wins,last_match_at').or(`player_one_id.eq.${p.id},player_two_id.eq.${p.id}`).order('last_match_at',{ascending:false}).limit(8):{data:[]}; const rivalIds=[...new Set((rivalsOne??[]).map((r:any)=>r.player_one_id===p.id?r.player_two_id:r.player_one_id))]; const {data:rivalProfiles}=rivalIds.length?await supabase.from('profiles').select('id,username,display_name').in('id',rivalIds):{data:[]}; const rivalMap=new Map<string, any>((rivalProfiles??[] as any[]).map((x:any)=>[x.id,x])); const rivals=(rivalsOne??[]).map((r:any)=>{const opponentId=r.player_one_id===p.id?r.player_two_id:r.player_one_id; const opponent=rivalMap.get(opponentId); return {opponent_id:opponentId,opponent_username:opponent?.username,opponent_name:opponent?.display_name??'Jugador',played:r.matches_count,wins:r.player_one_id===p.id?r.player_one_wins:r.player_two_wins,losses:r.player_one_id===p.id?r.player_two_wins:r.player_one_wins,last_played:r.last_match_at}})
  const winrate=p.wins+p.losses?((p.wins/(p.wins+p.losses))*100).toFixed(1):'0.0'

@@ -1,0 +1,69 @@
+{
+  "player": {
+    "premium": [
+      "ai.coach.basic",
+      "ai.fitness.basic",
+      "ai.tournament.prep"
+    ],
+    "pro": [
+      "ai.coach.pro",
+      "ai.fitness.pro",
+      "ai.video.analysis",
+      "ai.tournament.prep"
+    ]
+  },
+  "coach": {
+    "base": [
+      "ai.coach.basic",
+      "ai.fitness.basic"
+    ],
+    "pro": [
+      "ai.coach.pro",
+      "ai.fitness.pro",
+      "ai.coach_business.analytics",
+      "ai.coach_business.copilot",
+      "ai.coach_business.student_insights"
+    ]
+  },
+  "club": {
+    "pro": [
+      "ai.club.analytics",
+      "ai.club.finance",
+      "ai.club.marketing",
+      "ai.club.crm",
+      "ai.club.forecasting"
+    ],
+    "enterprise": [
+      "ai.club.analytics",
+      "ai.club.finance",
+      "ai.club.marketing",
+      "ai.club.crm",
+      "ai.club.forecasting",
+      "ai.club.copilot",
+      "ai.tournament.analytics",
+      "ai.tournament.fair_play",
+      "ai.tournament.scheduler",
+      "ai.tournament.promotion"
+    ]
+  },
+  "organizer": {
+    "pro": [
+      "ai.tournament.analytics",
+      "ai.tournament.fair_play",
+      "ai.tournament.scheduler",
+      "ai.tournament.promotion"
+    ]
+  },
+  "seller": {
+    "pro": [
+      "ai.commerce.recommendations",
+      "ai.commerce.seller_insights",
+      "ai.commerce.promotion"
+    ]
+  },
+  "enterprise": {
+    "full": [
+      "ai.enterprise.full"
+    ]
+  }
+}

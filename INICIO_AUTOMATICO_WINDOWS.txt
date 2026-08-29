@@ -1,0 +1,11 @@
+CHALLENGE DYNASTY — INICIO AUTOMATICO WINDOWS
+
+1. Esta carpeta ya contiene la configuracion publica de Supabase necesaria para el build.
+2. NO compartas el archivo .env.local.
+3. Haz doble clic en FINALIZAR_WINDOWS.bat.
+4. El script instalara/reparara dependencias con npm ci y ejecutara:
+   - verificadores estructurales
+   - typecheck
+   - build de produccion
+5. Si termina con PASS, el build real quedo validado en este PC.
+6. Si falla, conserva la ultima pantalla del error; no borres archivos ni reinstales manualmente.

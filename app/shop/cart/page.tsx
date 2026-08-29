@@ -1,0 +1,6 @@
+export const dynamic='force-dynamic'
+import Sidebar from '@/components/Sidebar'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import ShopCartClient from '@/components/ShopCartClient'
+export default async function ShopCartPage(){const supabase=createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) redirect('/login?next=/shop/cart'); const {data:cartId,error:cartError}=await supabase.rpc('get_or_create_shop_cart'); if(cartError||!cartId) return <div className="p-10">No se pudo abrir el carrito.</div>; const {data:items=[]}=await supabase.from('shop_cart_items').select('id,quantity,product_id,variant_id,shop_products(title),shop_product_variants(title,sku,price)').eq('cart_id',cartId); return <main className="min-h-screen bg-[#0B0F19] text-white grid-bg"><Sidebar/><section className="lg:pl-64 p-6 lg:p-12 max-w-[1400px] mx-auto"><ShopCartClient cart={{id:cartId}} items={items as any} products={[]}/></section></main>}

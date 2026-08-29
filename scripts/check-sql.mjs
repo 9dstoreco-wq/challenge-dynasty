@@ -1,5 +1,9 @@
 import fs from 'node:fs'
-const root=process.cwd()
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
+const root = path.resolve(SCRIPT_DIR, '..')
 const dirs=['app','components','lib']
 const scan=[]
 function walk(dir){for(const ent of fs.readdirSync(dir,{withFileTypes:true})){if(['node_modules','.next'].includes(ent.name)) continue; const p=`${dir}/${ent.name}`; if(ent.isDirectory()) walk(p); else if(/\.(tsx|ts)$/.test(ent.name)) scan.push(p)}}

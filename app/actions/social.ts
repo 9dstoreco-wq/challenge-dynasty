@@ -1,7 +1,14 @@
-'use server'
+﻿'use server'
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+
+// Canonical partner action lives in partners.ts; re-export to preserve existing imports.
+import { respondToPartnerRequest as respondToPartnerRequestCore } from './partners'
+
+export async function respondToPartnerRequest(requestId: string, response: 'ACCEPTED' | 'REJECTED') {
+  return respondToPartnerRequestCore(requestId, response)
+}
 
 export async function createPost(content: string, title?: string) {
   const supabase = createClient()
@@ -62,9 +69,5 @@ export async function markNotificationRead(notificationId: string) {
   const {error}=await supabase.rpc('mark_notification_read',{p_notification_id:notificationId}); if(error) throw new Error(error.message); revalidatePath('/notifications')
 }
 
-export async function respondToPartnerRequest(requestId:string,response:'ACCEPTED'|'REJECTED') {
-  const supabase=createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error('Debes iniciar sesión')
-  throw new Error('Las invitaciones de partner aún no están conectadas al motor social actual de Dynasty.')
-}
+export async function markAllNotificationsRead(){ const supabase=createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error('Debes iniciar sesión'); const {error}=await supabase.rpc('mark_all_notifications_read'); if(error) throw new Error(error.message); revalidatePath('/notifications'); return true }
 
-export async function markAllNotificationsRead(){ const supabase=createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error('Debes iniciar sesión'); const {error}=await supabase.from('notifications').update({read_at:new Date().toISOString()}).eq('profile_id',user.id).is('read_at',null); if(error) throw new Error(error.message); revalidatePath('/notifications'); return true }

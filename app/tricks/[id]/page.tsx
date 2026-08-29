@@ -1,3 +1,23 @@
-export default function TrickDetail(){
-  return <main className="min-h-screen bg-[#0B0F19] text-white grid place-items-center p-6"><div className="max-w-xl text-center"><div className="text-5xl mb-4">✨</div><h1 className="text-3xl font-black">SKILL CHALLENGES EN PREPARACIÓN</h1><p className="text-white/45 mt-3">Este módulo todavía no tiene un contrato backend oficial conectado.</p><a href="/tricks" className="inline-flex mt-6 rounded-xl bg-[#00F0FF] text-black px-4 py-3 font-black">VOLVER</a></div></main>
+import { notFound } from 'next/navigation'
+import Sidebar from '@/components/Sidebar'
+import BottomNav from '@/components/BottomNav'
+import SkillSubmissionForm from '@/components/SkillSubmissionForm'
+import VoteSkillButton from '@/components/VoteSkillButton'
+import { createClient } from '@/lib/supabase/server'
+
+export const dynamic = 'force-dynamic'
+
+export default async function TrickDetail({params}:{params:Promise<{id:string}>}){
+  const { id } = await params
+  const supabase=createClient()
+  const {data:challenge}=await supabase.from('skill_challenges').select('id,title,description,category,difficulty,points,target_votes,status,expires_at,created_at,creator_id').eq('id',id).maybeSingle()
+  if(!challenge) notFound()
+  const [{data:creator},{data:submissions}]=await Promise.all([
+    supabase.from('profiles').select('id,display_name,username').eq('id',challenge.creator_id).maybeSingle(),
+    supabase.from('skill_submissions').select('id,user_id,video_url,caption,votes,skill_points_awarded,created_at').eq('challenge_id',challenge.id).order('votes',{ascending:false}).order('created_at',{ascending:false})
+  ])
+  const submitterIds=[...new Set((submissions??[]).map((x:any)=>x.user_id).filter(Boolean))]
+  const {data:submitters}=submitterIds.length?await supabase.from('profiles').select('id,display_name,username').in('id',submitterIds):{data:[]}
+  const bySubmitter=new Map((submitters??[]).map((x:any)=>[x.id,x]))
+  return <div className="min-h-screen bg-[#0B0F19] grid-bg text-white"><Sidebar/><main className="lg:pl-64 pb-20 lg:pb-0"><div className="max-w-5xl mx-auto px-4 md:px-8 py-8 space-y-6"><section className="rounded-3xl border border-[#00F0FF]/20 bg-gradient-to-br from-[#141B2D] via-[#101827] to-[#0B0F19] p-6 md:p-10"><div className="flex flex-wrap items-center gap-2 text-xs font-black"><span className="rounded-full bg-[#00F0FF]/10 text-[#00F0FF] px-3 py-1">{challenge.category}</span><span className="rounded-full bg-white/5 px-3 py-1">{challenge.difficulty}</span><span className="rounded-full bg-white/5 px-3 py-1">+{challenge.points} XP</span></div><h1 className="text-4xl md:text-5xl font-black mt-5">{challenge.title}</h1><p className="text-white/55 mt-4 max-w-3xl">{challenge.description??'Demuestra tu habilidad y consigue reconocimiento de la comunidad.'}</p><div className="text-xs text-white/35 mt-5">Creado por {creator?.display_name??creator?.username??'Jugador Dynasty'} · {submissions?.length??0} pruebas</div></section><SkillSubmissionForm challengeId={challenge.id}/><section className="space-y-4"><h2 className="text-2xl font-black">PRUEBAS DE LA COMUNIDAD</h2>{(submissions??[]).map((s:any)=>{const u=bySubmitter.get(s.user_id);return <article key={s.id} className="rounded-3xl border border-white/10 bg-[#141B2D] p-5"><div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4"><div><div className="font-black text-lg">{u?.display_name??u?.username??'Jugador'}</div><div className="text-xs text-white/35 mt-1">{new Date(s.created_at).toLocaleString('es-CO')}</div></div><div className="flex items-center gap-2"><span className="text-xs text-white/35">{s.votes} votos</span><span className="text-xs font-black text-[#00E676]">+{s.skill_points_awarded??0} XP</span><VoteSkillButton submissionId={s.id}/></div></div>{s.caption&&<p className="text-white/55 mt-4">{s.caption}</p>}<a href={s.video_url} target="_blank" rel="noreferrer" className="inline-flex mt-4 rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-xs font-black">VER PRUEBA ↗</a></article>})}{(submissions??[]).length===0&&<div className="rounded-3xl border border-white/10 bg-[#141B2D] p-8 text-center text-white/45">Todavía no hay pruebas. Sube la primera.</div>}</section></div></main><BottomNav/></div>
 }

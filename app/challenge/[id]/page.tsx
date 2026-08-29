@@ -1,28 +1,31 @@
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import ChallengeActions from '@/components/ChallengeActions'
 import MatchResultForm from '@/components/MatchResultForm'
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+  const { id } = await params
   const supabase = createClient()
   const { data: challenge } = await supabase
     .from('challenges')
     .select('id,creator_id,title,creator:profiles!challenges_creator_id_fkey(display_name)')
-    .eq('id', params.id)
+    .eq('id', id)
     .maybeSingle()
 
-  const a = challenge?.creator?.display_name ?? 'Jugador'
+  const a = (challenge?.creator as any)?.display_name ?? 'Jugador'
   return { title: `${challenge?.title ?? 'Reto'} · CHALLENGE DYNASTY`, description: `Reto deportivo de ${a} en CHALLENGE DYNASTY.` }
 }
 
-export default async function ChallengePage({ params }: { params: { id: string } }) {
+export default async function ChallengePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
+  const { id } = await params
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: challenge } = await supabase
     .from('challenges')
     .select('id,title,status,challenge_type,scheduled_at,location_name,sport_id,creator_id,creator:profiles!challenges_creator_id_fkey(username,display_name)')
-    .eq('id', params.id)
+    .eq('id', id)
     .maybeSingle()
 
   if (!challenge) {
@@ -103,3 +106,5 @@ export default async function ChallengePage({ params }: { params: { id: string }
     )}
   </section></main>
 }
+
+
