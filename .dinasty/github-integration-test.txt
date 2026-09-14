@@ -1,0 +1,3 @@
+DINASTY GitHub integration verification
+Repository: 9dstoreco-wq/challenge-dynasty
+Purpose: harmless authenticated push verification
