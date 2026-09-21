@@ -1,4 +1,5 @@
 import DynastyAIContextPanel from '@/components/DynastyAIContextPanel'
+import DynastyAIChat from '@/components/DynastyAIChat'
 
 export default function Page() {
   return (
@@ -8,6 +9,7 @@ export default function Page() {
         <h1 className="mt-3 text-4xl font-black tracking-tight">DYNASTY COMMERCE INTELLIGENCE</h1>
         <p className="mt-3 max-w-2xl text-lg opacity-70">Recomendaciones y crecimiento para Shop y Marketplace.</p>
         <DynastyAIContextPanel area="Commerce Intelligence" />
+        <DynastyAIChat mode="commerce" placeholder="Pregúntame sobre tu tienda o marketplace..." />
       </div>
     </main>
   )

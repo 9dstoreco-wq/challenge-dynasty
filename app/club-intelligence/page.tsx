@@ -1,4 +1,5 @@
 import DynastyAIContextPanel from '@/components/DynastyAIContextPanel'
+import DynastyAIChat from '@/components/DynastyAIChat'
 
 export default function Page() {
   return (
@@ -8,6 +9,7 @@ export default function Page() {
         <h1 className="mt-3 text-4xl font-black tracking-tight">DYNASTY CLUB INTELLIGENCE</h1>
         <p className="mt-3 max-w-2xl text-lg opacity-70">La inteligencia del club: finanzas, marketing y operaciones.</p>
         <DynastyAIContextPanel area="Club Intelligence" />
+        <DynastyAIChat mode="club" placeholder="Pregúntame sobre tu club..." />
       </div>
     </main>
   )

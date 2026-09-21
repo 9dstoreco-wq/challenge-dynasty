@@ -1,11 +1,14 @@
-"use client";
-import { FormEvent, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import DynastyAIChat from '@/components/DynastyAIChat'
 
-type Message={role:"user"|"assistant";content:string};
-
-export default function CoachAIPage(){
- const supabase=createClient(); const [message,setMessage]=useState(""); const [messages,setMessages]=useState<Message[]>([]); const [busy,setBusy]=useState(false); const [dailyReady,setDailyReady]=useState(false); const [error,setError]=useState("")
- async function send(e:FormEvent){e.preventDefault();const text=message.trim();if(!text||busy)return;setBusy(true);setError("");setMessages(m=>[...m,{role:"user",content:text}]);setMessage("");try{const {data,error:invokeError}=await supabase.functions.invoke('dynasty-ai-chat',{body:{message:text,mode:'coach'}});if(invokeError)throw invokeError;if(data?.error)throw new Error(data.error);if(data?.response){setMessages(m=>[...m,{role:'assistant',content:data.response}]);setDailyReady(true)}else throw new Error('AI_PROVIDER_NOT_CONFIGURED')}catch(err){const msg=err instanceof Error?err.message:'Error de conexión con Dynasty Coach AI';setError(msg);setMessages(m=>[...m,{role:'assistant',content:msg}])}finally{setBusy(false)}}
- return <main className="min-h-screen p-6 md:p-10"><div className="mx-auto max-w-3xl"><p className="text-xs font-black tracking-[0.35em] uppercase opacity-60">DYNASTY AI CORE</p><h1 className="mt-3 text-4xl font-black">Dynasty Coach AI</h1><p className="mt-3 opacity-70">Tu entrenador diario con contexto y memoria de Dynasty.</p><div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm"><strong>Sesión AI:</strong> {dailyReady?'activa':'lista para iniciar'}.</div>{error&&<div className="mt-4 rounded-2xl border border-red-400/20 bg-red-400/5 p-4 text-sm text-red-200">{error}</div>}<div className="mt-6 space-y-3">{messages.map((m,i)=><div key={`${m.role}-${i}`} className={`rounded-2xl border border-white/10 p-4 ${m.role==='user'?'bg-white/10':'bg-white/5'}`}><div className="text-xs font-black uppercase opacity-50">{m.role==='user'?'Tú':'Coach AI'}</div><div className="mt-1 whitespace-pre-wrap">{m.content}</div></div>)}</div><form onSubmit={send} className="mt-8 space-y-4"><textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="¿Qué quieres trabajar hoy?" className="min-h-32 w-full rounded-3xl border border-white/10 bg-white/5 p-5 outline-none"/><button type="submit" disabled={busy} className="rounded-full border border-white/15 px-6 py-3 font-bold disabled:opacity-50">{busy?'Pensando...':'Hablar con Coach AI'}</button></form></div></main>
+export default function CoachAIPage() {
+  return (
+    <main className="min-h-screen p-6 md:p-10">
+      <div className="mx-auto max-w-3xl">
+        <p className="text-xs font-black tracking-[0.35em] uppercase opacity-60">DYNASTY AI CORE</p>
+        <h1 className="mt-3 text-4xl font-black">Dynasty Coach AI</h1>
+        <p className="mt-3 opacity-70">Tu entrenador diario con contexto y memoria de Dynasty.</p>
+        <DynastyAIChat mode="coach" placeholder="¿Qué quieres trabajar hoy?" />
+      </div>
+    </main>
+  )
 }

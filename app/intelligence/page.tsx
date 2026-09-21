@@ -1,13 +1,13 @@
 import Link from "next/link";
 
 const cards = [
-  ["Coach AI", "Tu entrenador personal diario.", "Pádel, fitness, hábitos y progreso."],
-  ["Fitness Intelligence", "Entrena con contexto.", "Planifica y adapta tus sesiones."],
-  ["Club Intelligence", "Haz crecer tu club.", "Finanzas, marketing, ocupación y CRM."],
-  ["Coach Intelligence", "Haz más con menos.", "Copiloto para alumnos y negocio."],
-  ["Tournament Intelligence", "Organiza mejor.", "Fair Play, draw, scheduler y promoción."],
-  ["Commerce Intelligence", "Vende inteligentemente.", "Shop, Marketplace y recomendaciones."],
-];
+  ["Coach AI", "Tu entrenador personal diario.", "Pádel, fitness, hábitos y progreso.", "/coach-ai"],
+  ["Fitness Intelligence", "Entrena con contexto.", "Planifica y adapta tus sesiones.", "/fitness-intelligence"],
+  ["Club Intelligence", "Haz crecer tu club.", "Finanzas, marketing, ocupación y CRM.", "/club-intelligence"],
+  ["Coach Intelligence", "Haz más con menos.", "Copiloto para alumnos y negocio.", "/coach-intelligence"],
+  ["Tournament Intelligence", "Organiza mejor.", "Fair Play, draw, scheduler y promoción.", "/tournament-intelligence"],
+  ["Commerce Intelligence", "Vende inteligentemente.", "Shop, Marketplace y recomendaciones.", "/commerce-intelligence"],
+] as const;
 
 export default function IntelligencePage() {
   return (
@@ -25,12 +25,16 @@ export default function IntelligencePage() {
         </div>
 
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {cards.map(([title, tagline, detail]) => (
-            <article key={title} className="rounded-3xl border border-white/10 bg-white/5 p-6">
+          {cards.map(([title, tagline, detail, href]) => (
+            <Link
+              key={title}
+              href={href}
+              className="rounded-3xl border border-white/10 bg-white/5 p-6 block hover:border-[#00F0FF]/40 hover:bg-white/[0.07] transition-colors"
+            >
               <h2 className="text-xl font-black">{title}</h2>
               <p className="mt-2 font-semibold">{tagline}</p>
               <p className="mt-2 text-sm opacity-65">{detail}</p>
-            </article>
+            </Link>
           ))}
         </section>
 
