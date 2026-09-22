@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   applicationName: 'Challenge Dynasty',
   category: 'sports',
   manifest: '/manifest.webmanifest',
-  icons: { icon: '/icon.svg', apple: '/icon.svg' },
+  icons: { icon: [{ url: '/favicon-32.png', sizes: '32x32', type: 'image/png' }, { url: '/icon-512.png', sizes: '512x512', type: 'image/png' }], apple: '/apple-icon.png' },
   openGraph: { title: 'CHALLENGE DYNASTY', description: 'La red competitiva para todos tus deportes.', siteName: 'Challenge Dynasty', type: 'website' },
   twitter: { card: 'summary', title: 'CHALLENGE DYNASTY', description: 'Reta, compite y construye tu reputación deportiva.' },
 }
