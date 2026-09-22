@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import ChallengeActions from '@/components/ChallengeActions'
 import MatchResultForm from '@/components/MatchResultForm'
+import PageHero from '@/components/PageHero'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
   const { id } = await params
@@ -75,8 +76,8 @@ export default async function ChallengePage({ params, searchParams }: { params: 
   const scoreSet3 = typeof resultData.score_set3 === 'string' ? resultData.score_set3 : ''
 
   return <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center p-6"><section className="w-full max-w-3xl rounded-[32px] border border-gold-400/20 bg-gradient-to-br from-[#161616] to-[#0A0A0C] p-8">
-    <div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">⚔️ CHALLENGE DYNASTY</div>
-    <h1 className="text-5xl font-display font-black tracking-wide mt-4 text-center">{creator?.display_name ?? 'Jugador'} <span className="text-white/20">VS</span> {rival?.display_name ?? 'Rival'}</h1>
+    <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">⚔️ CHALLENGE DYNASTY</div>
+    <h1 className="text-5xl font-display font-black tracking-wide mt-4 text-center">{creator?.display_name ?? 'Jugador'} <span className="text-white/20">VS</span> {rival?.display_name ?? 'Rival'}</h1></PageHero>
     <div className="text-center text-white/50 mt-3">{challenge.title} · {challenge.status}</div>
 
     <ChallengeActions challengeId={challenge.id} status={currentInvitationStatus} currentUserId={user?.id} challengerId={challenge.creator_id} invitationId={invitation?.id ?? undefined} />

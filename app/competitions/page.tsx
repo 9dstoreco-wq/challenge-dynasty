@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import Sidebar from '@/components/Sidebar'
 import BottomNav from '@/components/BottomNav'
 import { createClient } from '@/lib/supabase/server'
+import PageHero from '@/components/PageHero'
 
 export default async function CompetitionsPage() {
   const supabase = await createClient()
@@ -18,11 +19,11 @@ export default async function CompetitionsPage() {
       <Sidebar />
       <main className="lg:pl-64 pb-20 lg:pb-0">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
-          <div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">TOURNAMENT OS</div>
+          <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">TOURNAMENT OS</div>
           <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">COMPETICIONES</h1>
           <p className="text-white/50 mt-2">
             Torneos reales de Supabase, listos para evolucionar hacia cuadros, grupos, fixtures y programación.
-          </p>
+          </p></PageHero>
 
           <div className="grid md:grid-cols-2 gap-4 mt-7">
             {tournaments.map((t: {id:string;title:string;status:string;starts_at:string|null;ends_at:string|null}) => (

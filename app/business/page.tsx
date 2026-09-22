@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 import Sidebar from '@/components/Sidebar'
 import BottomNav from '@/components/BottomNav'
 import { createClient } from '@/lib/supabase/server'
+import PageHero from '@/components/PageHero'
 
 export default async function Business(){
   const supabase = await createClient()
@@ -13,9 +14,9 @@ export default async function Business(){
   const plans = plansData ?? []
 
   return <div className="min-h-screen bg-[#0A0A0C] text-white grid-bg"><Sidebar/><main className="lg:pl-64 pb-20"><div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
-    <div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">DYNASTY BUSINESS ENGINE</div>
+    <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">DYNASTY BUSINESS ENGINE</div>
     <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">Herramientas que generan valor.</h1>
-    <p className="text-white/55 mt-3 max-w-3xl">DYNASTY cobra por sus planes, software, visibilidad y productos propios. Las reservas, inscripciones y servicios siguen siendo ingresos del club, organizador o coach.</p>
+    <p className="text-white/55 mt-3 max-w-3xl">DYNASTY cobra por sus planes, software, visibilidad y productos propios. Las reservas, inscripciones y servicios siguen siendo ingresos del club, organizador o coach.</p></PageHero>
 
     <div className="mt-8 rounded-3xl border border-white/10 bg-[#161616] p-6">
       <div className="flex items-center justify-between gap-4"><div><div className="text-xs text-[#D4AF37] font-black tracking-widest">PLANES EN SUPABASE</div><h2 className="text-2xl font-black mt-1">Catálogo comercial real</h2></div><span className="rounded-full border border-white/10 px-3 py-1 text-xs font-black">{plans.length} activos</span></div>
