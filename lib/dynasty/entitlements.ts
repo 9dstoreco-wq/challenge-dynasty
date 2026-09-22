@@ -22,6 +22,12 @@ export const DYNASTY_AI_FEATURES = {
   commerceSellerInsights: "ai.commerce.seller_insights",
   commercePromotion: "ai.commerce.promotion",
   enterpriseFull: "ai.enterprise.full",
+  // Mode-level access gates for Dynasty AI chat (club/coach_business/tournament/commerce).
+  // Granted via a billing_entitlements row for the profile or the owning organization.
+  clubAccess: "ai.club.access",
+  coachBusinessAccess: "ai.coach_business.access",
+  tournamentAccess: "ai.tournament.access",
+  commerceAccess: "ai.commerce.access",
 } as const;
 
 export type DynastyAiFeature =
