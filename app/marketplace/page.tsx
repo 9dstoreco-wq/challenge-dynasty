@@ -3,6 +3,7 @@ import Sidebar from '@/components/Sidebar'
 import MarketplaceClient from '@/components/MarketplaceClient'
 import { Search, ShieldCheck, ShoppingBag, PackageCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import PageHero from '@/components/PageHero'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +30,7 @@ export default async function MarketplacePage() {
     .order('published_at', { ascending: false })
     .limit(24)
 
-  const listings = data as Listing[]
+  const listings = (data ?? []) as Listing[]
 
   return (
     <main className="min-h-screen bg-[#0A0A0C] text-white grid-bg">
@@ -37,9 +38,9 @@ export default async function MarketplacePage() {
       <section className="lg:pl-64 p-6 lg:p-12 max-w-[1500px] mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
           <div>
-            <div className="text-[#D4AF37] text-xs font-black tracking-[.28em] uppercase">Comunidad · Compra · Venta</div>
+            <PageHero><div className="text-[#D4AF37] text-xs font-black tracking-[.28em] uppercase">Comunidad · Compra · Venta</div>
             <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide tracking-tight mt-2">Marketplace</h1>
-            <p className="text-white/50 mt-3 max-w-2xl">El mercado deportivo de CHALLENGE DYNASTY. Descubre productos, publica lo que ya no usas y conecta con compradores de la comunidad.</p>
+            <p className="text-white/50 mt-3 max-w-2xl">El mercado deportivo de CHALLENGE DYNASTY. Descubre productos, publica lo que ya no usas y conecta con compradores de la comunidad.</p></PageHero>
           </div>
           <div className="flex gap-3">
             <Link href="/marketplace/orders" className="rounded-2xl border border-white/10 bg-white/[.04] font-black px-5 py-3 inline-flex items-center justify-center gap-2">Mis órdenes</Link><Link href="/marketplace/seller" className="rounded-2xl border border-white/10 bg-white/[.04] font-black px-5 py-3 inline-flex items-center justify-center gap-2">Vender</Link>
