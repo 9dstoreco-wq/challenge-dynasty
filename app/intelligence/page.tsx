@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Sidebar from '@/components/Sidebar'
 
 const cards = [
   ["Coach AI", "Tu entrenador personal diario.", "Pádel, fitness, hábitos y progreso.", "/coach-ai"],
@@ -11,7 +12,7 @@ const cards = [
 
 export default function IntelligencePage() {
   return (
-    <main className="min-h-screen p-6 md:p-10">
+    <div className="min-h-screen bg-[#0A0A0C] text-white grid-bg"><Sidebar/><main className="lg:pl-64 pb-20 lg:pb-10 p-6 md:p-10">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10">
           <p className="text-xs font-black tracking-[0.35em] uppercase opacity-60">DYNASTY AI CORE</p>
@@ -50,6 +51,6 @@ export default function IntelligencePage() {
           </Link>
         </div>
       </div>
-    </main>
+    </main></div>
   );
 }
