@@ -16,8 +16,10 @@ const FREE_MODES = new Set(["coach", "fitness"]);
 
 // Modes that are the premium, revenue-facing product: clubs, coaches (business side), and
 // tournament organizers. Each maps to the feature_key that must exist as an active
-// billing_entitlements row (for the user's profile, or for an organization they own) before
-// the mode is usable. A user holding "ai.enterprise.full" bypasses all of these.
+// billing_entitlements row (for the caller's profile, or for an organization they are an
+// active member of) before the mode is usable. Checked via the hardened
+// public.has_ai_entitlement() RPC (supabase/migrations/20260826_ai_security_performance_hardening.sql),
+// which self-derives the caller from auth.uid() and verifies org membership internally.
 const MODE_FEATURE_KEY: Record<string, string | null> = {
   coach: null,
   fitness: null,
@@ -29,38 +31,48 @@ const MODE_FEATURE_KEY: Record<string, string | null> = {
 
 const ENTERPRISE_FEATURE_KEY = "ai.enterprise.full";
 
+async function hasFeature(
+  supabase: ReturnType<typeof createClient>,
+  featureKey: string,
+  organizationId?: string
+): Promise<boolean> {
+  const args: Record<string, string> = { p_feature_key: featureKey };
+  if (organizationId) args.p_organization_id = organizationId;
+  const { data, error } = await supabase.rpc("has_ai_entitlement", args);
+  if (error) {
+    console.error("has_ai_entitlement error", { featureKey, organizationId, message: error.message });
+    return false;
+  }
+  return data === true;
+}
+
 async function hasModeAccess(
   supabase: ReturnType<typeof createClient>,
-  profileId: string,
   mode: string
 ): Promise<boolean> {
   if (FREE_MODES.has(mode)) return true;
   const featureKey = MODE_FEATURE_KEY[mode];
   if (!featureKey) return true;
 
-  const { data: enterprise } = await supabase.rpc("has_billing_entitlement", {
-    p_feature_key: ENTERPRISE_FEATURE_KEY,
-    p_profile_id: profileId,
-  });
-  if (enterprise) return true;
+  // Enterprise override (profile-level).
+  if (await hasFeature(supabase, ENTERPRISE_FEATURE_KEY)) return true;
 
-  const { data: profileEntitled } = await supabase.rpc("has_billing_entitlement", {
-    p_feature_key: featureKey,
-    p_profile_id: profileId,
-  });
-  if (profileEntitled) return true;
+  // Profile-level entitlement for this exact feature.
+  if (await hasFeature(supabase, featureKey)) return true;
 
-  const { data: ownedOrgs } = await supabase
-    .from("organizations")
-    .select("id")
-    .eq("owner_id", profileId);
+  // Organization-level entitlement: has_ai_entitlement verifies active membership itself,
+  // so we only need to enumerate the organizations the caller currently belongs to.
+  const { data: memberships, error: membershipError } = await supabase
+    .from("organization_memberships")
+    .select("organization_id")
+    .eq("status", "active");
+  if (membershipError) {
+    console.error("organization_memberships lookup error", membershipError.message);
+    return false;
+  }
 
-  for (const org of (ownedOrgs as Array<{ id: string }> | null) ?? []) {
-    const { data: orgEntitled } = await supabase.rpc("has_billing_entitlement", {
-      p_feature_key: featureKey,
-      p_organization_id: org.id,
-    });
-    if (orgEntitled) return true;
+  for (const row of (memberships as Array<{ organization_id: string }> | null) ?? []) {
+    if (await hasFeature(supabase, featureKey, row.organization_id)) return true;
   }
 
   return false;
@@ -93,7 +105,7 @@ Deno.serve(async (req) => {
 
   const profileId = userData.user.id;
 
-  const modeAllowed = await hasModeAccess(supabase, profileId, mode);
+  const modeAllowed = await hasModeAccess(supabase, mode);
   if (!modeAllowed) {
     return json({ error: "PLAN_REQUIRED", feature: MODE_FEATURE_KEY[mode] }, 402);
   }
