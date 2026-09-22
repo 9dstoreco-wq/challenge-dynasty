@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { CheckCircle2, Loader2, ShoppingCart, X } from 'lucide-react'
+import { toSafeMessage } from '@/lib/safe-error'
 
 type Listing = {
   id: string
@@ -47,7 +48,7 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
       setMessage(`Orden reservada correctamente: ${String(data).slice(0, 8)}…`)
       setSelected(null)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'No se pudo crear la orden.')
+      setError(toSafeMessage(e, 'marketplace.reserve', 'No se pudo crear la orden.'))
     } finally {
       setBusy(false)
     }

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { toSafeMessage } from '@/lib/safe-error'
 
 export async function updateProfile(input: {
   fullName: string
@@ -9,7 +10,7 @@ export async function updateProfile(input: {
   city?: string
   country?: string
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Debes iniciar sesión')
   const cleanName = input.fullName.trim()
@@ -22,14 +23,14 @@ export async function updateProfile(input: {
     country_code: input.country?.trim().toUpperCase().slice(0,2) || null,
     updated_at: new Date().toISOString(),
   }).eq('id', user.id)
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(toSafeMessage(error, 'profile.updateProfile'))
   revalidatePath(`/u/${cleanUsername}`)
   revalidatePath('/settings')
   return true
 }
 
 export async function updateProfileSport(input: { sportId: string; skillLevel: string; isPrimary?: boolean }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Debes iniciar sesión')
   if (input.isPrimary) {
@@ -41,31 +42,31 @@ export async function updateProfileSport(input: { sportId: string; skillLevel: s
     skill_level: input.skillLevel || null,
     is_primary: Boolean(input.isPrimary),
     is_discoverable: true,
-    relationship: 'player',
+    relationship: input.isPrimary ? 'primary' : 'active',
     updated_at: new Date().toISOString(),
   }, { onConflict: 'profile_id,sport_id' })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(toSafeMessage(error, 'profile.updateProfileSport'))
   revalidatePath('/onboarding')
   revalidatePath('/settings')
   return true
 }
 
 export async function blockProfile(profileId: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user || user.id === profileId) throw new Error('Usuario inválido')
   const { error } = await supabase.from('user_blocks').upsert({ blocker_profile_id: user.id, blocked_profile_id: profileId }, { onConflict: 'blocker_profile_id,blocked_profile_id' })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(toSafeMessage(error, 'profile.blockProfile'))
   revalidatePath('/players')
   return true
 }
 
 export async function unblockProfile(profileId: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Debes iniciar sesión')
   const { error } = await supabase.from('user_blocks').delete().eq('blocker_profile_id', user.id).eq('blocked_profile_id', profileId)
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(toSafeMessage(error, 'profile.unblockProfile'))
   revalidatePath('/players')
   return true
 }
@@ -77,7 +78,7 @@ export async function reportContent(input: {
   reason: string
   details?: string
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Debes iniciar sesión')
   const targetType = input.matchId ? 'match' : input.postId ? 'post' : input.targetUserId ? 'profile' : 'unknown'
@@ -90,6 +91,6 @@ export async function reportContent(input: {
     reason: input.reason.trim(),
     details: input.details?.trim() || null,
   })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(toSafeMessage(error, 'profile.reportContent'))
   return true
 }

@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 /** @type {import('next').NextConfig} */
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -7,6 +9,7 @@ const securityHeaders = [
 ]
 
 const nextConfig = {
+  outputFileTracingRoot: fileURLToPath(new URL('.', import.meta.url)),
   poweredByHeader: false,
   reactStrictMode: true,
   images: { remotePatterns: [{ protocol: 'https', hostname: '**' }] },

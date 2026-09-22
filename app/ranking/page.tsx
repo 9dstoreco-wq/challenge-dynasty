@@ -1,10 +1,10 @@
-﻿export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'
 import Sidebar from '@/components/Sidebar'
 import BottomNav from '@/components/BottomNav'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function RankingPage(){
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: rankingsData, error } = await supabase
     .from('sport_rankings')
     .select('profile_id,sport_id,rating,rank,wins,losses,matches_played,profiles(display_name,username,avatar_url)')
@@ -17,7 +17,7 @@ export default async function RankingPage(){
     <div className="text-xs tracking-[.3em] text-[#00F0FF] font-black">CHALLENGE DYNASTY · RANKING</div>
     <h1 className="text-4xl md:text-6xl font-black mt-2">RANKING</h1>
     <p className="text-white/50 mt-2">Posiciones calculadas desde el ranking competitivo real de Dynasty.</p>
-    {error ? <div className="mt-7 rounded-3xl border border-red-400/20 bg-red-400/5 p-8 text-center text-red-200">No se pudo cargar el ranking en este momento.</div> : rankings.length === 0 ? <div className="mt-7 rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-10 text-center text-white/45">Todavía no hay suficientes posiciones competitivas registradas.</div> : <div className="mt-7 space-y-3">{rankings.map((r:any, i:number)=>{
+    {error ? <div className="mt-7 rounded-3xl border border-red-400/20 bg-red-400/5 p-8 text-center text-red-200">No se pudo cargar el ranking en este momento.</div> : rankings.length === 0 ? <div className="mt-7 rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-10 text-center text-white/45">Todavía no hay suficientes posiciones competitivas registradas.</div> : <div className="mt-7 space-y-3">{rankings.map((r, i:number)=>{
       const p = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles
       return <div key={`${r.profile_id}-${r.sport_id}`} className="rounded-2xl border border-white/10 bg-[#141B2D] p-5 flex items-center gap-4">
         <div className="w-12 text-center text-2xl font-black text-[#FFD700]">{r.rank ?? i+1}</div>
@@ -27,4 +27,3 @@ export default async function RankingPage(){
     })}</div>}
   </div></main><BottomNav/></div>
 }
-

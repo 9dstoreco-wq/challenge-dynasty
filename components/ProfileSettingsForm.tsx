@@ -5,7 +5,7 @@ import { updateProfile, updateProfileSport } from '@/app/actions/profile'
 type Sport={id:string;name:string;icon:string|null}
 type PS={sport_id:string;skill_level:string|null;is_primary:boolean}
 
-export default function ProfileSettingsForm({profile,sports,profileSports}:{profile:any;sports:Sport[];profileSports:PS[]}) {
+export default function ProfileSettingsForm({profile,sports,profileSports}:{profile:{display_name?:string|null;username?:string|null;city?:string|null;country_code?:string|null}|null;sports:Sport[];profileSports:PS[]}) {
   const [fullName,setFullName]=useState(profile?.display_name??''); const [username,setUsername]=useState(profile?.username??''); const [city,setCity]=useState(profile?.city??''); const [country,setCountry]=useState(profile?.country_code??'CO'); const [sportId,setSportId]=useState(sports[0]?.id??profileSports[0]?.sport_id??''); const [level,setLevel]=useState(profileSports.find(x=>x.sport_id===sportId)?.skill_level??''); const [msg,setMsg]=useState(''); const [busy,setBusy]=useState(false)
   async function saveProfile(e:React.FormEvent){e.preventDefault();setBusy(true);setMsg('');try{await updateProfile({fullName,username,city,country});setMsg('Perfil actualizado.')}catch(e){setMsg(e instanceof Error?e.message:'No se pudo actualizar')}finally{setBusy(false)}}
   async function saveSport(){setBusy(true);setMsg('');try{await updateProfileSport({sportId,skillLevel:level,isPrimary:true});setMsg('Deporte actualizado.')}catch(e){setMsg(e instanceof Error?e.message:'No se pudo actualizar')}finally{setBusy(false)}}

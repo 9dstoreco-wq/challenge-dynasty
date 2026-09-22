@@ -3,8 +3,8 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Search, ShoppingBag, ArrowRight } from 'lucide-react'
 
-type Variant={id:string;product_id:string;sku:string|null;title:string|null;price:number;attributes:any}
-type Product={id:string;slug:string;title:string;description:string|null;product_type:string;base_price:number;currency_code:string;featured:boolean;metadata:any;variants:Variant[]}
+type Variant={id:string;product_id:string;sku:string|null;title:string|null;price:number;attributes:Record<string, string|number|boolean|null>|null}
+type Product={id:string;slug:string;title:string;description:string|null;product_type:string;base_price:number;currency_code:string;featured:boolean;metadata:Record<string, string|number|boolean|null>|null;variants:Variant[]}
 
 export default function ShopCatalogClient({products}:{products:Product[]}){
  const [q,setQ]=useState('')

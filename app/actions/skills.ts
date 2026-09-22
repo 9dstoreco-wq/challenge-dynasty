@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { toSafeMessage } from '@/lib/safe-error'
 
 export async function createSkillChallenge(input: {
   sportId: string
@@ -12,7 +13,7 @@ export async function createSkillChallenge(input: {
   targetVotes?: number
   expiresAt?: string | null
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Debes iniciar sesión')
   const { data, error } = await supabase.rpc('create_skill_challenge', {
@@ -25,12 +26,12 @@ export async function createSkillChallenge(input: {
     p_target_votes: input.targetVotes ?? 100,
     p_expires_at: input.expiresAt ?? null,
   })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(toSafeMessage(error, 'skills.createSkillChallenge'))
   return data as string
 }
 
 export async function submitSkillChallenge(input: { challengeId: string; videoUrl: string; caption?: string }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Debes iniciar sesión')
   const { data, error } = await supabase.rpc('submit_skill_challenge', {
@@ -38,18 +39,18 @@ export async function submitSkillChallenge(input: { challengeId: string; videoUr
     p_video_url: input.videoUrl,
     p_caption: input.caption ?? null,
   })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(toSafeMessage(error, 'skills.submitSkillChallenge'))
   return data as string
 }
 
 export async function voteSkillSubmission(submissionId: string, score: number) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Debes iniciar sesión')
   const { error } = await supabase.rpc('vote_skill_submission', {
     p_submission_id: submissionId,
     p_value: score,
   })
-  if (error) throw new Error(error.message)
+  if (error) throw new Error(toSafeMessage(error, 'skills.voteSkillSubmission'))
   return true
 }

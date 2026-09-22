@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
 import MarketplaceClient from '@/components/MarketplaceClient'
 import { Search, ShieldCheck, ShoppingBag, PackageCheck } from 'lucide-react'
@@ -19,7 +20,7 @@ type Listing = {
 }
 
 export default async function MarketplacePage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data = [] } = await supabase
     .from('marketplace_listings')
     .select('id,title,description,city,price,currency_code,listing_type,is_featured,published_at,seller_id')
@@ -41,8 +42,8 @@ export default async function MarketplacePage() {
             <p className="text-white/50 mt-3 max-w-2xl">El mercado deportivo de CHALLENGE DYNASTY. Descubre productos, publica lo que ya no usas y conecta con compradores de la comunidad.</p>
           </div>
           <div className="flex gap-3">
-            <a href="/marketplace/orders" className="rounded-2xl border border-white/10 bg-white/[.04] font-black px-5 py-3 inline-flex items-center justify-center gap-2">Mis órdenes</a><a href="/marketplace/seller" className="rounded-2xl border border-white/10 bg-white/[.04] font-black px-5 py-3 inline-flex items-center justify-center gap-2">Vender</a>
-            <a href="/shop" className="rounded-2xl bg-[#00F0FF] text-black font-black px-6 py-3 inline-flex items-center justify-center gap-2"><ShoppingBag size={18}/> IR A DYNASTY SHOP</a>
+            <Link href="/marketplace/orders" className="rounded-2xl border border-white/10 bg-white/[.04] font-black px-5 py-3 inline-flex items-center justify-center gap-2">Mis órdenes</Link><Link href="/marketplace/seller" className="rounded-2xl border border-white/10 bg-white/[.04] font-black px-5 py-3 inline-flex items-center justify-center gap-2">Vender</Link>
+            <Link href="/shop" className="rounded-2xl bg-[#00F0FF] text-black font-black px-6 py-3 inline-flex items-center justify-center gap-2"><ShoppingBag size={18}/> IR A DYNASTY SHOP</Link>
           </div>
         </div>
 

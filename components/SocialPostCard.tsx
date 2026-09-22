@@ -3,11 +3,14 @@ import { useState } from 'react'
 import { Heart, MessageCircle, Share2, UserRound, Swords } from 'lucide-react'
 import { addComment, toggleLike, toggleFollow } from '@/app/actions/social'
 
-export default function SocialPostCard({ post, currentUserId }: { post:any; currentUserId?:string|null }) {
+type Comment = {id:string;content:string;user_name?:string|null}
+type Post = {id:string;user_id:string;username:string;full_name:string;created_at:string;type:string;title?:string|null;content:string|null;liked_by_me?:boolean;likes_count?:number;following_by_me?:boolean;comments?:Comment[];match?:{winner_name:string;loser_name:string;challenge_id:string;score_set1?:string|null;score_set2?:string|null;score_set3?:string|null}|null}
+
+export default function SocialPostCard({ post, currentUserId }: { post:Post; currentUserId?:string|null }) {
   const [liked, setLiked] = useState(Boolean(post.liked_by_me))
   const [likes, setLikes] = useState(Number(post.likes_count || 0))
   const [comment, setComment] = useState('')
-  const [comments, setComments] = useState<any[]>(post.comments || [])
+  const [comments, setComments] = useState<Comment[]>(post.comments || [])
   const [following, setFollowing] = useState(Boolean(post.following_by_me))
   const [busy, setBusy] = useState(false)
   async function like(){ if(!currentUserId) return; setBusy(true); try { const next=await toggleLike(post.id); setLiked(next); setLikes(v=>v+(next?1:-1)) } finally { setBusy(false) } }

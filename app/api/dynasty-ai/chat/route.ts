@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { toSafeMessage } from "@/lib/safe-error";
 
 export const dynamic = "force-dynamic";
 
@@ -30,13 +31,13 @@ function allowedRequest(key: string) {
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!session?.access_token) {
+  if (authError || !user) {
     return NextResponse.json({ error: "AUTH_REQUIRED" }, { status: 401 });
   }
 
-  const key = rateLimitKey(request, session.user.id);
+  const key = rateLimitKey(request, user.id);
   if (!allowedRequest(key)) {
     return NextResponse.json({ error: "RATE_LIMITED" }, { status: 429, headers: { "Retry-After": "60" } });
   }
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
 
   if (error) {
     return NextResponse.json(
-      { error: "AI_FUNCTION_ERROR", detail: error.message },
+      { error: "AI_FUNCTION_ERROR", detail: toSafeMessage(error, "api.dynasty-ai.chat") },
       { status: 502 }
     );
   }

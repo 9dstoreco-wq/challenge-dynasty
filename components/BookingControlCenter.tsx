@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { CalendarDays, Clock3, CreditCard, Loader2, ShieldCheck, XCircle } from 'lucide-react'
+import { toSafeMessage } from '@/lib/safe-error'
 
 type Bookable={id:string;title:string;activity_name:string|null;duration_minutes:number;price:number;currency_code:string;capacity:number;booking_mode:string;location_id:string|null}
 type Booking={id:string;bookable_id:string;starts_at:string;ends_at:string;status:string;payment_status:string;amount:number;currency_code:string;quantity:number}
@@ -25,9 +26,9 @@ export default function BookingControlCenter({bookables,bookings}:{bookables:Boo
    const {data,error:rpcError}=await supabase.rpc('create_atomic_booking',{p_requested_by:userData.user.id,p_starts_at:new Date(starts).toISOString(),p_ends_at:end,p_items:[{bookable_id:selected.id,quantity}]})
    if(rpcError) throw rpcError
    setMessage(`Reserva creada: ${String(data).slice(0,8)}…`)
-  }catch(e){setError(e instanceof Error?e.message:'No se pudo crear la reserva.')}finally{setBusy(false)}
+  }catch(e){setError(toSafeMessage(e,'bookings.reserve','No se pudo crear la reserva.'))}finally{setBusy(false)}
  }
- async function cancel(id:string){setBusy(true);setError(null);setMessage(null);try{const {error:e}=await supabase.rpc('cancel_booking',{p_booking_id:id});if(e)throw e;setMessage('Reserva cancelada. Recarga para actualizar el calendario.')}catch(e){setError(e instanceof Error?e.message:'No se pudo cancelar.')}finally{setBusy(false)}}
+ async function cancel(id:string){setBusy(true);setError(null);setMessage(null);try{const {error:e}=await supabase.rpc('cancel_booking',{p_booking_id:id});if(e)throw e;setMessage('Reserva cancelada. Recarga para actualizar el calendario.')}catch(e){setError(toSafeMessage(e,'bookings.cancel','No se pudo cancelar.'))}finally{setBusy(false)}}
  return <div className="space-y-6">
   <section className="rounded-3xl border border-white/10 bg-[#141B2D] p-6">
    <div className="flex items-start justify-between gap-4"><div><div className="text-xs tracking-[.25em] text-[#FFD700] font-black">BOOKING ENGINE</div><h2 className="text-2xl font-black mt-1">RESERVA ATÓMICA</h2><p className="text-sm text-white/45 mt-2 max-w-2xl">Disponibilidad, capacidad, conflictos y pago quedan validados por el backend antes de confirmar.</p></div><ShieldCheck className="text-[#00F0FF]"/></div>

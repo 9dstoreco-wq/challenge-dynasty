@@ -1,0 +1,1124 @@
+{
+ "account_security_events.risk_level": [
+  "low",
+  "medium",
+  "high",
+  "critical"
+ ],
+ "ai_coach_interactions.mode": [
+  "daily",
+  "match",
+  "training",
+  "rival",
+  "tournament",
+  "deep"
+ ],
+ "ai_conversations.mode": [
+  "coach",
+  "fitness",
+  "club",
+  "coach_business",
+  "tournament",
+  "commerce"
+ ],
+ "ai_daily_coach_sessions.mode": [
+  "coach",
+  "fitness",
+  "tournament"
+ ],
+ "ai_evolution_council_reviews.verdict": [
+  "pass",
+  "fail",
+  "blocked"
+ ],
+ "ai_evolution_evaluations.stage": [
+  "critic",
+  "simulation",
+  "test",
+  "post_apply"
+ ],
+ "ai_evolution_evaluations.verdict": [
+  "pass",
+  "fail",
+  "blocked"
+ ],
+ "ai_evolution_outcomes.outcome": [
+  "success",
+  "failure",
+  "mixed",
+  "inconclusive"
+ ],
+ "ai_evolution_outcomes.status": [
+  "pending",
+  "measured",
+  "rolled_back",
+  "inconclusive"
+ ],
+ "ai_evolution_proposals.risk_level": [
+  "low",
+  "medium",
+  "high",
+  "critical"
+ ],
+ "ai_evolution_proposals.status": [
+  "proposed",
+  "approved",
+  "rejected",
+  "simulated",
+  "tested",
+  "applied"
+ ],
+ "ai_evolution_runs.risk_level": [
+  "low",
+  "medium",
+  "high",
+  "critical"
+ ],
+ "ai_evolution_runs.status": [
+  "started",
+  "completed",
+  "failed",
+  "blocked"
+ ],
+ "ai_messages.role": [
+  "user",
+  "assistant",
+  "system"
+ ],
+ "ai_policy_events.event_type": [
+  "created",
+  "canary_started",
+  "promoted",
+  "retired",
+  "rejected"
+ ],
+ "ai_policy_versions.status": [
+  "candidate",
+  "canary",
+  "active",
+  "retired"
+ ],
+ "ai_recommendation_outcomes.outcome": [
+  "accepted",
+  "completed",
+  "dismissed",
+  "ignored",
+  "failed"
+ ],
+ "analytics_daily_metrics.metric_scope": [
+  "platform",
+  "profile",
+  "organization",
+  "seller",
+  "sport"
+ ],
+ "background_job_runs.status": [
+  "started",
+  "completed",
+  "failed",
+  "skipped"
+ ],
+ "billing_invoices.status": [
+  "draft",
+  "open",
+  "paid",
+  "void",
+  "uncollectible",
+  "refunded"
+ ],
+ "billing_plans.audience_type": [
+  "player",
+  "provider",
+  "organization",
+  "seller",
+  "all"
+ ],
+ "billing_plans.billing_interval": [
+  "monthly",
+  "yearly",
+  "one_time"
+ ],
+ "billing_subscriptions.status": [
+  "trialing",
+  "active",
+  "past_due",
+  "paused",
+  "cancelled",
+  "expired"
+ ],
+ "bookable_entities.booking_mode": [
+  "instant",
+  "approval_required"
+ ],
+ "bookable_entities.entity_type": [
+  "resource",
+  "person",
+  "class",
+  "event",
+  "service"
+ ],
+ "bookable_entities.status": [
+  "active",
+  "paused",
+  "archived"
+ ],
+ "booking_groups.payment_status": [
+  "not_required",
+  "pending",
+  "paid",
+  "refunded",
+  "failed"
+ ],
+ "booking_groups.status": [
+  "pending",
+  "confirmed",
+  "failed",
+  "cancelled",
+  "completed"
+ ],
+ "booking_payment_records.payment_owner_type": [
+  "provider",
+  "organization"
+ ],
+ "booking_payment_records.payment_status": [
+  "unpaid",
+  "deposit_paid",
+  "partially_paid",
+  "paid",
+  "refunded",
+  "waived"
+ ],
+ "booking_waitlist.status": [
+  "waiting",
+  "offered",
+  "accepted",
+  "expired",
+  "cancelled"
+ ],
+ "bookings.payment_status": [
+  "not_required",
+  "pending",
+  "paid",
+  "refunded",
+  "partially_refunded",
+  "failed"
+ ],
+ "bookings.status": [
+  "pending",
+  "confirmed",
+  "waitlisted",
+  "cancelled",
+  "completed",
+  "no_show",
+  "expired"
+ ],
+ "card_definitions.rarity": [
+  "common",
+  "rare",
+  "epic",
+  "legendary",
+  "secret"
+ ],
+ "challenge_invitations.status": [
+  "pending",
+  "accepted",
+  "declined",
+  "expired",
+  "cancelled"
+ ],
+ "challenge_participants.role": [
+  "creator",
+  "participant",
+  "opponent",
+  "team_member"
+ ],
+ "challenge_participants.status": [
+  "invited",
+  "accepted",
+  "declined",
+  "withdrawn"
+ ],
+ "challenges.challenge_type": [
+  "match",
+  "skill",
+  "distance",
+  "time",
+  "custom"
+ ],
+ "challenges.status": [
+  "draft",
+  "open",
+  "accepted",
+  "active",
+  "completed",
+  "cancelled"
+ ],
+ "content_reports.status": [
+  "open",
+  "reviewing",
+  "resolved",
+  "dismissed"
+ ],
+ "conversation_messages.status": [
+  "sent",
+  "edited",
+  "deleted",
+  "flagged"
+ ],
+ "conversations.status": [
+  "open",
+  "closed",
+  "archived"
+ ],
+ "discovery_blocks.block_scope": [
+  "entity",
+  "type",
+  "source"
+ ],
+ "discovery_controls.distance_mode": [
+  "same_city",
+  "nearby",
+  "custom",
+  "national",
+  "global"
+ ],
+ "discovery_events.entity_type": [
+  "player",
+  "challenge",
+  "listing",
+  "promotion",
+  "club",
+  "tournament",
+  "coach",
+  "academy",
+  "brand",
+  "product"
+ ],
+ "discovery_events.event_type": [
+  "impression",
+  "open",
+  "click",
+  "dismiss",
+  "conversion"
+ ],
+ "discovery_events.surface": [
+  "home",
+  "search",
+  "nearby",
+  "recommended",
+  "feed",
+  "marketplace",
+  "notification"
+ ],
+ "entity_availability.availability_status": [
+  "available",
+  "limited",
+  "waitlist",
+  "unavailable",
+  "closed",
+  "ended"
+ ],
+ "entity_availability.entity_type": [
+  "listing",
+  "profile",
+  "challenge",
+  "tournament",
+  "club",
+  "coach",
+  "academy"
+ ],
+ "entity_sports.entity_type": [
+  "listing",
+  "challenge",
+  "club",
+  "tournament",
+  "coach",
+  "academy",
+  "promotion",
+  "product",
+  "event"
+ ],
+ "finance_accounts.account_type": [
+  "cash",
+  "bank",
+  "digital_wallet",
+  "accounts_receivable",
+  "accounts_payable",
+  "revenue",
+  "expense",
+  "equity",
+  "other"
+ ],
+ "finance_categories.category_type": [
+  "income",
+  "expense",
+  "asset",
+  "liability",
+  "equity",
+  "transfer"
+ ],
+ "finance_invoices.direction": [
+  "receivable",
+  "payable"
+ ],
+ "finance_invoices.status": [
+  "draft",
+  "open",
+  "partial",
+  "paid",
+  "overdue",
+  "cancelled"
+ ],
+ "finance_recurring_items.frequency": [
+  "weekly",
+  "monthly",
+  "quarterly",
+  "yearly"
+ ],
+ "finance_recurring_items.transaction_type": [
+  "income",
+  "expense"
+ ],
+ "finance_transactions.status": [
+  "pending",
+  "posted",
+  "void"
+ ],
+ "finance_transactions.transaction_type": [
+  "income",
+  "expense",
+  "transfer",
+  "adjustment"
+ ],
+ "marketplace_item_returns.status": [
+  "requested",
+  "approved",
+  "refunded",
+  "rejected"
+ ],
+ "marketplace_listing_delivery_options.delivery_type": [
+  "shipping",
+  "pickup",
+  "digital",
+  "in_person",
+  "online"
+ ],
+ "marketplace_listings.audience_scope": [
+  "sport_specific",
+  "multi_sport",
+  "universal"
+ ],
+ "marketplace_listings.listing_type": [
+  "tournament",
+  "club",
+  "academy",
+  "coach",
+  "brand",
+  "event",
+  "other"
+ ],
+ "marketplace_listings.location_scope": [
+  "local",
+  "regional",
+  "national",
+  "global",
+  "online"
+ ],
+ "marketplace_listings.status": [
+  "draft",
+  "pending",
+  "published",
+  "rejected",
+  "archived"
+ ],
+ "marketplace_order_payments.status": [
+  "pending",
+  "paid",
+  "failed",
+  "refunded",
+  "partially_refunded"
+ ],
+ "marketplace_order_refunds.status": [
+  "pending",
+  "succeeded",
+  "failed"
+ ],
+ "marketplace_orders.status": [
+  "pending",
+  "reserved",
+  "paid",
+  "cancelled",
+  "fulfilled",
+  "refunded",
+  "partially_refunded"
+ ],
+ "marketplace_promotions.promotion_type": [
+  "featured",
+  "boost",
+  "discount",
+  "local_campaign"
+ ],
+ "marketplace_promotions.status": [
+  "draft",
+  "active",
+  "paused",
+  "ended"
+ ],
+ "marketplace_seller_profiles.premium_status": [
+  "free",
+  "premium",
+  "suspended"
+ ],
+ "marketplace_seller_profiles.seller_type": [
+  "individual",
+  "coach",
+  "club",
+  "organization",
+  "brand",
+  "store"
+ ],
+ "marketplace_seller_profiles.status": [
+  "active",
+  "paused",
+  "suspended"
+ ],
+ "marketplace_seller_profiles.verification_status": [
+  "unverified",
+  "pending",
+  "verified",
+  "rejected"
+ ],
+ "marketplace_seller_settlements.status": [
+  "pending",
+  "ready",
+  "paid",
+  "void"
+ ],
+ "match_results.status": [
+  "pending",
+  "confirmed",
+  "disputed"
+ ],
+ "matches.status": [
+  "scheduled",
+  "in_progress",
+  "completed",
+  "cancelled"
+ ],
+ "moderation_actions.action_type": [
+  "warn",
+  "hide",
+  "remove",
+  "suspend",
+  "restore",
+  "restrict"
+ ],
+ "notification_deliveries.channel": [
+  "in_app",
+  "push",
+  "email",
+  "sms"
+ ],
+ "notification_deliveries.status": [
+  "queued",
+  "sent",
+  "delivered",
+  "failed",
+  "suppressed"
+ ],
+ "notification_devices.platform": [
+  "ios",
+  "android",
+  "web"
+ ],
+ "notifications.priority": [
+  "low",
+  "normal",
+  "high",
+  "urgent"
+ ],
+ "organization_activities.activity_type": [
+  "sport",
+  "fitness",
+  "wellness",
+  "recreation",
+  "hybrid"
+ ],
+ "organization_activity_memberships.role_in_activity": [
+  "manager",
+  "coach",
+  "instructor",
+  "participant"
+ ],
+ "organization_activity_memberships.status": [
+  "active",
+  "inactive"
+ ],
+ "organization_locations.status": [
+  "active",
+  "inactive"
+ ],
+ "organization_memberships.membership_type": [
+  "owner",
+  "admin",
+  "manager",
+  "coach",
+  "staff",
+  "member"
+ ],
+ "organization_memberships.status": [
+  "invited",
+  "active",
+  "suspended",
+  "left"
+ ],
+ "organization_resources.status": [
+  "active",
+  "maintenance",
+  "inactive"
+ ],
+ "organizations.organization_type": [
+  "club",
+  "academy",
+  "fitness_center",
+  "sports_center",
+  "organizer",
+  "business"
+ ],
+ "organizations.status": [
+  "draft",
+  "active",
+  "suspended",
+  "archived"
+ ],
+ "partner_requests.status": [
+  "PENDING",
+  "ACCEPTED",
+  "REJECTED",
+  "CANCELLED"
+ ],
+ "payment_records.status": [
+  "pending",
+  "authorized",
+  "paid",
+  "failed",
+  "refunded",
+  "partially_refunded",
+  "cancelled"
+ ],
+ "payment_refunds.status": [
+  "pending",
+  "succeeded",
+  "failed",
+  "cancelled"
+ ],
+ "platform_test_runs.status": [
+  "running",
+  "passed",
+  "failed",
+  "cancelled"
+ ],
+ "player_availability.intent": [
+  "match",
+  "rival",
+  "partner",
+  "training"
+ ],
+ "player_sports.relationship": [
+  "active",
+  "primary",
+  "secondary",
+  "learning",
+  "following",
+  "discover"
+ ],
+ "profile_locations.precision_mode": [
+  "exact",
+  "approximate",
+  "city",
+  "hidden"
+ ],
+ "profiles.player_status": [
+  "active",
+  "inactive",
+  "suspended"
+ ],
+ "promotion_events.event_type": [
+  "impression",
+  "open",
+  "click",
+  "conversion",
+  "registration"
+ ],
+ "promotions.promotion_type": [
+  "featured",
+  "boost",
+  "sponsored_card",
+  "sponsored_feed",
+  "notification_campaign"
+ ],
+ "promotions.status": [
+  "draft",
+  "scheduled",
+  "active",
+  "paused",
+  "completed",
+  "cancelled"
+ ],
+ "provider_organization_relationships.relationship_type": [
+  "employee",
+  "contractor",
+  "partner",
+  "guest"
+ ],
+ "provider_organization_relationships.status": [
+  "invited",
+  "active",
+  "inactive",
+  "ended"
+ ],
+ "provider_profiles.provider_type": [
+  "coach",
+  "instructor",
+  "trainer",
+  "consultant",
+  "creator"
+ ],
+ "provider_profiles.status": [
+  "active",
+  "paused",
+  "suspended"
+ ],
+ "provider_profiles.verification_status": [
+  "unverified",
+  "pending",
+  "verified",
+  "rejected"
+ ],
+ "provider_services.operational_owner_type": [
+  "provider",
+  "organization"
+ ],
+ "provider_services.ownership_type": [
+  "provider",
+  "organization"
+ ],
+ "provider_services.payment_owner_type": [
+  "provider",
+  "organization"
+ ],
+ "provider_services.service_mode": [
+  "in_person",
+  "online",
+  "hybrid"
+ ],
+ "provider_services.status": [
+  "draft",
+  "active",
+  "paused",
+  "archived"
+ ],
+ "provider_students.status": [
+  "active",
+  "inactive",
+  "archived"
+ ],
+ "referrals.status": [
+  "registered",
+  "qualified",
+  "rewarded",
+  "rejected"
+ ],
+ "relevance_feedback.feedback_type": [
+  "interested",
+  "not_interested",
+  "hide",
+  "save",
+  "report_irrelevant"
+ ],
+ "relevance_rules.rule_type": [
+  "hard_filter",
+  "score",
+  "penalty",
+  "boost"
+ ],
+ "seasons.status": [
+  "draft",
+  "active",
+  "completed",
+  "cancelled"
+ ],
+ "security_events.severity": [
+  "info",
+  "low",
+  "medium",
+  "high",
+  "critical"
+ ],
+ "security_events.status": [
+  "open",
+  "reviewing",
+  "resolved",
+  "dismissed"
+ ],
+ "security_rate_limits.scope_type": [
+  "ip",
+  "profile",
+  "session",
+  "organization",
+  "endpoint",
+  "operation"
+ ],
+ "share_event_actions.action_type": [
+  "shared",
+  "opened",
+  "copied",
+  "downloaded"
+ ],
+ "share_event_actions.platform": [
+  "whatsapp",
+  "instagram",
+  "tiktok",
+  "facebook",
+  "x",
+  "copy_link",
+  "download",
+  "native_share",
+  "other"
+ ],
+ "shareable_events.event_type": [
+  "challenge",
+  "challenge_accepted",
+  "victory",
+  "defeat",
+  "card",
+  "achievement",
+  "level_up",
+  "ranking_change",
+  "streak",
+  "tournament",
+  "other"
+ ],
+ "shareable_events.visibility": [
+  "public",
+  "unlisted",
+  "private"
+ ],
+ "shop_carts.status": [
+  "ACTIVE",
+  "CHECKOUT",
+  "CONVERTED",
+  "ABANDONED"
+ ],
+ "shop_coupons.discount_type": [
+  "percentage",
+  "fixed"
+ ],
+ "shop_inventory_movements.movement_type": [
+  "sale",
+  "purchase",
+  "adjustment_in",
+  "adjustment_out",
+  "transfer_in",
+  "transfer_out",
+  "return",
+  "reservation_release",
+  "reservation_consume"
+ ],
+ "shop_inventory_reservations.status": [
+  "active",
+  "released",
+  "consumed",
+  "expired"
+ ],
+ "shop_invoices.status": [
+  "draft",
+  "issued",
+  "cancelled",
+  "refunded"
+ ],
+ "shop_locations.location_type": [
+  "physical",
+  "online"
+ ],
+ "shop_locations.status": [
+  "active",
+  "inactive"
+ ],
+ "shop_order_payments.status": [
+  "pending",
+  "paid",
+  "failed",
+  "refunded",
+  "partially_refunded"
+ ],
+ "shop_orders.sales_channel": [
+  "online",
+  "physical"
+ ],
+ "shop_orders.status": [
+  "pending",
+  "payment_pending",
+  "paid",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "refunded"
+ ],
+ "shop_pos_payments.payment_method": [
+  "cash",
+  "card",
+  "transfer",
+  "mixed",
+  "other"
+ ],
+ "shop_pos_registers.status": [
+  "open",
+  "closed",
+  "disabled"
+ ],
+ "shop_pos_sales.sale_channel": [
+  "physical",
+  "online"
+ ],
+ "shop_pos_sales.status": [
+  "draft",
+  "completed",
+  "cancelled",
+  "refunded"
+ ],
+ "shop_products.status": [
+  "draft",
+  "active",
+  "archived"
+ ],
+ "shop_registers.status": [
+  "open",
+  "closed",
+  "suspended"
+ ],
+ "shop_returns.refund_method": [
+  "cash",
+  "card",
+  "transfer",
+  "store_credit",
+  "original_method",
+  "other"
+ ],
+ "shop_returns.status": [
+  "draft",
+  "completed",
+  "cancelled"
+ ],
+ "shop_staff.role": [
+  "owner",
+  "manager",
+  "cashier",
+  "inventory"
+ ],
+ "shop_staff.status": [
+  "active",
+  "suspended",
+  "revoked"
+ ],
+ "skill_challenges.difficulty": [
+  "BEGINNER",
+  "INTERMEDIATE",
+  "ADVANCED",
+  "PRO",
+  "ELITE"
+ ],
+ "skill_challenges.status": [
+  "OPEN",
+  "SUBMITTED",
+  "VOTING",
+  "COMPLETED"
+ ],
+ "social_comments.status": [
+  "visible",
+  "hidden",
+  "deleted",
+  "reported"
+ ],
+ "social_posts.post_type": [
+  "text",
+  "image",
+  "achievement",
+  "challenge",
+  "match",
+  "tournament",
+  "marketplace",
+  "share_card"
+ ],
+ "social_posts.visibility": [
+  "public",
+  "followers",
+  "private"
+ ],
+ "social_reactions.reaction_type": [
+  "like",
+  "fire",
+  "clap",
+  "wow",
+  "support"
+ ],
+ "social_share_actions.channel": [
+  "system",
+  "instagram",
+  "facebook",
+  "whatsapp",
+  "x",
+  "tiktok",
+  "copy_link",
+  "other"
+ ],
+ "social_share_events.event_type": [
+  "shared",
+  "opened",
+  "accepted"
+ ],
+ "social_share_events.platform": [
+  "whatsapp",
+  "instagram",
+  "tiktok",
+  "facebook",
+  "x",
+  "copy_link",
+  "other"
+ ],
+ "support_tickets.priority": [
+  "low",
+  "normal",
+  "high",
+  "urgent"
+ ],
+ "support_tickets.status": [
+  "open",
+  "pending",
+  "resolved",
+  "closed"
+ ],
+ "system_health_checks.status": [
+  "healthy",
+  "degraded",
+  "down"
+ ],
+ "tournament_categories.participant_mode": [
+  "individual",
+  "pair",
+  "team"
+ ],
+ "tournament_categories.status": [
+  "draft",
+  "open",
+  "closed",
+  "in_progress",
+  "completed",
+  "cancelled"
+ ],
+ "tournament_checkins.method": [
+  "manual",
+  "qr",
+  "self"
+ ],
+ "tournament_entries.entry_type": [
+  "individual",
+  "pair",
+  "team"
+ ],
+ "tournament_entries.status": [
+  "pending",
+  "confirmed",
+  "waitlisted",
+  "withdrawn",
+  "rejected",
+  "cancelled"
+ ],
+ "tournament_entry_members.role": [
+  "captain",
+  "member",
+  "substitute"
+ ],
+ "tournament_entry_members.status": [
+  "invited",
+  "confirmed",
+  "declined",
+  "removed"
+ ],
+ "tournament_fixtures.status": [
+  "scheduled",
+  "ready",
+  "in_progress",
+  "completed",
+  "walkover",
+  "cancelled"
+ ],
+ "tournament_prizes.prize_type": [
+  "cash",
+  "product",
+  "service",
+  "trophy",
+  "points",
+  "other"
+ ],
+ "tournament_registration_payments.status": [
+  "unpaid",
+  "deposit_paid",
+  "partial",
+  "paid",
+  "refunded",
+  "waived"
+ ],
+ "tournament_stages.stage_type": [
+  "group",
+  "round_robin",
+  "single_elimination",
+  "double_elimination",
+  "ladder",
+  "custom"
+ ],
+ "tournament_stages.status": [
+  "pending",
+  "active",
+  "completed",
+  "cancelled"
+ ],
+ "tournaments.format_type": [
+  "single_elimination",
+  "double_elimination",
+  "round_robin",
+  "groups_then_knockout",
+  "ladder",
+  "custom"
+ ],
+ "tournaments.participant_mode": [
+  "individual",
+  "pair",
+  "team"
+ ],
+ "tournaments.status": [
+  "draft",
+  "published",
+  "registration_open",
+  "registration_closed",
+  "in_progress",
+  "completed",
+  "cancelled"
+ ],
+ "tournaments.visibility": [
+  "public",
+  "private",
+  "unlisted"
+ ],
+ "user_missions.status": [
+  "active",
+  "completed",
+  "claimed",
+  "expired"
+ ],
+ "weekly_challenge_participants.status": [
+  "active",
+  "complete"
+ ]
+}

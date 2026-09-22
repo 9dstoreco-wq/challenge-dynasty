@@ -13,7 +13,7 @@ if (major < 20) fail(`Node 20+ required; detected ${process.versions.node}`)
 pass(`Node ${process.versions.node} (CI pins Node 20)`)
 
 let npmVersion = 'unknown'
-try { npmVersion = execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim() } catch { fail('npm is not available') }
+try { npmVersion = execFileSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['--version'], { encoding: 'utf8', shell: true }).trim() } catch { fail('npm is not available') }
 pass(`npm ${npmVersion}`)
 
 for (const envName of ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY']) {
@@ -21,7 +21,7 @@ for (const envName of ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KE
 }
 pass('required public Supabase environment variables present')
 
-for (const script of ['check-routes','check-sql','check-core-flow','check-production','check-hardening','typecheck','build']) {
+for (const script of ['check-routes','check-sql','check-sql-contracts','check-rpc-status-literals','check-error-sanitization','check-core-flow','check-production','check-hardening','typecheck','build']) {
   if (!pkg.scripts?.[script]) fail(`package.json missing script: ${script}`)
 }
 pass('all release scripts present')
@@ -41,7 +41,7 @@ pass('node_modules present')
 
 const run = (script) => {
   console.log(`\n>>> npm run ${script}`)
-  execFileSync('npm', ['run', script], { stdio: 'inherit', env: process.env })
+  execFileSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', script], { stdio: 'inherit', env: process.env, shell: true })
 }
-for (const script of ['check-routes','check-sql','check-core-flow','check-production','check-hardening','typecheck','build']) run(script)
+for (const script of ['check-routes','check-sql','check-sql-contracts','check-rpc-status-literals','check-error-sanitization','check-core-flow','check-production','check-hardening','typecheck','build']) run(script)
 pass('FULL RELEASE GATE')

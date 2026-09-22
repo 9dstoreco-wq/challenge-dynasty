@@ -1,11 +1,11 @@
-﻿export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'
 
 import Sidebar from '@/components/Sidebar'
 import BottomNav from '@/components/BottomNav'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function CompetitionsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: tournamentsData } = await supabase
     .from('tournaments')
     .select('id,title,status,starts_at,ends_at,organization_id')
@@ -25,7 +25,7 @@ export default async function CompetitionsPage() {
           </p>
 
           <div className="grid md:grid-cols-2 gap-4 mt-7">
-            {tournaments.map((t: any) => (
+            {tournaments.map((t: {id:string;title:string;status:string;starts_at:string|null;ends_at:string|null}) => (
               <a
                 key={t.id}
                 href={`/competitions/${t.id}`}
@@ -52,4 +52,3 @@ export default async function CompetitionsPage() {
     </div>
   )
 }
-

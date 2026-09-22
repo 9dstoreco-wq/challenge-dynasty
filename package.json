@@ -9,13 +9,17 @@
     "typecheck": "tsc --noEmit",
     "check-routes": "node scripts/check-routes.mjs",
     "check-sql": "node scripts/check-sql.mjs",
+    "check-sql-contracts": "node scripts/check-sql-contracts.mjs",
+    "check-rpc-status-literals": "node scripts/check-rpc-status-literals.mjs",
+    "check-error-sanitization": "node scripts/check-error-sanitization.mjs",
     "check-core-flow": "node scripts/check-core-flow.mjs",
     "check-production": "node scripts/check-production.mjs",
     "check-hardening": "node scripts/check-hardening.mjs",
-    "verify-all": "npm run check-routes && npm run check-sql && npm run check-core-flow && npm run check-production && npm run check-hardening",
+    "verify-all": "npm run check-routes && npm run check-sql && npm run check-sql-contracts && npm run check-rpc-status-literals && npm run check-error-sanitization && npm run check-core-flow && npm run check-production && npm run check-hardening",
     "check-env": "node scripts/check-env.mjs",
     "verify:release": "npm run release-doctor",
-    "release-doctor": "node scripts/release-doctor.mjs"
+    "release-doctor": "node scripts/release-doctor.mjs",
+    "lint": "eslint app components lib --max-warnings 0"
   },
   "dependencies": {
     "@supabase/ssr": "0.5.2",
@@ -32,6 +36,8 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "autoprefixer": "10.4.20",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.5",
     "postcss": "8.4.49",
     "tailwindcss": "3.4.17",
     "typescript": "5.7.2"

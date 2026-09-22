@@ -1,0 +1,13 @@
+{
+  "_comment": "Maps PL/pgSQL record-field / alias names used inside SECURITY DEFINER RPC bodies (supabase/migrations/**/*.sql) to the table.column key they represent in sql-check-constraints.json. Used by scripts/check-rpc-status-literals.mjs to catch obsolete/invalid status literals written or compared inside RPC function bodies -- the exact bug class found in the 2026-09-21 tournament RPC audit (validate_tournament_schedule, generate_round_robin_draw, generate_groups_to_knockout_draw, generate_single_elimination_draw, swap_tournament_fixture_entries all referenced 'draft'/'ready'/'active'/'accepted', none of which the live CHECK constraints or the guard_tournament_stage_status trigger ever allow). Extend this map whenever a new RPC introduces a new record variable or alias for one of these columns.",
+  "tournament_stages.status": {
+    "variablePatterns": ["v_stage", "v_next", "v_next_stage", "stage"]
+  },
+  "tournament_entry_members.status": {
+    "variablePatterns": ["tem"]
+  },
+  "tournament_stages.stage_type": {
+    "column": "stage_type",
+    "variablePatterns": ["v_stage", "v_next", "v_next_stage", "stage"]
+  }
+}

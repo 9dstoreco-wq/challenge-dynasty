@@ -1,25 +1,26 @@
+import { relatedRow } from '@/app/arena/related-row'
 export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import ChallengeActions from '@/components/ChallengeActions'
 import MatchResultForm from '@/components/MatchResultForm'
 
-export async function generateMetadata({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
   const { id } = await params
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: challenge } = await supabase
     .from('challenges')
     .select('id,creator_id,title,creator:profiles!challenges_creator_id_fkey(display_name)')
     .eq('id', id)
     .maybeSingle()
 
-  const a = (challenge?.creator as any)?.display_name ?? 'Jugador'
+  const a = relatedRow(challenge?.creator)?.display_name ?? 'Jugador'
   return { title: `${challenge?.title ?? 'Reto'} · CHALLENGE DYNASTY`, description: `Reto deportivo de ${a} en CHALLENGE DYNASTY.` }
 }
 
 export default async function ChallengePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
   const { id } = await params
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: challenge } = await supabase
@@ -37,7 +38,7 @@ export default async function ChallengePage({ params, searchParams }: { params: 
     .select('profile_id,role,status,profile:profiles!challenge_participants_profile_id_fkey(username,display_name)')
     .eq('challenge_id', challenge.id)
 
-  const opponents = (participants ?? []).filter((p: any) => p.profile_id !== challenge.creator_id && p.status !== 'declined' && p.status !== 'withdrawn')
+  const opponents = (participants ?? []).filter((p) => p.profile_id !== challenge.creator_id && p.status !== 'declined' && p.status !== 'withdrawn')
   const opponent = opponents[0]
 
   const { data: invitation } = user
@@ -65,8 +66,8 @@ export default async function ChallengePage({ params, searchParams }: { params: 
         .maybeSingle()
     : { data: null }
 
-  const creator = challenge.creator as any
-  const rival = opponent?.profile as any
+  const creator = relatedRow(challenge.creator)
+  const rival = relatedRow(opponent?.profile)
   const currentInvitationStatus = challenge.creator_id === user?.id ? 'creator' : invitation?.status ?? opponent?.status ?? 'none'
   const resultData = (result?.result_data ?? {}) as Record<string, unknown>
   const scoreSet1 = typeof resultData.score_set1 === 'string' ? resultData.score_set1 : ''
@@ -106,5 +107,3 @@ export default async function ChallengePage({ params, searchParams }: { params: 
     )}
   </section></main>
 }
-
-
