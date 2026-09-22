@@ -1,2 +1,26 @@
-@tailwind base; @tailwind components; @tailwind utilities;
-:root{color-scheme:dark} html,body{margin:0;padding:0;background:#0B0F19;color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}button,input{font:inherit}.glow{box-shadow:0 0 28px rgba(0,240,255,.14)}.grid-bg{background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:32px 32px}.scrollbar-thin::-webkit-scrollbar{width:6px;height:6px}.scrollbar-thin::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:999px}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{color-scheme:dark;--font-sans:'Inter',ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-display:'Bebas Neue',ui-sans-serif,system-ui}
+html,body{margin:0;padding:0;background:#0A0A0C;color:#fff;font-family:var(--font-sans),Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+button,input{font:inherit}
+
+.font-display{font-family:var(--font-display),ui-sans-serif,system-ui;letter-spacing:.02em}
+
+.glow{box-shadow:0 0 28px rgba(212,175,55,.16)}
+.glow-lg{box-shadow:0 0 60px rgba(212,175,55,.22)}
+
+.gold-text{background:linear-gradient(135deg,#F6E6B3 0%,#D4AF37 45%,#8A6418 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.grid-bg{background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:32px 32px}
+
+.hairline-gold{border-color:rgba(212,175,55,.28)}
+
+.scrollbar-thin::-webkit-scrollbar{width:6px;height:6px}
+.scrollbar-thin::-webkit-scrollbar-thumb{background:rgba(212,175,55,.25);border-radius:999px}
+
+a, button, [role="button"], .transition-base{transition:background-color .18s ease,border-color .18s ease,color .18s ease,opacity .18s ease,transform .18s ease,box-shadow .18s ease}
+a:active, button:active{transform:scale(.98)}
+article.rounded-3xl, .rounded-3xl{transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}

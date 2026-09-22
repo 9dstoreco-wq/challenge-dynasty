@@ -58,10 +58,10 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
     <>
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
         {listings.map((x) => (
-          <article key={x.id} className="rounded-3xl border border-white/10 bg-[#141B2D] p-6 flex flex-col">
+          <article key={x.id} className="rounded-3xl border border-white/10 bg-[#161616] p-6 flex flex-col">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-xs text-[#FFD700] font-black uppercase tracking-widest">{x.listing_type}</div>
-              {x.is_featured ? <span className="text-[10px] rounded-full border border-[#FFD700]/30 px-2 py-1 text-[#FFD700] font-black">DESTACADO</span> : null}
+              <div className="text-xs text-[#D4AF37] font-black uppercase tracking-widest">{x.listing_type}</div>
+              {x.is_featured ? <span className="text-[10px] rounded-full border border-[#D4AF37]/30 px-2 py-1 text-[#D4AF37] font-black">DESTACADO</span> : null}
             </div>
             <h2 className="text-xl font-black mt-2">{x.title}</h2>
             <p className="text-white/45 text-sm mt-2 flex-1">{x.description || 'Publicación Marketplace'}</p>
@@ -88,7 +88,7 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
           <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#111827] p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-xs uppercase tracking-widest text-[#00F0FF] font-black">Nueva orden</div>
+                <div className="text-xs uppercase tracking-widest text-[#D4AF37] font-black">Nueva orden</div>
                 <h3 className="text-2xl font-black mt-1">{selected.title}</h3>
               </div>
               <button onClick={() => setSelected(null)} className="rounded-full border border-white/10 p-2" aria-label="Cerrar"><X size={18} /></button>
@@ -105,7 +105,7 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
               <span className="text-white/45">Subtotal</span>
               <strong>{total.toLocaleString('es-CO')} {selected.currency_code || 'COP'}</strong>
             </div>
-            <button disabled={busy} onClick={reserve} className="mt-5 w-full rounded-2xl bg-[#00F0FF] text-black font-black px-5 py-3 flex items-center justify-center gap-2 disabled:opacity-60">
+            <button disabled={busy} onClick={reserve} className="mt-5 w-full rounded-2xl bg-[#D4AF37] text-black font-black px-5 py-3 flex items-center justify-center gap-2 disabled:opacity-60">
               {busy ? <Loader2 size={17} className="animate-spin" /> : <ShoppingCart size={17} />} {busy ? 'Procesando…' : 'Crear orden reservada'}
             </button>
             <p className="text-xs text-white/35 mt-3 text-center">La orden reserva inventario. El pago real se confirma posteriormente mediante el proveedor conectado.</p>

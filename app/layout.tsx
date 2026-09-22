@@ -1,3 +1,8 @@
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/700.css'
+import '@fontsource/inter/900.css'
+import '@fontsource/bebas-neue/400.css'
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
 
@@ -13,6 +18,6 @@ export const metadata: Metadata = {
   twitter: { card: 'summary', title: 'CHALLENGE DYNASTY', description: 'Reta, compite y construye tu reputación deportiva.' },
 }
 
-export const viewport: Viewport = { themeColor: '#0B0F19', colorScheme: 'dark' }
+export const viewport: Viewport = { themeColor: '#0A0A0C', colorScheme: 'dark' }
 
 export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="es"><body>{children}</body></html>}

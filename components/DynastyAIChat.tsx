@@ -67,7 +67,7 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
       <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
         <div className="font-black">Dynasty AI</div>
         <p className="mt-2 text-sm opacity-60">Inicia sesión para hablar con Dynasty AI.</p>
-        <a href="/login" className="mt-4 inline-block rounded-full bg-[#00F0FF] text-black px-5 py-2.5 text-sm font-black">
+        <a href="/login" className="mt-4 inline-block rounded-full bg-[#D4AF37] text-black px-5 py-2.5 text-sm font-black">
           Iniciar sesión
         </a>
       </div>
@@ -105,7 +105,7 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
         <button
           type="submit"
           disabled={busy || !message.trim()}
-          className="rounded-full bg-[#00F0FF] text-black px-6 py-3 font-black disabled:opacity-40"
+          className="rounded-full bg-[#D4AF37] text-black px-6 py-3 font-black disabled:opacity-40"
         >
           {busy ? 'Pensando...' : 'Enviar a Dynasty AI'}
         </button>

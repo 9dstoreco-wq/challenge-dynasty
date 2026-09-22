@@ -33,17 +33,17 @@ export default async function DynastyAIContextPanel({ area }: { area: string }) 
     <div className="mt-8 grid gap-4 md:grid-cols-3">
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
         <div className="text-xs font-black tracking-widest opacity-50">{area}</div>
-        <div className="mt-3 text-3xl font-black">{entitlements.length}</div>
+        <div className="mt-3 text-3xl font-display font-black tracking-wide">{entitlements.length}</div>
         <div className="mt-1 text-sm opacity-60">entitlements activos</div>
       </div>
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
         <div className="text-xs font-black tracking-widest opacity-50">ORGANIZACIONES</div>
-        <div className="mt-3 text-3xl font-black">{organizations.length}</div>
+        <div className="mt-3 text-3xl font-display font-black tracking-wide">{organizations.length}</div>
         <div className="mt-1 text-sm opacity-60">organizaciones accesibles</div>
       </div>
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
         <div className="text-xs font-black tracking-widest opacity-50">SELLER PROFILES</div>
-        <div className="mt-3 text-3xl font-black">{sellers.length}</div>
+        <div className="mt-3 text-3xl font-display font-black tracking-wide">{sellers.length}</div>
         <div className="mt-1 text-sm opacity-60">perfiles propios</div>
       </div>
     </div>

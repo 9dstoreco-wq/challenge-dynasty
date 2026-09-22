@@ -30,7 +30,7 @@ export default async function ChallengePage({ params, searchParams }: { params: 
     .maybeSingle()
 
   if (!challenge) {
-    return <main className="min-h-screen bg-[#0B0F19] text-white grid place-items-center p-6"><div className="rounded-3xl border border-white/10 bg-[#141B2D] p-8 text-center"><h1 className="text-2xl font-black">Reto no encontrado</h1><p className="text-white/50 mt-2">El enlace puede haber expirado o no existe.</p></div></main>
+    return <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center p-6"><div className="rounded-3xl border border-white/10 bg-[#161616] p-8 text-center"><h1 className="text-2xl font-black">Reto no encontrado</h1><p className="text-white/50 mt-2">El enlace puede haber expirado o no existe.</p></div></main>
   }
 
   const { data: participants } = await supabase
@@ -74,9 +74,9 @@ export default async function ChallengePage({ params, searchParams }: { params: 
   const scoreSet2 = typeof resultData.score_set2 === 'string' ? resultData.score_set2 : ''
   const scoreSet3 = typeof resultData.score_set3 === 'string' ? resultData.score_set3 : ''
 
-  return <main className="min-h-screen bg-[#0B0F19] text-white grid place-items-center p-6"><section className="w-full max-w-3xl rounded-[32px] border border-cyan-400/20 bg-gradient-to-br from-[#141B2D] to-[#0B0F19] p-8">
-    <div className="text-xs tracking-[.3em] text-[#00F0FF] font-black">⚔️ CHALLENGE DYNASTY</div>
-    <h1 className="text-5xl font-black mt-4 text-center">{creator?.display_name ?? 'Jugador'} <span className="text-white/20">VS</span> {rival?.display_name ?? 'Rival'}</h1>
+  return <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center p-6"><section className="w-full max-w-3xl rounded-[32px] border border-gold-400/20 bg-gradient-to-br from-[#161616] to-[#0A0A0C] p-8">
+    <div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">⚔️ CHALLENGE DYNASTY</div>
+    <h1 className="text-5xl font-display font-black tracking-wide mt-4 text-center">{creator?.display_name ?? 'Jugador'} <span className="text-white/20">VS</span> {rival?.display_name ?? 'Rival'}</h1>
     <div className="text-center text-white/50 mt-3">{challenge.title} · {challenge.status}</div>
 
     <ChallengeActions challengeId={challenge.id} status={currentInvitationStatus} currentUserId={user?.id} challengerId={challenge.creator_id} invitationId={invitation?.id ?? undefined} />

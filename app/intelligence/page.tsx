@@ -15,7 +15,7 @@ export default function IntelligencePage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-10">
           <p className="text-xs font-black tracking-[0.35em] uppercase opacity-60">DYNASTY AI CORE</p>
-          <h1 className="mt-3 text-4xl md:text-6xl font-black tracking-tight">
+          <h1 className="mt-3 text-4xl md:text-6xl font-display font-black tracking-wide tracking-tight">
             Intelligence for sport.
           </h1>
           <p className="mt-4 max-w-2xl text-base md:text-lg opacity-70">
@@ -29,7 +29,7 @@ export default function IntelligencePage() {
             <Link
               key={title}
               href={href}
-              className="rounded-3xl border border-white/10 bg-white/5 p-6 block hover:border-[#00F0FF]/40 hover:bg-white/[0.07] transition-colors"
+              className="rounded-3xl border border-white/10 bg-white/5 p-6 block hover:border-[#D4AF37]/40 hover:bg-white/[0.07] transition-colors"
             >
               <h2 className="text-xl font-black">{title}</h2>
               <p className="mt-2 font-semibold">{tagline}</p>
