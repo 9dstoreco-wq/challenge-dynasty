@@ -1,0 +1,140 @@
+'use client'
+import { useEffect, useState, type FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+
+type StaffRow = { profile_id: string; role: string; status: string; display_name: string | null; username: string | null; created_at: string }
+type ClaimableLocation = { id: string; name: string; location_type: string }
+
+const ROLE_LABELS: Record<string, string> = { owner: 'Dueño', manager: 'Gerente', cashier: 'Cajero', inventory: 'Inventario' }
+const STATUS_LABELS: Record<string, string> = { active: 'Activo', suspended: 'Suspendido', revoked: 'Revocado' }
+
+const ERROR_LABELS: Record<string, string> = {
+  AUTH_REQUIRED: 'Necesitas iniciar sesión.',
+  SHOP_PERMISSION_DENIED: 'No tienes permiso para gestionar el equipo de esta tienda.',
+  PROFILE_NOT_FOUND: 'Ese correo no tiene una cuenta registrada en Challenge Dynasty todavía. Deben registrarse primero.',
+  INVALID_ROLE: 'Rol inválido.',
+  INVALID_STATUS: 'Estado inválido.',
+  CANNOT_REMOVE_LAST_OWNER: 'No puedes quitar al último dueño activo de la tienda.',
+}
+
+function friendlyError(message: string): string {
+  return ERROR_LABELS[message] || 'Algo salió mal. Intenta de nuevo.'
+}
+
+export function ShopClaimOwnership({ locations }: { locations: ClaimableLocation[] }) {
+  const supabase = createClient()
+  const router = useRouter()
+  const [busy, setBusy] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  async function claim(locationId: string) {
+    setBusy(locationId); setError(null)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.email) { setError('Necesitas iniciar sesión.'); setBusy(null); return }
+    const { error: rpcError } = await supabase.rpc('invite_shop_staff', { p_location_id: locationId, p_email: user.email, p_role: 'owner' })
+    setBusy(null)
+    if (rpcError) { setError(friendlyError(rpcError.message)); return }
+    router.refresh()
+  }
+
+  if (locations.length === 0) return null
+
+  return (
+    <div className="rounded-3xl border border-[#D4AF37]/30 bg-[#161616] p-6">
+      <h2 className="font-black text-xl">Reclamar tienda</h2>
+      <p className="text-sm text-white/50 mt-1">Estas tiendas todavía no tienen dueño asignado. Si es tuya, reclámala para ver su panel de control.</p>
+      <div className="mt-5 space-y-2">
+        {locations.map((loc) => (
+          <div key={loc.id} className="flex items-center justify-between rounded-xl bg-white/[.03] p-3">
+            <span>{loc.name} <span className="text-white/40 text-xs">({loc.location_type})</span></span>
+            <button onClick={() => claim(loc.id)} disabled={busy === loc.id} className="rounded-full bg-[#D4AF37] text-black text-xs font-bold px-4 py-2 disabled:opacity-50">
+              {busy === loc.id ? 'Reclamando…' : 'Soy el dueño'}
+            </button>
+          </div>
+        ))}
+      </div>
+      {error && <div className="mt-3 text-sm text-red-400">{error}</div>}
+    </div>
+  )
+}
+
+export function ShopStaffPanel({ locationId, locationName, myRole }: { locationId: string; locationName: string; myRole: string }) {
+  const supabase = createClient()
+  const [staff, setStaff] = useState<StaffRow[]>([])
+  const [loading, setLoading] = useState(true)
+  const [email, setEmail] = useState('')
+  const [role, setRole] = useState('cashier')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const canManage = myRole === 'owner' || myRole === 'manager'
+
+  async function load() {
+    setLoading(true)
+    const { data, error: rpcError } = await supabase.rpc('list_shop_staff', { p_location_id: locationId })
+    setLoading(false)
+    if (rpcError) { setError(friendlyError(rpcError.message)); return }
+    setStaff(Array.isArray(data) ? data : [])
+  }
+
+  useEffect(() => { load() }, [locationId])
+
+  async function addStaff(e: FormEvent) {
+    e.preventDefault()
+    if (!email.trim()) return
+    setBusy(true); setError(null)
+    const { error: rpcError } = await supabase.rpc('invite_shop_staff', { p_location_id: locationId, p_email: email.trim(), p_role: role })
+    setBusy(false)
+    if (rpcError) { setError(friendlyError(rpcError.message)); return }
+    setEmail('')
+    load()
+  }
+
+  async function setStatus(profileId: string, status: string) {
+    setBusy(true); setError(null)
+    const { error: rpcError } = await supabase.rpc('set_shop_staff_status', { p_location_id: locationId, p_profile_id: profileId, p_status: status })
+    setBusy(false)
+    if (rpcError) { setError(friendlyError(rpcError.message)); return }
+    load()
+  }
+
+  return (
+    <div className="rounded-3xl border border-white/10 bg-[#161616] p-6">
+      <h2 className="font-black text-xl">Equipo — {locationName}</h2>
+      <p className="text-sm text-white/40 mt-1">Quién tiene acceso a esta tienda y qué puede hacer.</p>
+
+      {canManage && (
+        <form onSubmit={addStaff} className="mt-5 flex flex-wrap gap-2">
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="correo@empleado.com" className="flex-1 min-w-[200px] rounded-xl bg-white/[.05] border border-white/10 px-3 py-2 text-sm" />
+          <select value={role} onChange={(e) => setRole(e.target.value)} className="rounded-xl bg-white/[.05] border border-white/10 px-3 py-2 text-sm">
+            <option value="manager">Gerente</option>
+            <option value="cashier">Cajero</option>
+            <option value="inventory">Inventario</option>
+          </select>
+          <button type="submit" disabled={busy} className="rounded-full bg-[#D4AF37] text-black text-xs font-bold px-5 py-2 disabled:opacity-50">Agregar</button>
+        </form>
+      )}
+
+      {error && <div className="mt-3 text-sm text-red-400">{error}</div>}
+
+      <div className="mt-5 space-y-2 max-h-96 overflow-auto">
+        {loading && <div className="text-white/40 text-sm">Cargando…</div>}
+        {!loading && staff.length === 0 && <div className="text-white/40 text-sm">Todavía no hay empleados agregados.</div>}
+        {staff.map((s) => (
+          <div key={s.profile_id} className="flex items-center justify-between rounded-xl bg-white/[.03] p-3 text-sm gap-2">
+            <div className="truncate">
+              <div className="font-bold truncate">{s.display_name || s.username || 'Sin nombre'}</div>
+              <div className="text-white/40 text-xs">{ROLE_LABELS[s.role] || s.role} · {STATUS_LABELS[s.status] || s.status}</div>
+            </div>
+            {canManage && s.status === 'active' && (
+              <button onClick={() => setStatus(s.profile_id, 'suspended')} disabled={busy} className="text-xs text-white/50 hover:text-white shrink-0">Suspender</button>
+            )}
+            {canManage && s.status !== 'active' && (
+              <button onClick={() => setStatus(s.profile_id, 'active')} disabled={busy} className="text-xs text-[#D4AF37] hover:text-white shrink-0">Reactivar</button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
