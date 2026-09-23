@@ -1,6 +1,7 @@
 'use client'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, Store, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, Bot, LayoutGrid, History } from 'lucide-react'
+import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, Store, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, Bot, LayoutGrid, History, ShieldCheck } from 'lucide-react'
 
 const groups = [
   {
@@ -53,6 +54,21 @@ const groups = [
 ] as const
 
 export default function Sidebar() {
+  const [isMaster, setIsMaster] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/master/status')
+      .then((res) => (res.ok ? res.json() : { isAdmin: false }))
+      .then((data) => {
+        if (!cancelled) setIsMaster(Boolean(data?.isAdmin))
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 border-r border-white/10 bg-[#0A0A0C]/95 p-5 flex-col z-40">
       <div className="flex items-center gap-3 mb-8">
@@ -75,6 +91,16 @@ export default function Sidebar() {
             </div>
           </div>
         ))}
+        {isMaster ? (
+          <div>
+            <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/35">Plataforma</div>
+            <div className="space-y-1">
+              <Link href="/master" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[#D4AF37] hover:bg-white/5">
+                <ShieldCheck size={18} />Master
+              </Link>
+            </div>
+          </div>
+        ) : null}
       </nav>
       <div className="mt-auto rounded-2xl bg-[#161616] p-4">
         <div className="text-xs text-white/50">SPORTS + PLAYER</div>
