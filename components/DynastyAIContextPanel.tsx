@@ -1,4 +1,5 @@
 import { getDynastyAIContext } from '@/lib/dynasty/ai-context'
+import { getTranslations } from 'next-intl/server'
 
 type Context = {
   profile_id?: string | null
@@ -8,6 +9,7 @@ type Context = {
 }
 
 export default async function DynastyAIContextPanel({ area }: { area: string }) {
+  const t = await getTranslations('Intelligence')
   let context: Context | null = null
   let authenticated = true
   try {
@@ -20,7 +22,7 @@ export default async function DynastyAIContextPanel({ area }: { area: string }) 
     return (
       <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
         <div className="font-black">{area}</div>
-        <p className="mt-2 text-sm opacity-60">Inicia sesión para cargar tu contexto Dynasty.</p>
+        <p className="mt-2 text-sm opacity-60">{t('panelLoginPrompt')}</p>
       </div>
     )
   }
@@ -34,17 +36,17 @@ export default async function DynastyAIContextPanel({ area }: { area: string }) 
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
         <div className="text-xs font-black tracking-widest opacity-50">{area}</div>
         <div className="mt-3 text-3xl font-display font-black tracking-wide">{entitlements.length}</div>
-        <div className="mt-1 text-sm opacity-60">entitlements activos</div>
+        <div className="mt-1 text-sm opacity-60">{t('panelEntitlementsLabel')}</div>
       </div>
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-        <div className="text-xs font-black tracking-widest opacity-50">ORGANIZACIONES</div>
+        <div className="text-xs font-black tracking-widest opacity-50">{t('panelOrganizationsLabel')}</div>
         <div className="mt-3 text-3xl font-display font-black tracking-wide">{organizations.length}</div>
-        <div className="mt-1 text-sm opacity-60">organizaciones accesibles</div>
+        <div className="mt-1 text-sm opacity-60">{t('panelOrganizationsSub')}</div>
       </div>
       <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-        <div className="text-xs font-black tracking-widest opacity-50">SELLER PROFILES</div>
+        <div className="text-xs font-black tracking-widest opacity-50">{t('panelSellerLabel')}</div>
         <div className="mt-3 text-3xl font-display font-black tracking-wide">{sellers.length}</div>
-        <div className="mt-1 text-sm opacity-60">perfiles propios</div>
+        <div className="mt-1 text-sm opacity-60">{t('panelSellerSub')}</div>
       </div>
     </div>
   )

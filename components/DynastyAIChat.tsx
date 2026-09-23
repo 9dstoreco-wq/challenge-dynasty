@@ -1,25 +1,25 @@
 'use client'
 import { FormEvent, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 type DynastyAiMode = 'coach' | 'fitness' | 'club' | 'coach_business' | 'tournament' | 'commerce'
 
-const ERROR_COPY: Record<string, string> = {
-  AUTH_REQUIRED: 'Inicia sesión para hablar con Dynasty AI.',
-  RATE_LIMITED: 'Demasiados mensajes seguidos. Espera un momento y vuelve a intentar.',
-  MESSAGE_REQUIRED: 'Escribe un mensaje antes de enviar.',
-  MESSAGE_TOO_LONG: 'Tu mensaje es demasiado largo.',
-  PAYLOAD_TOO_LARGE: 'Tu mensaje es demasiado largo.',
-  INVALID_MODE: 'Modo de IA inválido.',
-  AI_FUNCTION_ERROR: 'Dynasty AI no pudo responder en este momento.',
-}
-
-function copyFor(code: string | undefined, fallback: string) {
-  if (!code) return fallback
-  return ERROR_COPY[code] ?? fallback
-}
-
 export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMode; placeholder?: string }) {
+  const t = useTranslations('Intelligence')
+  const ERROR_COPY: Record<string, string> = {
+    AUTH_REQUIRED: t('errAuthRequired'),
+    RATE_LIMITED: t('errRateLimited'),
+    MESSAGE_REQUIRED: t('errMessageRequired'),
+    MESSAGE_TOO_LONG: t('errMessageTooLong'),
+    PAYLOAD_TOO_LARGE: t('errMessageTooLong'),
+    INVALID_MODE: t('errInvalidMode'),
+    AI_FUNCTION_ERROR: t('errAiFunctionError'),
+  }
+  function copyFor(code: string | undefined, fallback: string) {
+    if (!code) return fallback
+    return ERROR_COPY[code] ?? fallback
+  }
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [busy, setBusy] = useState(false)
@@ -43,7 +43,7 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
         if (res.status === 401) setNeedsAuth(true)
-        const msg = copyFor(data?.error, 'Error de conexión con Dynasty AI.')
+        const msg = copyFor(data?.error, t('chatConnectionError'))
         setError(msg)
         setMessages((m) => [...m, { role: 'assistant', content: msg }])
         return
@@ -54,7 +54,7 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
         throw new Error('AI_PROVIDER_NOT_CONFIGURED')
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Error de conexión con Dynasty AI.'
+      const msg = err instanceof Error ? err.message : t('chatConnectionError')
       setError(msg)
       setMessages((m) => [...m, { role: 'assistant', content: msg }])
     } finally {
@@ -65,10 +65,10 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
   if (needsAuth) {
     return (
       <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
-        <div className="font-black">Dynasty AI</div>
-        <p className="mt-2 text-sm opacity-60">Inicia sesión para hablar con Dynasty AI.</p>
+        <div className="font-black">{t('chatTitle')}</div>
+        <p className="mt-2 text-sm opacity-60">{t('chatLoginPrompt')}</p>
         <a href="/login" className="mt-4 inline-block rounded-full bg-[#D4AF37] text-black px-5 py-2.5 text-sm font-black">
-          Iniciar sesión
+          {t('chatLoginBtn')}
         </a>
       </div>
     )
@@ -82,7 +82,7 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
       <div className="space-y-3 max-h-[420px] overflow-y-auto">
         {messages.length === 0 && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm opacity-60">
-            Empieza la conversación con Dynasty AI.
+            {t('chatEmptyState')}
           </div>
         )}
         {messages.map((m, i) => (
@@ -90,7 +90,7 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
             key={`${m.role}-${i}`}
             className={`rounded-2xl border border-white/10 p-4 ${m.role === 'user' ? 'bg-white/10' : 'bg-white/5'}`}
           >
-            <div className="text-xs font-black uppercase opacity-50">{m.role === 'user' ? 'Tú' : 'Dynasty AI'}</div>
+            <div className="text-xs font-black uppercase opacity-50">{m.role === 'user' ? t('chatYou') : t('chatAI')}</div>
             <div className="mt-1 whitespace-pre-wrap text-sm">{m.content}</div>
           </div>
         ))}
@@ -99,7 +99,7 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder={placeholder ?? '¿En qué te ayudo hoy?'}
+          placeholder={placeholder ?? t('chatDefaultPlaceholder')}
           className="min-h-24 w-full rounded-3xl border border-white/10 bg-white/5 p-4 text-sm outline-none"
         />
         <button
@@ -107,7 +107,7 @@ export default function DynastyAIChat({ mode, placeholder }: { mode: DynastyAiMo
           disabled={busy || !message.trim()}
           className="rounded-full bg-[#D4AF37] text-black px-6 py-3 font-black disabled:opacity-40"
         >
-          {busy ? 'Pensando...' : 'Enviar a Dynasty AI'}
+          {busy ? t('chatThinking') : t('chatSend')}
         </button>
       </form>
     </div>
