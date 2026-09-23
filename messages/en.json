@@ -577,5 +577,33 @@
     "tcValidate": "VALIDATE",
     "tcPublish": "PUBLISH",
     "tcEngineResult": "Engine result"
+  },
+  "Competitions": {
+    "tag": "TOURNAMENT OS",
+    "title": "COMPETITIONS",
+    "subtitle": "Real tournaments from Supabase, ready to evolve into brackets, groups, fixtures and scheduling.",
+    "dateTBD": "Date TBD",
+    "empty": "No tournaments created yet. The Tournament OS infrastructure already exists in Supabase.",
+    "notFound": "Tournament not found.",
+    "categoryFallback": "category",
+    "maxEntries": "Max. {count} pairs/entries",
+    "fixturesTitle": "Fixtures",
+    "fixturesRegistered": "{count} registered",
+    "noFixtures": "No fixtures generated yet.",
+    "tbd": "TBD"
+  },
+  "Onboarding": {
+    "step": "FIRST STEP",
+    "title": "Choose your main sport.",
+    "subtitle": "Your account can have several sports, but we start with one.",
+    "loading": "Loading sports...",
+    "selectSport": "Select a sport.",
+    "loginFirst": "Log in first.",
+    "defaultName": "Dynasty Player",
+    "sportUnavailable": "That sport is no longer available.",
+    "done": "Done. You can now create your first challenge.",
+    "saving": "SAVING...",
+    "saveSport": "SAVE SPORT",
+    "goToChallenge": "GO TO CHALLENGE"
   }
 }

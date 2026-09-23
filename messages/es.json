@@ -577,5 +577,33 @@
     "tcValidate": "VALIDAR",
     "tcPublish": "PUBLICAR",
     "tcEngineResult": "Resultado del motor"
+  },
+  "Competitions": {
+    "tag": "TOURNAMENT OS",
+    "title": "COMPETICIONES",
+    "subtitle": "Torneos reales de Supabase, listos para evolucionar hacia cuadros, grupos, fixtures y programación.",
+    "dateTBD": "Fecha por definir",
+    "empty": "No hay torneos creados todavía. La infraestructura Tournament OS sí existe en Supabase.",
+    "notFound": "Torneo no encontrado.",
+    "categoryFallback": "categoría",
+    "maxEntries": "Máx. {count} parejas/entradas",
+    "fixturesTitle": "Fixtures",
+    "fixturesRegistered": "{count} registrados",
+    "noFixtures": "Todavía no hay fixtures generados.",
+    "tbd": "TBD"
+  },
+  "Onboarding": {
+    "step": "PRIMER PASO",
+    "title": "Elige tu deporte principal.",
+    "subtitle": "Tu cuenta puede tener varios deportes, pero empezamos con uno.",
+    "loading": "Cargando deportes...",
+    "selectSport": "Selecciona un deporte.",
+    "loginFirst": "Inicia sesión primero.",
+    "defaultName": "Jugador Dynasty",
+    "sportUnavailable": "El deporte ya no está disponible.",
+    "done": "Listo. Ya puedes crear tu primer reto.",
+    "saving": "GUARDANDO...",
+    "saveSport": "GUARDAR DEPORTE",
+    "goToChallenge": "IR A CHALLENGE"
   }
 }
