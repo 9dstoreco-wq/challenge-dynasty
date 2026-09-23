@@ -162,10 +162,13 @@
     "goToCart": "Ir al carrito →",
     "selectVariant": "Selecciona una variante.",
     "addedToCart": "Producto añadido al carrito.",
-    "couldNotOpenCart": "No se pudo abrir el carrito."
+    "couldNotOpenCart": "No se pudo abrir el carrito.",
+    "cartHeroTag": "DYNASTY SHOP · CARRITO",
+    "cartHeroTitle": "TU CARRITO",
+    "cartHeroSubtitle": "Revisa tus artículos, confirma tus datos de envío y cierra el pedido."
   },
   "ShopCart": {
-    "title": "Tu carrito",
+    "title": "Artículos",
     "linesCount": "{count} líneas",
     "defaultProductName": "Producto Dynasty",
     "defaultVariantName": "Variante",

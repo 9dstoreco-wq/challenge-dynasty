@@ -162,10 +162,13 @@
     "goToCart": "Go to cart →",
     "selectVariant": "Select a variant.",
     "addedToCart": "Product added to cart.",
-    "couldNotOpenCart": "Could not open the cart."
+    "couldNotOpenCart": "Could not open the cart.",
+    "cartHeroTag": "DYNASTY SHOP · CART",
+    "cartHeroTitle": "YOUR CART",
+    "cartHeroSubtitle": "Review your items, confirm your shipping details and close out the order."
   },
   "ShopCart": {
-    "title": "Your cart",
+    "title": "Items",
     "linesCount": "{count} lines",
     "defaultProductName": "Dynasty Product",
     "defaultVariantName": "Variant",
