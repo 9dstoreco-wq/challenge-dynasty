@@ -224,5 +224,72 @@
     "rankingEmpty": "Set up a sport and play your first match.",
     "defaultUsername": "player",
     "defaultDisplayName": "Player"
+  },
+  "Arena": {
+    "title": "Live competition",
+    "subtitle": "Real challenges from CHALLENGE DYNASTY.",
+    "defaultSport": "Sport",
+    "defaultPlayer": "Player",
+    "defaultRival": "Opponent",
+    "tbd": "TBD",
+    "locationTbd": "Location TBD",
+    "empty": "The Arena is waiting for new challenges."
+  },
+  "Clubs": {
+    "title": "Sports clubs",
+    "subtitle": "Organizations, courts, bookings, coaches and tournaments from one place.",
+    "locationUnknown": "Location not set",
+    "defaultDescription": "Dynasty Club",
+    "empty": "No active organizations registered yet."
+  },
+  "Coaches": {
+    "title": "Train. Manage. Grow.",
+    "subtitle": "Independent coaches or club-affiliated ones, with services and schedules connected to the ecosystem.",
+    "activeCoaches": "ACTIVE COACHES",
+    "noCoaches": "No active coach profiles yet.",
+    "defaultCoachName": "Dynasty Coach",
+    "independent": "Independent",
+    "affiliated": "Affiliated with an organization",
+    "inPerson": "In person",
+    "online": "Online",
+    "activeServices": "ACTIVE SERVICES",
+    "noServices": "No coach services published yet."
+  },
+  "Bookings": {
+    "title": "Advanced bookings",
+    "subtitle": "Book resources, services and activities with atomic validation, capacity and conflict control.",
+    "engineTitle": "ATOMIC BOOKING",
+    "engineBody": "Availability, capacity, conflicts and payment are validated by the backend before confirming.",
+    "noBookables": "No active bookable resources yet.",
+    "defaultService": "Service",
+    "startLabel": "Booking start",
+    "quantityLabel": "Quantity",
+    "duration": "Duration",
+    "capacity": "Capacity",
+    "total": "Total",
+    "ends": "Ends",
+    "processing": "PROCESSING…",
+    "confirmBooking": "CONFIRM BOOKING",
+    "scheduleTitle": "Schedule & control",
+    "bookingsCount": "{count} bookings",
+    "noBookings": "You have no bookings yet. Once there's data, status, payment and actions will show here.",
+    "paymentLabel": "Payment",
+    "cancel": "Cancel",
+    "loginRequired": "You must sign in to book.",
+    "bookingCreated": "Booking created: {id}…",
+    "bookingFailed": "Could not create the booking.",
+    "bookingCancelled": "Booking cancelled. Reload to refresh the calendar.",
+    "cancelFailed": "Could not cancel."
+  },
+  "History": {
+    "title": "Competitive history",
+    "subtitle": "Every confirmed match leaves a trace in your history.",
+    "loginPrompt": "Sign in to see your history",
+    "defaultMatch": "Match",
+    "vs": "vs",
+    "locationUnknown": "Location not specified",
+    "win": "WIN",
+    "loss": "LOSS",
+    "empty": "You have no confirmed matches yet."
   }
 }

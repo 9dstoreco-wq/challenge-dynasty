@@ -224,5 +224,72 @@
     "rankingEmpty": "Configura un deporte y juega tu primer partido.",
     "defaultUsername": "jugador",
     "defaultDisplayName": "Jugador"
+  },
+  "Arena": {
+    "title": "Competencia en vivo",
+    "subtitle": "Retos reales de CHALLENGE DYNASTY.",
+    "defaultSport": "Deporte",
+    "defaultPlayer": "Jugador",
+    "defaultRival": "Rival",
+    "tbd": "Por definir",
+    "locationTbd": "Ubicación por definir",
+    "empty": "La Arena está esperando nuevos retos."
+  },
+  "Clubs": {
+    "title": "Clubes deportivos",
+    "subtitle": "Organizaciones, canchas, reservas, coaches y torneos desde un mismo espacio.",
+    "locationUnknown": "Ubicación no definida",
+    "defaultDescription": "Club Dynasty",
+    "empty": "Todavía no hay organizaciones activas registradas en Supabase."
+  },
+  "Coaches": {
+    "title": "Entrena. Gestiona. Crece.",
+    "subtitle": "Coaches independientes o vinculados a clubes, con servicios y agenda conectables al ecosistema.",
+    "activeCoaches": "COACHES ACTIVOS",
+    "noCoaches": "Todavía no hay perfiles de coach activos.",
+    "defaultCoachName": "Coach Dynasty",
+    "independent": "Independiente",
+    "affiliated": "Vinculado a organización",
+    "inPerson": "Presencial",
+    "online": "Online",
+    "activeServices": "SERVICIOS ACTIVOS",
+    "noServices": "Todavía no hay servicios de coach publicados."
+  },
+  "Bookings": {
+    "title": "Reservas avanzadas",
+    "subtitle": "Reserva recursos, servicios y actividades con validación atómica, capacidad y control de conflictos.",
+    "engineTitle": "RESERVA ATÓMICA",
+    "engineBody": "Disponibilidad, capacidad, conflictos y pago quedan validados por el backend antes de confirmar.",
+    "noBookables": "No hay recursos reservables activos todavía.",
+    "defaultService": "Servicio",
+    "startLabel": "Inicio de reserva",
+    "quantityLabel": "Cantidad",
+    "duration": "Duración",
+    "capacity": "Capacidad",
+    "total": "Total",
+    "ends": "Termina",
+    "processing": "PROCESANDO…",
+    "confirmBooking": "CONFIRMAR RESERVA",
+    "scheduleTitle": "Agenda y control",
+    "bookingsCount": "{count} reservas",
+    "noBookings": "Aún no tienes reservas. Cuando haya datos, aquí aparecerán estado, pago y acciones.",
+    "paymentLabel": "Pago",
+    "cancel": "Cancelar",
+    "loginRequired": "Debes iniciar sesión para reservar.",
+    "bookingCreated": "Reserva creada: {id}…",
+    "bookingFailed": "No se pudo crear la reserva.",
+    "bookingCancelled": "Reserva cancelada. Recarga para actualizar el calendario.",
+    "cancelFailed": "No se pudo cancelar."
+  },
+  "History": {
+    "title": "Historial competitivo",
+    "subtitle": "Cada partido confirmado deja rastro en tu historial.",
+    "loginPrompt": "Inicia sesión para ver tu historial",
+    "defaultMatch": "Partido",
+    "vs": "vs",
+    "locationUnknown": "Ubicación no indicada",
+    "win": "VICTORIA",
+    "loss": "DERROTA",
+    "empty": "Todavía no tienes partidos confirmados."
   }
 }
