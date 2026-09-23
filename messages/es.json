@@ -1,0 +1,48 @@
+{
+  "Sidebar": {
+    "groups": {
+      "jugar": "Jugar",
+      "comunidad": "Comunidad",
+      "dynastyAi": "Dynasty AI",
+      "negocio": "Negocio",
+      "comercio": "Comercio",
+      "cuenta": "Cuenta",
+      "plataforma": "Plataforma"
+    },
+    "items": {
+      "inicio": "Inicio",
+      "retos": "Retos",
+      "deportes": "Deportes",
+      "trucos": "Trucos",
+      "ranking": "Ranking",
+      "historial": "Historial",
+      "arena": "Arena",
+      "jugadores": "Jugadores",
+      "partners": "Partners",
+      "notificaciones": "Notificaciones",
+      "dynastyAi": "Dynasty AI",
+      "clubes": "Clubes",
+      "coaches": "Coaches",
+      "miCoachOs": "Mi Coach OS",
+      "competiciones": "Competiciones",
+      "reservas": "Reservas",
+      "promote": "Promote",
+      "planes": "Planes",
+      "finanzas": "Finanzas",
+      "marketplace": "Marketplace",
+      "dynastyShop": "Dynasty Shop",
+      "miTienda": "Mi Tienda",
+      "miPerfil": "Mi perfil",
+      "master": "Master"
+    },
+    "retar": "RETAR",
+    "profileCard": {
+      "kicker": "SPORTS + PLAYER",
+      "title": "Tu perfil",
+      "badge": "PASAPORTE"
+    }
+  },
+  "LocaleSwitcher": {
+    "label": "Idioma"
+  }
+}

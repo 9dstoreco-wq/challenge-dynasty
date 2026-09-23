@@ -70,14 +70,27 @@ export function ShopStaffPanel({ locationId, locationName, myRole }: { locationI
   const canManage = myRole === 'owner' || myRole === 'manager'
 
   async function load() {
-    setLoading(true)
     const { data, error: rpcError } = await supabase.rpc('list_shop_staff', { p_location_id: locationId })
     setLoading(false)
     if (rpcError) { setError(friendlyError(rpcError.message)); return }
     setStaff(Array.isArray(data) ? data : [])
   }
 
-  useEffect(() => { load() }, [locationId])
+  // Mirrors the promise-chain shape used elsewhere (WompiCheckoutButton): setState
+  // only happens inside the .then() callback, never in the effect's own synchronous
+  // body, which is what react-hooks/set-state-in-effect actually checks for -- calling
+  // an async/await function directly from the effect still trips it even when the
+  // setState calls are technically after an await.
+  useEffect(() => {
+    let cancelled = false
+    supabase.rpc('list_shop_staff', { p_location_id: locationId }).then(({ data, error: rpcError }) => {
+      if (cancelled) return
+      setLoading(false)
+      if (rpcError) { setError(friendlyError(rpcError.message)); return }
+      setStaff(Array.isArray(data) ? data : [])
+    })
+    return () => { cancelled = true }
+  }, [locationId, supabase])
 
   async function addStaff(e: FormEvent) {
     e.preventDefault()
@@ -87,6 +100,7 @@ export function ShopStaffPanel({ locationId, locationName, myRole }: { locationI
     setBusy(false)
     if (rpcError) { setError(friendlyError(rpcError.message)); return }
     setEmail('')
+    setLoading(true)
     load()
   }
 
@@ -95,6 +109,7 @@ export function ShopStaffPanel({ locationId, locationName, myRole }: { locationI
     const { error: rpcError } = await supabase.rpc('set_shop_staff_status', { p_location_id: locationId, p_profile_id: profileId, p_status: status })
     setBusy(false)
     if (rpcError) { setError(friendlyError(rpcError.message)); return }
+    setLoading(true)
     load()
   }
 

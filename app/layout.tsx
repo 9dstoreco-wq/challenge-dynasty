@@ -5,6 +5,8 @@ import '@fontsource/inter/900.css'
 import '@fontsource/bebas-neue/400.css'
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getMessages } from 'next-intl/server'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://challenge-dynasty.com'),
@@ -20,4 +22,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: '#0A0A0C', colorScheme: 'dark' }
 
-export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="es"><body>{children}</body></html>}
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+  return <html lang={locale}><body>
+    <NextIntlClientProvider locale={locale} messages={messages}>{children}</NextIntlClientProvider>
+  </body></html>
+}

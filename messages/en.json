@@ -1,0 +1,48 @@
+{
+  "Sidebar": {
+    "groups": {
+      "jugar": "Play",
+      "comunidad": "Community",
+      "dynastyAi": "Dynasty AI",
+      "negocio": "Business",
+      "comercio": "Commerce",
+      "cuenta": "Account",
+      "plataforma": "Platform"
+    },
+    "items": {
+      "inicio": "Home",
+      "retos": "Challenges",
+      "deportes": "Sports",
+      "trucos": "Tricks",
+      "ranking": "Ranking",
+      "historial": "History",
+      "arena": "Arena",
+      "jugadores": "Players",
+      "partners": "Partners",
+      "notificaciones": "Notifications",
+      "dynastyAi": "Dynasty AI",
+      "clubes": "Clubs",
+      "coaches": "Coaches",
+      "miCoachOs": "My Coach OS",
+      "competiciones": "Competitions",
+      "reservas": "Bookings",
+      "promote": "Promote",
+      "planes": "Plans",
+      "finanzas": "Finance",
+      "marketplace": "Marketplace",
+      "dynastyShop": "Dynasty Shop",
+      "miTienda": "My Shop",
+      "miPerfil": "My profile",
+      "master": "Master"
+    },
+    "retar": "CHALLENGE",
+    "profileCard": {
+      "kicker": "SPORTS + PLAYER",
+      "title": "Your profile",
+      "badge": "PASSPORT"
+    }
+  },
+  "LocaleSwitcher": {
+    "label": "Language"
+  }
+}
