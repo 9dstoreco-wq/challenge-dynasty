@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import PageHero from '@/components/PageHero'
 import { ShopClaimOwnership, ShopStaffPanel } from '@/components/ShopStaffPanel'
 import ShopProductManager, { type Product, type ShippingRule } from '@/components/ShopProductManager'
+import { getTranslations } from 'next-intl/server'
 
 type InventoryRow = { location_type: string; available_quantity: number | null; product_title: string | null; variant_title: string | null }
 type SalesRow = { gross_sales: number | null }
@@ -13,6 +14,7 @@ type ClaimableLocation = { id: string; name: string; location_type: string }
 
 export default async function ShopAdminPage(){
   const supabase = await createClient()
+  const t = await getTranslations('ShopAdmin')
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/shop/admin')
 
@@ -26,10 +28,10 @@ export default async function ShopAdminPage(){
 
   if (managed.length === 0) {
     return <main className="min-h-screen bg-[#0A0A0C] text-white grid-bg"><Sidebar/><section className="lg:pl-64 p-6 lg:p-12 max-w-[1500px] mx-auto">
-      <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">DYNASTY SHOP · ADMIN</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">CONTROL COMERCIAL</h1></PageHero>
+      <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">{t('tag')}</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{t('title')}</h1></PageHero>
       {claimableLocations.length > 0
         ? <div className="mt-8"><ShopClaimOwnership locations={claimableLocations} /></div>
-        : <div className="mt-8 rounded-3xl border border-dashed border-white/10 p-10 text-center text-white/40">No tienes acceso a ninguna tienda todavía. Si deberías tenerlo, pídele a quien administra la tienda que te agregue desde este mismo panel.</div>}
+        : <div className="mt-8 rounded-3xl border border-dashed border-white/10 p-10 text-center text-white/40">{t('noAccess')}</div>}
     </section></main>
   }
 
@@ -47,10 +49,10 @@ export default async function ShopAdminPage(){
   const revenue = sales.reduce((a:number,x)=>a+Number(x.gross_sales||0),0)
 
   return <main className="min-h-screen bg-[#0A0A0C] text-white grid-bg"><Sidebar/><section className="lg:pl-64 p-6 lg:p-12 max-w-[1500px] mx-auto">
-    <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">DYNASTY SHOP · ADMIN</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">CONTROL COMERCIAL</h1></PageHero>
-    <div className="grid md:grid-cols-4 gap-4 mt-8">{[['ONLINE',online],['FÍSICO',physical],['VENTAS',revenue.toLocaleString('es-CO')],['ALERTAS',alerts.length]].map(([k,v])=><div key={k} className="rounded-3xl border border-white/10 bg-[#161616] p-6"><div className="text-xs text-white/40 tracking-widest">{k}</div><div className="text-3xl font-display font-black tracking-wide mt-2">{v}</div></div>)}</div>
-    <div className="grid lg:grid-cols-2 gap-5 mt-6"><div className="rounded-3xl border border-white/10 bg-[#161616] p-6"><h2 className="font-black text-xl">Inventario</h2><p className="text-sm text-white/40 mt-1">Físico y online, por ubicación y variante.</p><div className="mt-5 space-y-2 max-h-96 overflow-auto">{inventory.slice(0,30).map((x,i:number)=><div key={i} className="flex justify-between rounded-xl bg-white/[.03] p-3"><span className="truncate pr-3">{x.product_title || x.variant_title || 'Producto'}</span><b>{x.available_quantity ?? 0}</b></div>)}</div></div>
-    <div className="rounded-3xl border border-white/10 bg-[#161616] p-6"><h2 className="font-black text-xl">Alertas</h2><p className="text-sm text-white/40 mt-1">Reposición y stock bajo.</p><div className="mt-5 space-y-2">{alerts.slice(0,20).map((x,i:number)=><div key={i} className="rounded-xl bg-white/[.03] p-3 text-sm">{x.product_title || x.variant_title || 'Producto'} · <b>{x.available_quantity ?? 0}</b></div>)}{alerts.length===0&&<div className="text-white/40">Sin alertas activas.</div>}</div></div></div>
+    <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">{t('tag')}</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{t('title')}</h1></PageHero>
+    <div className="grid md:grid-cols-4 gap-4 mt-8">{[[t('statOnline'),online],[t('statPhysical'),physical],[t('statSales'),revenue.toLocaleString('es-CO')],[t('statAlerts'),alerts.length]].map(([k,v])=><div key={k} className="rounded-3xl border border-white/10 bg-[#161616] p-6"><div className="text-xs text-white/40 tracking-widest">{k}</div><div className="text-3xl font-display font-black tracking-wide mt-2">{v}</div></div>)}</div>
+    <div className="grid lg:grid-cols-2 gap-5 mt-6"><div className="rounded-3xl border border-white/10 bg-[#161616] p-6"><h2 className="font-black text-xl">{t('inventoryTitle')}</h2><p className="text-sm text-white/40 mt-1">{t('inventorySubtitle')}</p><div className="mt-5 space-y-2 max-h-96 overflow-auto">{inventory.slice(0,30).map((x,i:number)=><div key={i} className="flex justify-between rounded-xl bg-white/[.03] p-3"><span className="truncate pr-3">{x.product_title || x.variant_title || t('defaultProduct')}</span><b>{x.available_quantity ?? 0}</b></div>)}</div></div>
+    <div className="rounded-3xl border border-white/10 bg-[#161616] p-6"><h2 className="font-black text-xl">{t('alertsTitle')}</h2><p className="text-sm text-white/40 mt-1">{t('alertsSubtitle')}</p><div className="mt-5 space-y-2">{alerts.slice(0,20).map((x,i:number)=><div key={i} className="rounded-xl bg-white/[.03] p-3 text-sm">{x.product_title || x.variant_title || t('defaultProduct')} · <b>{x.available_quantity ?? 0}</b></div>)}{alerts.length===0&&<div className="text-white/40">{t('noAlerts')}</div>}</div></div></div>
     <div className="grid lg:grid-cols-2 gap-5 mt-6">
       {managed.map((loc) => <ShopStaffPanel key={loc.location_id} locationId={loc.location_id} locationName={loc.location_name} myRole={loc.my_role} />)}
     </div>

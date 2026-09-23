@@ -2,36 +2,34 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslations } from 'next-intl'
 
 type StaffRow = { profile_id: string; role: string; status: string; display_name: string | null; username: string | null; created_at: string }
 type ClaimableLocation = { id: string; name: string; location_type: string }
 
-const ROLE_LABELS: Record<string, string> = { owner: 'Dueño', manager: 'Gerente', cashier: 'Cajero', inventory: 'Inventario' }
-const STATUS_LABELS: Record<string, string> = { active: 'Activo', suspended: 'Suspendido', revoked: 'Revocado' }
-
-const ERROR_LABELS: Record<string, string> = {
-  AUTH_REQUIRED: 'Necesitas iniciar sesión.',
-  SHOP_PERMISSION_DENIED: 'No tienes permiso para gestionar el equipo de esta tienda.',
-  PROFILE_NOT_FOUND: 'Ese correo no tiene una cuenta registrada en Challenge Dynasty todavía. Deben registrarse primero.',
-  INVALID_ROLE: 'Rol inválido.',
-  INVALID_STATUS: 'Estado inválido.',
-  CANNOT_REMOVE_LAST_OWNER: 'No puedes quitar al último dueño activo de la tienda.',
-}
-
-function friendlyError(message: string): string {
-  return ERROR_LABELS[message] || 'Algo salió mal. Intenta de nuevo.'
-}
-
 export function ShopClaimOwnership({ locations }: { locations: ClaimableLocation[] }) {
+  const t = useTranslations('ShopAdmin')
   const supabase = createClient()
   const router = useRouter()
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const ERROR_LABELS: Record<string, string> = {
+    AUTH_REQUIRED: t('errAuthRequired'),
+    SHOP_PERMISSION_DENIED: t('errPermissionDenied'),
+    PROFILE_NOT_FOUND: t('errProfileNotFound'),
+    INVALID_ROLE: t('errInvalidRole'),
+    INVALID_STATUS: t('errInvalidStatus'),
+    CANNOT_REMOVE_LAST_OWNER: t('errCannotRemoveLastOwner'),
+  }
+  function friendlyError(message: string): string {
+    return ERROR_LABELS[message] || t('genericStaffError')
+  }
+
   async function claim(locationId: string) {
     setBusy(locationId); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user?.email) { setError('Necesitas iniciar sesión.'); setBusy(null); return }
+    if (!user?.email) { setError(t('errAuthRequired')); setBusy(null); return }
     const { error: rpcError } = await supabase.rpc('invite_shop_staff', { p_location_id: locationId, p_email: user.email, p_role: 'owner' })
     setBusy(null)
     if (rpcError) { setError(friendlyError(rpcError.message)); return }
@@ -42,14 +40,14 @@ export function ShopClaimOwnership({ locations }: { locations: ClaimableLocation
 
   return (
     <div className="rounded-3xl border border-[#D4AF37]/30 bg-[#161616] p-6">
-      <h2 className="font-black text-xl">Reclamar tienda</h2>
-      <p className="text-sm text-white/50 mt-1">Estas tiendas todavía no tienen dueño asignado. Si es tuya, reclámala para ver su panel de control.</p>
+      <h2 className="font-black text-xl">{t('claimTitle')}</h2>
+      <p className="text-sm text-white/50 mt-1">{t('claimSubtitle')}</p>
       <div className="mt-5 space-y-2">
         {locations.map((loc) => (
           <div key={loc.id} className="flex items-center justify-between rounded-xl bg-white/[.03] p-3">
             <span>{loc.name} <span className="text-white/40 text-xs">({loc.location_type})</span></span>
             <button onClick={() => claim(loc.id)} disabled={busy === loc.id} className="rounded-full bg-[#D4AF37] text-black text-xs font-bold px-4 py-2 disabled:opacity-50">
-              {busy === loc.id ? 'Reclamando…' : 'Soy el dueño'}
+              {busy === loc.id ? t('claiming') : t('claimBtn')}
             </button>
           </div>
         ))}
@@ -60,6 +58,7 @@ export function ShopClaimOwnership({ locations }: { locations: ClaimableLocation
 }
 
 export function ShopStaffPanel({ locationId, locationName, myRole }: { locationId: string; locationName: string; myRole: string }) {
+  const t = useTranslations('ShopAdmin')
   const supabase = createClient()
   const [staff, setStaff] = useState<StaffRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -68,6 +67,20 @@ export function ShopStaffPanel({ locationId, locationName, myRole }: { locationI
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const canManage = myRole === 'owner' || myRole === 'manager'
+
+  const ROLE_LABELS: Record<string, string> = { owner: t('roleOwner'), manager: t('roleManager'), cashier: t('roleCashier'), inventory: t('roleInventory') }
+  const STATUS_LABELS: Record<string, string> = { active: t('statusActive'), suspended: t('statusSuspended'), revoked: t('statusRevoked') }
+  const ERROR_LABELS: Record<string, string> = {
+    AUTH_REQUIRED: t('errAuthRequired'),
+    SHOP_PERMISSION_DENIED: t('errPermissionDenied'),
+    PROFILE_NOT_FOUND: t('errProfileNotFound'),
+    INVALID_ROLE: t('errInvalidRole'),
+    INVALID_STATUS: t('errInvalidStatus'),
+    CANNOT_REMOVE_LAST_OWNER: t('errCannotRemoveLastOwner'),
+  }
+  function friendlyError(message: string): string {
+    return ERROR_LABELS[message] || t('genericStaffError')
+  }
 
   async function load() {
     const { data, error: rpcError } = await supabase.rpc('list_shop_staff', { p_location_id: locationId })
@@ -90,6 +103,7 @@ export function ShopStaffPanel({ locationId, locationName, myRole }: { locationI
       setStaff(Array.isArray(data) ? data : [])
     })
     return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationId, supabase])
 
   async function addStaff(e: FormEvent) {
@@ -115,37 +129,37 @@ export function ShopStaffPanel({ locationId, locationName, myRole }: { locationI
 
   return (
     <div className="rounded-3xl border border-white/10 bg-[#161616] p-6">
-      <h2 className="font-black text-xl">Equipo — {locationName}</h2>
-      <p className="text-sm text-white/40 mt-1">Quién tiene acceso a esta tienda y qué puede hacer.</p>
+      <h2 className="font-black text-xl">{t('teamTitle', {name: locationName})}</h2>
+      <p className="text-sm text-white/40 mt-1">{t('teamSubtitle')}</p>
 
       {canManage && (
         <form onSubmit={addStaff} className="mt-5 flex flex-wrap gap-2">
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="correo@empleado.com" className="flex-1 min-w-[200px] rounded-xl bg-white/[.05] border border-white/10 px-3 py-2 text-sm" />
+          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder={t('staffEmailPlaceholder')} className="flex-1 min-w-[200px] rounded-xl bg-white/[.05] border border-white/10 px-3 py-2 text-sm" />
           <select value={role} onChange={(e) => setRole(e.target.value)} className="rounded-xl bg-white/[.05] border border-white/10 px-3 py-2 text-sm">
-            <option value="manager">Gerente</option>
-            <option value="cashier">Cajero</option>
-            <option value="inventory">Inventario</option>
+            <option value="manager">{t('roleManager')}</option>
+            <option value="cashier">{t('roleCashier')}</option>
+            <option value="inventory">{t('roleInventory')}</option>
           </select>
-          <button type="submit" disabled={busy} className="rounded-full bg-[#D4AF37] text-black text-xs font-bold px-5 py-2 disabled:opacity-50">Agregar</button>
+          <button type="submit" disabled={busy} className="rounded-full bg-[#D4AF37] text-black text-xs font-bold px-5 py-2 disabled:opacity-50">{t('addBtn')}</button>
         </form>
       )}
 
       {error && <div className="mt-3 text-sm text-red-400">{error}</div>}
 
       <div className="mt-5 space-y-2 max-h-96 overflow-auto">
-        {loading && <div className="text-white/40 text-sm">Cargando…</div>}
-        {!loading && staff.length === 0 && <div className="text-white/40 text-sm">Todavía no hay empleados agregados.</div>}
+        {loading && <div className="text-white/40 text-sm">{t('loadingEllipsis')}</div>}
+        {!loading && staff.length === 0 && <div className="text-white/40 text-sm">{t('noStaff')}</div>}
         {staff.map((s) => (
           <div key={s.profile_id} className="flex items-center justify-between rounded-xl bg-white/[.03] p-3 text-sm gap-2">
             <div className="truncate">
-              <div className="font-bold truncate">{s.display_name || s.username || 'Sin nombre'}</div>
+              <div className="font-bold truncate">{s.display_name || s.username || t('noName')}</div>
               <div className="text-white/40 text-xs">{ROLE_LABELS[s.role] || s.role} · {STATUS_LABELS[s.status] || s.status}</div>
             </div>
             {canManage && s.status === 'active' && (
-              <button onClick={() => setStatus(s.profile_id, 'suspended')} disabled={busy} className="text-xs text-white/50 hover:text-white shrink-0">Suspender</button>
+              <button onClick={() => setStatus(s.profile_id, 'suspended')} disabled={busy} className="text-xs text-white/50 hover:text-white shrink-0">{t('suspendBtn')}</button>
             )}
             {canManage && s.status !== 'active' && (
-              <button onClick={() => setStatus(s.profile_id, 'active')} disabled={busy} className="text-xs text-[#D4AF37] hover:text-white shrink-0">Reactivar</button>
+              <button onClick={() => setStatus(s.profile_id, 'active')} disabled={busy} className="text-xs text-[#D4AF37] hover:text-white shrink-0">{t('reactivateBtn')}</button>
             )}
           </div>
         ))}
