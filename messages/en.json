@@ -386,5 +386,62 @@
     "subtitle": "The season layer is starting to consume real competitive activity from the backend.",
     "empty": "Not enough competitive activity yet to show seasons.",
     "noDate": "No date"
+  },
+  "Settings": {
+    "loginRequired": "Sign in to open settings",
+    "title": "Settings",
+    "subtitle": "Your sports identity controls how Dynasty finds, challenges and ranks you."
+  },
+  "Social": {
+    "title": "Competitive feed",
+    "subtitle": "Results, posts and community activity.",
+    "createChallenge": "CREATE CHALLENGE",
+    "preferences": "PREFERENCES",
+    "empty": "No posts yet. Official results and your posts will show up here.",
+    "defaultUsername": "player",
+    "defaultDisplayName": "Player"
+  },
+  "Search": {
+    "title": "Search",
+    "placeholder": "Player, username or city",
+    "searchBtn": "SEARCH",
+    "noRanking": "NO RANKING",
+    "locationUnknown": "Location not specified",
+    "noResults": "We couldn't find any players matching “{q}”.",
+    "prompt": "Type a name, username or city to discover players."
+  },
+  "Promote": {
+    "title": "Make your tournament visible.",
+    "subtitle": "The organizer keeps their registrations. Dynasty monetizes promotion, visibility and ad space.",
+    "packLabel": "PROMOTION",
+    "pack1Title": "FEATURED",
+    "pack1Body": "Greater presence in the calendar and discovery.",
+    "pack2Title": "BOOST",
+    "pack2Body": "A boost inside Challenge Dynasty.",
+    "pack3Title": "DYNASTY PROMOTE",
+    "pack3Body": "Campaign, sponsors and premium placements.",
+    "promoteBtn": "PROMOTE"
+  },
+  "Partners": {
+    "title": "Find your partner.",
+    "subtitle": "Discover players set up for padel. Send real invites and pair up once your rival accepts.",
+    "compatiblePlayers": "🎯 COMPATIBLE PLAYERS",
+    "available": "{count} available",
+    "levelUnspecified": "LEVEL NOT SPECIFIED",
+    "noCity": "No city",
+    "challenge": "CHALLENGE",
+    "view": "VIEW",
+    "empty": "Set up Padel in your profile to start finding partners.",
+    "passportTitle": "Sports passport",
+    "passportBody": "Your current level: {level}.",
+    "notConfigured": "not set",
+    "directChallengeTitle": "Direct challenge",
+    "directChallengeBody": "You can turn any compatible profile into an official challenge.",
+    "noFakeDataTitle": "No fake data",
+    "noFakeDataBody": "This screen only shows real, discoverable profiles.",
+    "inviting": "SENDING...",
+    "invited": "✓ SENT",
+    "invite": "INVITE",
+    "inviteFailed": "Could not send"
   }
 }

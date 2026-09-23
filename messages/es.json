@@ -386,5 +386,62 @@
     "subtitle": "La capa de temporada empieza a consumir la actividad competitiva real del backend.",
     "empty": "Todavía no hay actividad competitiva suficiente para mostrar temporadas.",
     "noDate": "Sin fecha"
+  },
+  "Settings": {
+    "loginRequired": "Inicia sesión para abrir configuración",
+    "title": "Configuración",
+    "subtitle": "Tu identidad deportiva controla cómo Dynasty te encuentra, te reta y te posiciona."
+  },
+  "Social": {
+    "title": "Feed competitivo",
+    "subtitle": "Resultados, publicaciones y actividad de la comunidad.",
+    "createChallenge": "CREAR RETO",
+    "preferences": "PREFERENCIAS",
+    "empty": "Todavía no hay publicaciones. Los resultados oficiales y tus posts aparecerán aquí.",
+    "defaultUsername": "jugador",
+    "defaultDisplayName": "Jugador"
+  },
+  "Search": {
+    "title": "Buscar",
+    "placeholder": "Jugador, username o ciudad",
+    "searchBtn": "BUSCAR",
+    "noRanking": "SIN RANKING",
+    "locationUnknown": "Ubicación no indicada",
+    "noResults": "No encontramos jugadores con “{q}”.",
+    "prompt": "Escribe un nombre, username o ciudad para descubrir jugadores."
+  },
+  "Promote": {
+    "title": "Haz que tu torneo se vea.",
+    "subtitle": "El organizador conserva sus inscripciones. Dynasty monetiza la promoción, visibilidad y espacios publicitarios.",
+    "packLabel": "PROMOTION",
+    "pack1Title": "DESTACADO",
+    "pack1Body": "Mayor presencia en el calendario y descubrimiento.",
+    "pack2Title": "BOOST",
+    "pack2Body": "Impulso dentro de Challenge Dynasty.",
+    "pack3Title": "DYNASTY PROMOTE",
+    "pack3Body": "Campaña, patrocinadores y espacios premium.",
+    "promoteBtn": "PROMOCIONAR"
+  },
+  "Partners": {
+    "title": "Encuentra tu pareja.",
+    "subtitle": "Descubre jugadores configurados para pádel. Envía invitaciones reales y forma pareja cuando tu rival acepte.",
+    "compatiblePlayers": "🎯 JUGADORES COMPATIBLES",
+    "available": "{count} disponibles",
+    "levelUnspecified": "NIVEL NO INDICADO",
+    "noCity": "Sin ciudad",
+    "challenge": "RETAR",
+    "view": "VER",
+    "empty": "Configura Pádel en tu perfil para empezar a encontrar partners.",
+    "passportTitle": "Pasaporte deportivo",
+    "passportBody": "Tu nivel actual: {level}.",
+    "notConfigured": "sin configurar",
+    "directChallengeTitle": "Reto directo",
+    "directChallengeBody": "Puedes convertir cualquier perfil compatible en un reto oficial.",
+    "noFakeDataTitle": "Sin datos ficticios",
+    "noFakeDataBody": "La pantalla solo muestra perfiles existentes y descubribles.",
+    "inviting": "ENVIANDO...",
+    "invited": "✓ ENVIADA",
+    "invite": "INVITAR",
+    "inviteFailed": "No se pudo enviar"
   }
 }
