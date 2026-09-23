@@ -341,5 +341,50 @@
     "empty": "Todavía no hay suficientes posiciones competitivas registradas.",
     "defaultPlayer": "Jugador Dynasty",
     "matchesStats": "{matches} partidos · {wins}V / {losses}D"
+  },
+  "Notifications": {
+    "title": "Notificaciones",
+    "subtitle": "Retos, partners y resultados.",
+    "loginRequired": "Inicia sesión para ver tus notificaciones.",
+    "empty": "Todavía no tienes actividad.",
+    "markAllRead": "MARCAR TODO LEÍDO",
+    "defaultTitle": "Notificación",
+    "read": "LEÍDA",
+    "new": "NUEVA"
+  },
+  "NotificationPreferences": {
+    "title": "Preferencias",
+    "subtitle": "Controla cómo Dynasty debe avisarte de tu actividad.",
+    "loginRequired": "Inicia sesión para configurar tus preferencias.",
+    "currentStatus": "Estado actual",
+    "prefsExist": "Ya existe una configuración guardada para tu cuenta.",
+    "prefsDefault": "Todavía no tienes preferencias guardadas; se aplicarán los valores por defecto del sistema.",
+    "categoryChallengeReceived": "Reto recibido",
+    "categoryChallengeResponse": "Respuesta de reto",
+    "categoryPartner": "Partner",
+    "categoryResult": "Resultado",
+    "categoryTournament": "Torneo",
+    "categoryMarketplace": "Marketplace",
+    "managedNote": "Gestionado por tu configuración de notificaciones.",
+    "advancedNote": "La gestión avanzada por canal (in-app, email, push) queda preparada para la configuración específica del proveedor."
+  },
+  "Missions": {
+    "title": "MISIONES",
+    "subtitle": "El sistema de misiones todavía no existe como módulo oficial en el backend vivo.",
+    "notice": "No mostramos progreso ni puntos inventados."
+  },
+  "Rewards": {
+    "title": "RECOMPENSAS",
+    "subtitle": "Insignias conectadas al sistema real de achievements.",
+    "defaultCategory": "Achievement",
+    "unlocked": "DESBLOQUEADA",
+    "locked": "BLOQUEADA",
+    "empty": "Todavía no hay achievements configurados."
+  },
+  "Season": {
+    "title": "TEMPORADAS",
+    "subtitle": "La capa de temporada empieza a consumir la actividad competitiva real del backend.",
+    "empty": "Todavía no hay actividad competitiva suficiente para mostrar temporadas.",
+    "noDate": "Sin fecha"
   }
 }

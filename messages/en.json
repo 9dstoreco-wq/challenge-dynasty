@@ -341,5 +341,50 @@
     "empty": "Not enough competitive standings recorded yet.",
     "defaultPlayer": "Dynasty Player",
     "matchesStats": "{matches} matches · {wins}W / {losses}L"
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "subtitle": "Challenges, partners and results.",
+    "loginRequired": "Sign in to see your notifications.",
+    "empty": "You have no activity yet.",
+    "markAllRead": "MARK ALL READ",
+    "defaultTitle": "Notification",
+    "read": "READ",
+    "new": "NEW"
+  },
+  "NotificationPreferences": {
+    "title": "Preferences",
+    "subtitle": "Control how Dynasty should notify you about your activity.",
+    "loginRequired": "Sign in to set your preferences.",
+    "currentStatus": "Current status",
+    "prefsExist": "There's already a saved configuration for your account.",
+    "prefsDefault": "You have no saved preferences yet; the system defaults will apply.",
+    "categoryChallengeReceived": "Challenge received",
+    "categoryChallengeResponse": "Challenge response",
+    "categoryPartner": "Partner",
+    "categoryResult": "Result",
+    "categoryTournament": "Tournament",
+    "categoryMarketplace": "Marketplace",
+    "managedNote": "Managed by your notification settings.",
+    "advancedNote": "Advanced per-channel management (in-app, email, push) is ready for provider-specific configuration."
+  },
+  "Missions": {
+    "title": "MISSIONS",
+    "subtitle": "The missions system doesn't exist yet as an official module in the live backend.",
+    "notice": "We don't show fabricated progress or points."
+  },
+  "Rewards": {
+    "title": "REWARDS",
+    "subtitle": "Badges connected to the real achievements system.",
+    "defaultCategory": "Achievement",
+    "unlocked": "UNLOCKED",
+    "locked": "LOCKED",
+    "empty": "No achievements configured yet."
+  },
+  "Season": {
+    "title": "SEASONS",
+    "subtitle": "The season layer is starting to consume real competitive activity from the backend.",
+    "empty": "Not enough competitive activity yet to show seasons.",
+    "noDate": "No date"
   }
 }
