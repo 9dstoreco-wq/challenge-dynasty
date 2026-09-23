@@ -390,7 +390,21 @@
   "Settings": {
     "loginRequired": "Inicia sesión para abrir configuración",
     "title": "Configuración",
-    "subtitle": "Tu identidad deportiva controla cómo Dynasty te encuentra, te reta y te posiciona."
+    "subtitle": "Tu identidad deportiva controla cómo Dynasty te encuentra, te reta y te posiciona.",
+    "profileUpdated": "Perfil actualizado.",
+    "errUpdateFailed": "No se pudo actualizar",
+    "sportUpdated": "Deporte actualizado.",
+    "identityTitle": "Identidad",
+    "namePlaceholder": "Nombre",
+    "usernamePlaceholder": "username",
+    "cityPlaceholder": "Ciudad",
+    "clubComingSoon": "Club: próximamente, cuando conectemos el modelo oficial de membresías de clubes.",
+    "saving": "GUARDANDO...",
+    "saveProfileBtn": "GUARDAR PERFIL",
+    "sportsPassportTitle": "Pasaporte deportivo",
+    "selectLevel": "Selecciona nivel",
+    "saveMainSportBtn": "GUARDAR DEPORTE PRINCIPAL",
+    "addMoreSportsHint": "Puedes añadir más deportes desde esta misma lógica; el principal es el que alimenta el descubrimiento por defecto."
   },
   "Social": {
     "title": "Feed competitivo",
@@ -399,7 +413,17 @@
     "preferences": "PREFERENCIAS",
     "empty": "Todavía no hay publicaciones. Los resultados oficiales y tus posts aparecerán aquí.",
     "defaultUsername": "jugador",
-    "defaultDisplayName": "Jugador"
+    "defaultDisplayName": "Jugador",
+    "following": "Siguiendo",
+    "follow": "Seguir",
+    "officialResult": "🏆 RESULTADO OFICIAL",
+    "post": "POST",
+    "resultLabel": "RESULTADO",
+    "rematch": "REVANCHA",
+    "commentPlaceholder": "Comenta...",
+    "sendBtn": "Enviar",
+    "defaultCommenter": "Jugador",
+    "you": "Tú"
   },
   "Search": {
     "title": "Buscar",

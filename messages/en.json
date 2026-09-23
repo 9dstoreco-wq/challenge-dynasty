@@ -390,7 +390,21 @@
   "Settings": {
     "loginRequired": "Sign in to open settings",
     "title": "Settings",
-    "subtitle": "Your sports identity controls how Dynasty finds, challenges and ranks you."
+    "subtitle": "Your sports identity controls how Dynasty finds, challenges and ranks you.",
+    "profileUpdated": "Profile updated.",
+    "errUpdateFailed": "Couldn't update",
+    "sportUpdated": "Sport updated.",
+    "identityTitle": "Identity",
+    "namePlaceholder": "Name",
+    "usernamePlaceholder": "username",
+    "cityPlaceholder": "City",
+    "clubComingSoon": "Club: coming soon, once we connect the official club membership model.",
+    "saving": "SAVING...",
+    "saveProfileBtn": "SAVE PROFILE",
+    "sportsPassportTitle": "Sports passport",
+    "selectLevel": "Select level",
+    "saveMainSportBtn": "SAVE MAIN SPORT",
+    "addMoreSportsHint": "You can add more sports through this same flow; the main one feeds default discovery."
   },
   "Social": {
     "title": "Competitive feed",
@@ -399,7 +413,17 @@
     "preferences": "PREFERENCES",
     "empty": "No posts yet. Official results and your posts will show up here.",
     "defaultUsername": "player",
-    "defaultDisplayName": "Player"
+    "defaultDisplayName": "Player",
+    "following": "Following",
+    "follow": "Follow",
+    "officialResult": "🏆 OFFICIAL RESULT",
+    "post": "POST",
+    "resultLabel": "RESULT",
+    "rematch": "REMATCH",
+    "commentPlaceholder": "Comment...",
+    "sendBtn": "Send",
+    "defaultCommenter": "Player",
+    "you": "You"
   },
   "Search": {
     "title": "Search",
