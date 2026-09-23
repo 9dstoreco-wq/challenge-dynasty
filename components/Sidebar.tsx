@@ -33,6 +33,7 @@ const groups = [
     items: [
       ['Clubes', Building2, '/clubs'],
       ['Coaches', GraduationCap, '/coaches'],
+      ['Mi Coach OS', GraduationCap, '/coaches/dashboard'],
       ['Competiciones', Medal, '/competitions'],
       ['Reservas', CalendarDays, '/bookings'],
       ['Promote', Megaphone, '/promote'],
@@ -45,6 +46,7 @@ const groups = [
     items: [
       ['Marketplace', ShoppingBag, '/marketplace'],
       ['Dynasty Shop', Store, '/shop'],
+      ['Mi Tienda', Store, '/shop/admin'],
     ],
   },
   {
