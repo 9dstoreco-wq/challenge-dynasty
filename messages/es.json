@@ -643,5 +643,26 @@
     "errCreateFailed": "No se pudo crear",
     "publishing": "PUBLICANDO...",
     "publishBtn": "PUBLICAR CHALLENGE"
+  },
+  "Profile": {
+    "notFoundTitle": "Jugador no encontrado",
+    "explorePlayers": "Explorar jugadores",
+    "backLink": "← Volver",
+    "tag": "PASAPORTE DEPORTIVO",
+    "locationUnknown": "Ubicación no indicada",
+    "challengeBtn": "⚡ RETAR",
+    "globalRanking": "RANKING GLOBAL",
+    "rankingLabel": "RANKING",
+    "rankingHint": "Se alimenta de competición validada.",
+    "wins": "VICTORIAS",
+    "losses": "DERROTAS",
+    "winRate": "WIN RATE",
+    "streak": "RACHA",
+    "rivalriesTitle": "⚔️ RIVALIDADES",
+    "defaultRivalName": "Jugador",
+    "matchesPlayed": "{count} partidos · {wins}V / {losses}D",
+    "emptyRivalries": "Aún no hay rivalidades registradas.",
+    "following": "✓ Siguiendo",
+    "follow": "Seguir"
   }
 }

@@ -643,5 +643,26 @@
     "errCreateFailed": "Couldn't create",
     "publishing": "PUBLISHING...",
     "publishBtn": "PUBLISH CHALLENGE"
+  },
+  "Profile": {
+    "notFoundTitle": "Player not found",
+    "explorePlayers": "Explore players",
+    "backLink": "← Back",
+    "tag": "SPORTS PASSPORT",
+    "locationUnknown": "Location not set",
+    "challengeBtn": "⚡ CHALLENGE",
+    "globalRanking": "GLOBAL RANKING",
+    "rankingLabel": "RANKING",
+    "rankingHint": "Fed by validated competition.",
+    "wins": "WINS",
+    "losses": "LOSSES",
+    "winRate": "WIN RATE",
+    "streak": "STREAK",
+    "rivalriesTitle": "⚔️ RIVALRIES",
+    "defaultRivalName": "Player",
+    "matchesPlayed": "{count} matches · {wins}W / {losses}L",
+    "emptyRivalries": "No rivalries recorded yet.",
+    "following": "✓ Following",
+    "follow": "Follow"
   }
 }
