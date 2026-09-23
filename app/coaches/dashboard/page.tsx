@@ -4,9 +4,11 @@ import Sidebar from '@/components/Sidebar'
 import { createClient } from '@/lib/supabase/server'
 import PageHero from '@/components/PageHero'
 import CoachDashboard from '@/components/CoachDashboard'
+import { getTranslations } from 'next-intl/server'
 
 export default async function CoachDashboardPage(){
   const supabase = await createClient()
+  const t = await getTranslations('CoachDashboard')
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/coaches/dashboard')
 
@@ -53,7 +55,7 @@ export default async function CoachDashboardPage(){
   }
 
   return <main className="min-h-screen bg-[#0A0A0C] text-white grid-bg"><Sidebar/><section className="lg:pl-64 p-6 lg:p-12 max-w-[1400px] mx-auto">
-    <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">COACH OS · MI PANEL</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">MI NEGOCIO DE COACH</h1></PageHero>
+    <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">{t('tag')}</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{t('title')}</h1></PageHero>
     <div className="mt-8"><CoachDashboard profile={profile ?? null} services={services} bookings={bookings} myProfileId={user.id} /></div>
   </section></main>
 }
