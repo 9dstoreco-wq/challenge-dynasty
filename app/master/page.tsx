@@ -3,6 +3,7 @@ import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
 import PageHero from "@/components/PageHero";
 import { createClient } from "@/lib/supabase/server";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,7 @@ function formatCOP(value: number): string {
 
 export default async function MasterPage() {
   const supabase = await createClient();
+  const t = await getTranslations("Master");
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -56,44 +58,44 @@ export default async function MasterPage() {
       <main className="lg:pl-64 pb-20 lg:pb-0">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
           <PageHero>
-            <div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">PLATFORM MASTER</div>
-            <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">Vista maestra</h1>
-            <p className="text-white/50 mt-2">Todo el ecosistema DINASTY, en un solo lugar. Solo visible para ti.</p>
+            <div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">{t("tag")}</div>
+            <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{t("title")}</h1>
+            <p className="text-white/50 mt-2">{t("subtitle")}</p>
           </PageHero>
 
           {error || !data ? (
             <div className="mt-8 rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-8 text-center text-white/45">
-              No se pudo cargar la vista general{error ? `: ${error.message}` : "."}
+              {t("loadError", { detail: error ? `: ${error.message}` : "." })}
             </div>
           ) : (
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                <StatCard label="Organizaciones" value={data.organizations_total} sub={`${data.organizations_active} activas`} />
-                <StatCard label="Usuarios" value={data.profiles_total} />
-                <StatCard label="Torneos" value={data.tournaments_total} sub={`${data.tournament_entries_total} inscripciones`} />
-                <StatCard label="Reservas" value={data.bookings_total} />
-                <StatCard label="Órdenes tienda" value={data.shop_orders_total} />
-                <StatCard label="Órdenes marketplace" value={data.marketplace_orders_total} />
-                <StatCard label="Suscripciones activas" value={data.billing_subscriptions_active} />
-                <StatCard label="Ingresos cobrados" value={formatCOP(data.revenue_paid_cop)} isText />
+                <StatCard label={t("organizations")} value={data.organizations_total} sub={t("activeCount",{count:data.organizations_active})} />
+                <StatCard label={t("users")} value={data.profiles_total} />
+                <StatCard label={t("tournaments")} value={data.tournaments_total} sub={t("entriesCount",{count:data.tournament_entries_total})} />
+                <StatCard label={t("bookings")} value={data.bookings_total} />
+                <StatCard label={t("shopOrders")} value={data.shop_orders_total} />
+                <StatCard label={t("marketplaceOrders")} value={data.marketplace_orders_total} />
+                <StatCard label={t("activeSubscriptions")} value={data.billing_subscriptions_active} />
+                <StatCard label={t("revenueCollected")} value={formatCOP(data.revenue_paid_cop)} isText />
               </div>
 
               <div className="mt-10">
-                <div className="text-xs text-[#D4AF37] font-black tracking-widest mb-3">ORGANIZACIONES</div>
+                <div className="text-xs text-[#D4AF37] font-black tracking-widest mb-3">{t("organizationsTag")}</div>
                 {data.organizations.length === 0 ? (
                   <div className="rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-8 text-center text-white/45">
-                    Todavía no hay organizaciones registradas.
+                    {t("emptyOrganizations")}
                   </div>
                 ) : (
                   <div className="rounded-3xl border border-white/10 bg-[#161616] overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="text-left text-white/40 text-xs uppercase tracking-wider">
-                          <th className="px-4 py-3">Nombre</th>
-                          <th className="px-4 py-3">Tipo</th>
-                          <th className="px-4 py-3">Ciudad</th>
-                          <th className="px-4 py-3">Estado</th>
-                          <th className="px-4 py-3">Creada</th>
+                          <th className="px-4 py-3">{t("colName")}</th>
+                          <th className="px-4 py-3">{t("colType")}</th>
+                          <th className="px-4 py-3">{t("colCity")}</th>
+                          <th className="px-4 py-3">{t("colStatus")}</th>
+                          <th className="px-4 py-3">{t("colCreated")}</th>
                         </tr>
                       </thead>
                       <tbody>
