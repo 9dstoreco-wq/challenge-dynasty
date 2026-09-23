@@ -291,5 +291,55 @@
     "win": "WIN",
     "loss": "LOSS",
     "empty": "You have no confirmed matches yet."
+  },
+  "Login": {
+    "title": "Log in",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "loggingIn": "LOGGING IN...",
+    "submitBtn": "LOG IN",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create account"
+  },
+  "Register": {
+    "title": "Create account",
+    "namePlaceholder": "Name",
+    "usernamePlaceholder": "Username",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "creating": "CREATING...",
+    "submitBtn": "CREATE ACCOUNT",
+    "accountCreated": "Account created. Check your email if confirmation is enabled.",
+    "alreadyHaveAccount": "Already have an account?",
+    "login": "Log in"
+  },
+  "Sports": {
+    "title": "Choose your sport.",
+    "subtitle": "One sports identity. All your challenges, rankings, skills, partners and seasons.",
+    "activeChallenges": "{count} active challenges",
+    "competitionLabel": "COMPETITION",
+    "rankingLabel": "Ranking",
+    "socialLabel": "SOCIAL",
+    "skillsLabel": "Skills",
+    "explore": "Explore {sport}",
+    "passportTitle": "Your sports career lives here.",
+    "passportBody": "Switch sports without creating another account.",
+    "sportsAvailable": "{count} sports available"
+  },
+  "Players": {
+    "title": "Your next rival",
+    "subtitle": "Padel players who have chosen to be discoverable.",
+    "levelUnspecified": "LEVEL NOT SPECIFIED",
+    "locationUnknown": "Location not specified",
+    "viewProfile": "VIEW PROFILE",
+    "challenge": "CHALLENGE",
+    "empty": "Not enough discoverable players yet."
+  },
+  "Ranking": {
+    "subtitle": "Standings calculated from Dynasty's real competitive ranking.",
+    "loadError": "Could not load the ranking right now.",
+    "empty": "Not enough competitive standings recorded yet.",
+    "defaultPlayer": "Dynasty Player",
+    "matchesStats": "{matches} matches · {wins}W / {losses}L"
   }
 }

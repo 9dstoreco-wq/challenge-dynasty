@@ -291,5 +291,55 @@
     "win": "VICTORIA",
     "loss": "DERROTA",
     "empty": "Todavía no tienes partidos confirmados."
+  },
+  "Login": {
+    "title": "Entrar",
+    "emailPlaceholder": "Correo",
+    "passwordPlaceholder": "Contraseña",
+    "loggingIn": "ENTRANDO...",
+    "submitBtn": "ENTRAR",
+    "noAccount": "¿No tienes cuenta?",
+    "createAccount": "Crear cuenta"
+  },
+  "Register": {
+    "title": "Crear cuenta",
+    "namePlaceholder": "Nombre",
+    "usernamePlaceholder": "Usuario",
+    "emailPlaceholder": "Correo",
+    "passwordPlaceholder": "Contraseña",
+    "creating": "CREANDO...",
+    "submitBtn": "CREAR CUENTA",
+    "accountCreated": "Cuenta creada. Revisa tu correo si la confirmación está activada.",
+    "alreadyHaveAccount": "¿Ya tienes cuenta?",
+    "login": "Entrar"
+  },
+  "Sports": {
+    "title": "Elige tu deporte.",
+    "subtitle": "Una sola identidad deportiva. Todos tus retos, rankings, skills, partners y temporadas.",
+    "activeChallenges": "{count} retos activos",
+    "competitionLabel": "COMPETENCIA",
+    "rankingLabel": "Ranking",
+    "socialLabel": "SOCIAL",
+    "skillsLabel": "Skills",
+    "explore": "Explorar {sport}",
+    "passportTitle": "Tu carrera deportiva vive aquí.",
+    "passportBody": "Cambia de deporte sin crear otra cuenta.",
+    "sportsAvailable": "{count} deportes disponibles"
+  },
+  "Players": {
+    "title": "Tu próximo rival",
+    "subtitle": "Jugadores de pádel que han elegido ser descubribles.",
+    "levelUnspecified": "NIVEL NO INDICADO",
+    "locationUnknown": "Ubicación no indicada",
+    "viewProfile": "VER PERFIL",
+    "challenge": "RETAR",
+    "empty": "No hay suficientes jugadores descubribles todavía."
+  },
+  "Ranking": {
+    "subtitle": "Posiciones calculadas desde el ranking competitivo real de Dynasty.",
+    "loadError": "No se pudo cargar el ranking en este momento.",
+    "empty": "Todavía no hay suficientes posiciones competitivas registradas.",
+    "defaultPlayer": "Jugador Dynasty",
+    "matchesStats": "{matches} partidos · {wins}V / {losses}D"
   }
 }
