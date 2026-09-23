@@ -7,7 +7,7 @@ import PageHero from '@/components/PageHero'
 export default async function ShopPosPage(){
   const supabase=await createClient()
   const [{data:products=[]},{data:locations=[]},{data:registers=[]}]=await Promise.all([
-    supabase.from('shop_products').select('id,title,base_price,featured,status').eq('status','published').limit(200),
+    supabase.from('shop_products').select('id,title,base_price,featured,status').eq('status','active').limit(200),
     supabase.from('shop_locations').select('id,name,code').eq('location_type','physical').eq('status','active').order('name'),
     supabase.from('shop_pos_registers').select('id,name,code,location_id,status,opening_float').order('name'),
   ])
