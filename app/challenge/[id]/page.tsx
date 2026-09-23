@@ -5,23 +5,26 @@ import type { Metadata } from 'next'
 import ChallengeActions from '@/components/ChallengeActions'
 import MatchResultForm from '@/components/MatchResultForm'
 import PageHero from '@/components/PageHero'
+import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
   const { id } = await params
   const supabase = await createClient()
+  const t = await getTranslations('Challenge')
   const { data: challenge } = await supabase
     .from('challenges')
     .select('id,creator_id,title,creator:profiles!challenges_creator_id_fkey(display_name)')
     .eq('id', id)
     .maybeSingle()
 
-  const a = relatedRow(challenge?.creator)?.display_name ?? 'Jugador'
-  return { title: `${challenge?.title ?? 'Reto'} · CHALLENGE DYNASTY`, description: `Reto deportivo de ${a} en CHALLENGE DYNASTY.` }
+  const a = relatedRow(challenge?.creator)?.display_name ?? t('defaultPlayer')
+  return { title: `${challenge?.title ?? t('notFoundTitle')} · CHALLENGE DYNASTY`, description: t('metaDescription', { name: a }) }
 }
 
 export default async function ChallengePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
   const { id } = await params
   const supabase = await createClient()
+  const t = await getTranslations('Challenge')
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: challenge } = await supabase
@@ -31,7 +34,7 @@ export default async function ChallengePage({ params, searchParams }: { params: 
     .maybeSingle()
 
   if (!challenge) {
-    return <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center p-6"><div className="rounded-3xl border border-white/10 bg-[#161616] p-8 text-center"><h1 className="text-2xl font-black">Reto no encontrado</h1><p className="text-white/50 mt-2">El enlace puede haber expirado o no existe.</p></div></main>
+    return <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center p-6"><div className="rounded-3xl border border-white/10 bg-[#161616] p-8 text-center"><h1 className="text-2xl font-black">{t('notFoundTitle')}</h1><p className="text-white/50 mt-2">{t('notFoundBody')}</p></div></main>
   }
 
   const { data: participants } = await supabase
@@ -77,15 +80,15 @@ export default async function ChallengePage({ params, searchParams }: { params: 
 
   return <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center p-6"><section className="w-full max-w-3xl rounded-[32px] border border-gold-400/20 bg-gradient-to-br from-[#161616] to-[#0A0A0C] p-8">
     <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">⚔️ CHALLENGE DYNASTY</div>
-    <h1 className="text-5xl font-display font-black tracking-wide mt-4 text-center">{creator?.display_name ?? 'Jugador'} <span className="text-white/20">VS</span> {rival?.display_name ?? 'Rival'}</h1></PageHero>
+    <h1 className="text-5xl font-display font-black tracking-wide mt-4 text-center">{creator?.display_name ?? t('defaultPlayer')} <span className="text-white/20">VS</span> {rival?.display_name ?? t('defaultRival')}</h1></PageHero>
     <div className="text-center text-white/50 mt-3">{challenge.title} · {challenge.status}</div>
 
     <ChallengeActions challengeId={challenge.id} status={currentInvitationStatus} currentUserId={user?.id} challengerId={challenge.creator_id} invitationId={invitation?.id ?? undefined} />
 
     <div className="grid md:grid-cols-3 gap-3 mt-8">
-      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">DEPORTE</div><div className="text-lg font-black mt-1">{challenge.sport_id}</div></div>
-      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">FECHA</div><div className="text-lg font-bold mt-1">{challenge.scheduled_at ? new Date(challenge.scheduled_at).toLocaleString('es-CO') : 'Por definir'}</div></div>
-      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">ESTADO</div><div className="text-lg font-black mt-1 text-[#00E676]">{result?.status === 'confirmed' ? 'COMPLETADO' : currentInvitationStatus}</div></div>
+      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('sportLabel')}</div><div className="text-lg font-black mt-1">{challenge.sport_id}</div></div>
+      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('dateLabel')}</div><div className="text-lg font-bold mt-1">{challenge.scheduled_at ? new Date(challenge.scheduled_at).toLocaleString('es-CO') : t('dateTBD')}</div></div>
+      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('statusLabel')}</div><div className="text-lg font-black mt-1 text-[#00E676]">{result?.status === 'confirmed' ? t('completed') : currentInvitationStatus}</div></div>
     </div>
 
     {match && user && result?.status !== 'confirmed' && (
