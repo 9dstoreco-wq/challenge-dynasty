@@ -4,6 +4,7 @@ import Sidebar from '@/components/Sidebar'
 import { createClient } from '@/lib/supabase/server'
 import PageHero from '@/components/PageHero'
 import { ShopClaimOwnership, ShopStaffPanel } from '@/components/ShopStaffPanel'
+import ShopProductManager, { type Product, type ShippingRule } from '@/components/ShopProductManager'
 
 type InventoryRow = { location_type: string; available_quantity: number | null; product_title: string | null; variant_title: string | null }
 type SalesRow = { gross_sales: number | null }
@@ -18,6 +19,7 @@ export default async function ShopAdminPage(){
   const { data: myLocationsData } = await supabase.rpc('get_my_shop_staff_locations')
   const staffLocations: StaffLocation[] = Array.isArray(myLocationsData) ? myLocationsData : []
   const managed = staffLocations.filter((l) => l.my_role === 'owner' || l.my_role === 'manager' || l.my_role === 'inventory')
+  const canManageProducts = staffLocations.some((l) => l.my_role === 'owner' || l.my_role === 'manager')
 
   const { data: claimableData } = await supabase.rpc('list_claimable_shop_locations')
   const claimableLocations: ClaimableLocation[] = Array.isArray(claimableData) ? claimableData : []
@@ -30,6 +32,11 @@ export default async function ShopAdminPage(){
         : <div className="mt-8 rounded-3xl border border-dashed border-white/10 p-10 text-center text-white/40">No tienes acceso a ninguna tienda todavía. Si deberías tenerlo, pídele a quien administra la tienda que te agregue desde este mismo panel.</div>}
     </section></main>
   }
+
+  const { data: productsData } = canManageProducts ? await supabase.rpc('list_my_shop_products') : { data: [] }
+  const products = (Array.isArray(productsData) ? productsData : []) as Product[]
+  const { data: shippingRulesData } = canManageProducts ? await supabase.from('shop_shipping_rules').select('id,country_code,currency_code,standard_cost,free_threshold,discounted_cost').order('country_code') : { data: [] }
+  const shippingRules = (shippingRulesData ?? []) as ShippingRule[]
 
   const { data: snapshot } = await supabase.rpc('get_my_shop_admin_snapshot')
   const inventory: InventoryRow[] = Array.isArray(snapshot?.inventory) ? snapshot.inventory : []
@@ -47,5 +54,6 @@ export default async function ShopAdminPage(){
     <div className="grid lg:grid-cols-2 gap-5 mt-6">
       {managed.map((loc) => <ShopStaffPanel key={loc.location_id} locationId={loc.location_id} locationName={loc.location_name} myRole={loc.my_role} />)}
     </div>
+    {canManageProducts && <ShopProductManager products={products} shippingRules={shippingRules} />}
   </section></main>
 }
