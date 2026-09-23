@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { CheckCircle2, Loader2, ShoppingCart, X } from 'lucide-react'
 import { toSafeMessage } from '@/lib/safe-error'
+import { COUNTRIES, countryLabel } from '@/lib/countries'
 
 type Listing = {
   id: string
@@ -16,6 +17,7 @@ type Listing = {
   is_featured: boolean | null
   published_at: string | null
   seller_id: string | null
+  country_code: string | null
 }
 
 const supabase = createBrowserClient(
@@ -29,6 +31,18 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [countryFilter, setCountryFilter] = useState<string>('all')
+
+  const availableCountries = useMemo(() => {
+    const codes = new Set(listings.map((x) => x.country_code).filter(Boolean) as string[])
+    return COUNTRIES.filter((c) => codes.has(c.code))
+  }, [listings])
+
+  const filtered = useMemo(() => {
+    if (countryFilter === 'all') return listings
+    if (countryFilter === 'none') return listings.filter((x) => !x.country_code)
+    return listings.filter((x) => x.country_code === countryFilter)
+  }, [listings, countryFilter])
 
   const total = useMemo(() => (selected?.price ?? 0) * qty, [selected, qty])
 
@@ -56,8 +70,18 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
 
   return (
     <>
+      {availableCountries.length > 1 && (
+        <div className="mb-6 flex items-center gap-3 flex-wrap">
+          <span className="text-xs uppercase tracking-widest text-white/40 font-black">País</span>
+          <button onClick={() => setCountryFilter('all')} className={`rounded-full px-4 py-2 text-sm font-black border ${countryFilter === 'all' ? 'bg-[#D4AF37] text-black border-[#D4AF37]' : 'border-white/10 text-white/60'}`}>Todos</button>
+          {availableCountries.map((c) => (
+            <button key={c.code} onClick={() => setCountryFilter(c.code)} className={`rounded-full px-4 py-2 text-sm font-black border ${countryFilter === c.code ? 'bg-[#D4AF37] text-black border-[#D4AF37]' : 'border-white/10 text-white/60'}`}>{c.flag} {c.name}</button>
+          ))}
+        </div>
+      )}
+
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
-        {listings.map((x) => (
+        {filtered.map((x) => (
           <article key={x.id} className="rounded-3xl border border-white/10 bg-[#161616] p-6 flex flex-col">
             <div className="flex items-center justify-between gap-3">
               <div className="text-xs text-[#D4AF37] font-black uppercase tracking-widest">{x.listing_type}</div>
@@ -66,13 +90,21 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
             <h2 className="text-xl font-black mt-2">{x.title}</h2>
             <p className="text-white/45 text-sm mt-2 flex-1">{x.description || 'Publicación Marketplace'}</p>
             <div className="mt-4 text-lg font-black">{x.price != null ? `${Number(x.price).toLocaleString('es-CO')} ${x.currency_code || 'COP'}` : 'Precio a consultar'}</div>
-            <div className="text-xs text-white/35 mt-2">{x.city || 'Ubicación no especificada'}</div>
+            <div className="text-xs text-white/35 mt-2 flex items-center gap-2 flex-wrap">
+              <span>{x.city || 'Ubicación no especificada'}</span>
+              <span className="text-white/20">·</span>
+              <span>{countryLabel(x.country_code)}</span>
+            </div>
             <button onClick={() => { setSelected(x); setQty(1); setError(null); setMessage(null) }} className="mt-5 rounded-2xl bg-white text-black font-black px-4 py-3 inline-flex items-center justify-center gap-2">
               <ShoppingCart size={17} /> Reservar / comprar
             </button>
           </article>
         ))}
       </div>
+
+      {filtered.length === 0 && (
+        <div className="rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-8 text-center text-white/45">No hay publicaciones para ese país.</div>
+      )}
 
       {(message || error) && (
         <div className={`mt-6 rounded-2xl border p-4 ${error ? 'border-red-400/30 bg-red-400/10 text-red-100' : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-100'}`}>

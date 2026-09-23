@@ -18,13 +18,14 @@ type Listing = {
   is_featured: boolean | null
   published_at: string | null
   seller_id: string | null
+  country_code: string | null
 }
 
 export default async function MarketplacePage() {
   const supabase = await createClient()
   const { data = [] } = await supabase
     .from('marketplace_listings')
-    .select('id,title,description,city,price,currency_code,listing_type,is_featured,published_at,seller_id')
+    .select('id,title,description,city,price,currency_code,listing_type,is_featured,published_at,seller_id,country_code')
     .eq('status', 'published')
     .order('is_featured', { ascending: false })
     .order('published_at', { ascending: false })
