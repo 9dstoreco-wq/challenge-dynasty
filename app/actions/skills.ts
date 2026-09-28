@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { toSafeMessage } from '@/lib/safe-error'
+import { getTranslations } from 'next-intl/server'
 
 export async function createSkillChallenge(input: {
   sportId: string
@@ -13,9 +14,10 @@ export async function createSkillChallenge(input: {
   targetVotes?: number
   expiresAt?: string | null
 }) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const { data, error } = await supabase.rpc('create_skill_challenge', {
     p_sport_id: input.sportId,
     p_title: input.title,
@@ -31,9 +33,10 @@ export async function createSkillChallenge(input: {
 }
 
 export async function submitSkillChallenge(input: { challengeId: string; videoUrl: string; caption?: string }) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const { data, error } = await supabase.rpc('submit_skill_challenge', {
     p_challenge_id: input.challengeId,
     p_video_url: input.videoUrl,
@@ -44,9 +47,10 @@ export async function submitSkillChallenge(input: { challengeId: string; videoUr
 }
 
 export async function voteSkillSubmission(submissionId: string, score: number) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const { error } = await supabase.rpc('vote_skill_submission', {
     p_submission_id: submissionId,
     p_value: score,

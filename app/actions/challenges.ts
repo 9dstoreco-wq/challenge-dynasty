@@ -2,9 +2,10 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { toSafeMessage } from '@/lib/safe-error'
+import { getTranslations } from 'next-intl/server'
 
-function assertUuidLike(value: string, field: string) {
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) throw new Error(`Dato inválido: ${field}`)
+function assertUuidLike(value: string, field: string, invalidFieldMessage: (field: string) => string) {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) throw new Error(invalidFieldMessage(field))
 }
 
 export async function createChallenge(input: {
@@ -15,15 +16,17 @@ export async function createChallenge(input: {
   matchType?: 'DIRECT' | 'INSTANT'
   points?: number
 }) {
-  assertUuidLike(input.challengedId, 'rival')
-  assertUuidLike(input.sportId, 'deporte')
+  const t = await getTranslations('Errors')
+  const invalidField = (field: string) => t('invalidField', { field })
+  assertUuidLike(input.challengedId, t('fieldOpponent'), invalidField)
+  assertUuidLike(input.sportId, t('fieldSport'), invalidField)
   const parsedDate = new Date(input.matchDate)
-  if (Number.isNaN(parsedDate.getTime())) throw new Error('Fecha inválida')
-  if (parsedDate.getTime() <= Date.now()) throw new Error('La fecha del reto debe ser futura')
-  if (input.points !== undefined && (!Number.isInteger(input.points) || input.points < 1 || input.points > 5000)) throw new Error('Los puntos deben estar entre 1 y 5000')
+  if (Number.isNaN(parsedDate.getTime())) throw new Error(t('invalidDate'))
+  if (parsedDate.getTime() <= Date.now()) throw new Error(t('challengeDateMustBeFuture'))
+  if (input.points !== undefined && (!Number.isInteger(input.points) || input.points < 1 || input.points > 5000)) throw new Error(t('pointsRange'))
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
 
   const { data, error } = await supabase.rpc('create_challenge', {
     p_challenged_id: input.challengedId,
@@ -38,9 +41,10 @@ export async function createChallenge(input: {
 }
 
 export async function respondToChallenge(invitationId: string, accept: boolean) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const { error } = await supabase.rpc('respond_to_challenge_invitation', {
     p_invitation_id: invitationId,
     p_accept: accept,
@@ -57,9 +61,10 @@ export async function submitMatchResult(input: {
   winnerId: string
   resultData?: Record<string, unknown>
 }) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const { data, error } = await supabase.rpc('submit_challenge_result', {
     p_match_id: input.matchId,
     p_winner_profile_id: input.winnerId,
@@ -75,9 +80,10 @@ export async function submitMatchResult(input: {
 }
 
 export async function confirmMatch(resultId: string, confirm: boolean) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const { error } = await supabase.rpc('review_challenge_result', { p_result_id: resultId, p_confirm: confirm })
   if (error) throw new Error(toSafeMessage(error, 'challenges.confirmMatch'))
   return true

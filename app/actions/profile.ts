@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { toSafeMessage } from '@/lib/safe-error'
+import { getTranslations } from 'next-intl/server'
 
 export async function updateProfile(input: {
   fullName: string
@@ -10,12 +11,13 @@ export async function updateProfile(input: {
   city?: string
   country?: string
 }) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const cleanName = input.fullName.trim()
   const cleanUsername = input.username.trim().toLowerCase()
-  if (!cleanName || !cleanUsername) throw new Error('Nombre y username son obligatorios')
+  if (!cleanName || !cleanUsername) throw new Error(t('nameUsernameRequired'))
   const { error } = await supabase.from('profiles').update({
     display_name: cleanName,
     username: cleanUsername,
@@ -30,9 +32,10 @@ export async function updateProfile(input: {
 }
 
 export async function updateProfileSport(input: { sportId: string; skillLevel: string; isPrimary?: boolean }) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   if (input.isPrimary) {
     await supabase.from('player_sports').update({ is_primary: false, updated_at: new Date().toISOString() }).eq('profile_id', user.id)
   }
@@ -52,9 +55,10 @@ export async function updateProfileSport(input: { sportId: string; skillLevel: s
 }
 
 export async function blockProfile(profileId: string) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.id === profileId) throw new Error('Usuario inválido')
+  if (!user || user.id === profileId) throw new Error(t('invalidUser'))
   const { error } = await supabase.from('user_blocks').upsert({ blocker_profile_id: user.id, blocked_profile_id: profileId }, { onConflict: 'blocker_profile_id,blocked_profile_id' })
   if (error) throw new Error(toSafeMessage(error, 'profile.blockProfile'))
   revalidatePath('/players')
@@ -62,9 +66,10 @@ export async function blockProfile(profileId: string) {
 }
 
 export async function unblockProfile(profileId: string) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const { error } = await supabase.from('user_blocks').delete().eq('blocker_profile_id', user.id).eq('blocked_profile_id', profileId)
   if (error) throw new Error(toSafeMessage(error, 'profile.unblockProfile'))
   revalidatePath('/players')
@@ -78,12 +83,13 @@ export async function reportContent(input: {
   reason: string
   details?: string
 }) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const targetType = input.matchId ? 'match' : input.postId ? 'post' : input.targetUserId ? 'profile' : 'unknown'
   const targetId = input.matchId ?? input.postId ?? input.targetUserId
-  if (!targetId) throw new Error('Debes indicar qué contenido reportar')
+  if (!targetId) throw new Error(t('reportTargetRequired'))
   const { error } = await supabase.from('content_reports').insert({
     reporter_profile_id: user.id,
     target_type: targetType,

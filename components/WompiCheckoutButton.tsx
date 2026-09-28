@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export type WompiCheckoutDomain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
 
@@ -19,14 +20,6 @@ interface WompiCheckoutButtonProps {
   className?: string;
 }
 
-const ERROR_LABELS: Record<string, string> = {
-  AUTH_REQUIRED: "Inicia sesión para pagar.",
-  ALREADY_PAID: "Esto ya está pagado.",
-  FORBIDDEN: "No tienes acceso a este pago.",
-  PAYMENT_PROVIDER_NOT_CONFIGURED: "Pagos aún no disponibles.",
-  INVALID_AMOUNT: "Monto inválido para cobrar.",
-};
-
 /**
  * Renders a "Pagar con Wompi" button. On mount it asks our own server
  * (/api/checkout/wompi) to look up the real amount owed and sign a Wompi Web Checkout
@@ -35,6 +28,14 @@ const ERROR_LABELS: Record<string, string> = {
  * which renders the actual payment button and opens Wompi's modal on click.
  */
 export function WompiCheckoutButton({ domain, rowId, className }: WompiCheckoutButtonProps) {
+  const t = useTranslations("WompiCheckout");
+  const ERROR_LABELS: Record<string, string> = {
+    AUTH_REQUIRED: t("authRequired"),
+    ALREADY_PAID: t("alreadyPaid"),
+    FORBIDDEN: t("forbidden"),
+    PAYMENT_PROVIDER_NOT_CONFIGURED: t("notConfigured"),
+    INVALID_AMOUNT: t("invalidAmount"),
+  };
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [config, setConfig] = useState<WompiCheckoutConfig | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +84,7 @@ export function WompiCheckoutButton({ domain, rowId, className }: WompiCheckoutB
   if (error) {
     return (
       <p className="text-sm text-challenge-fire">
-        {ERROR_LABELS[error] ?? "No se pudo iniciar el pago. Intenta de nuevo."}
+        {ERROR_LABELS[error] ?? t("genericError")}
       </p>
     );
   }
@@ -94,7 +95,7 @@ export function WompiCheckoutButton({ domain, rowId, className }: WompiCheckoutB
         disabled
         className={className ?? "rounded-lg bg-gold-500/50 px-6 py-3 font-bold text-black opacity-70"}
       >
-        Preparando pago…
+        {t("preparing")}
       </button>
     );
   }

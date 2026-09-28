@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { toSafeMessage } from '@/lib/safe-error'
+import { getTranslations } from 'next-intl/server'
 
 // Canonical partner action lives in partners.ts; re-export to preserve existing imports.
 import { respondToPartnerRequest as respondToPartnerRequestCore } from './partners'
@@ -12,11 +13,12 @@ export async function respondToPartnerRequest(requestId: string, response: 'ACCE
 }
 
 export async function createPost(content: string, title?: string) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const clean = content.trim()
-  if (!clean || clean.length > 2000) throw new Error('El post debe tener entre 1 y 2000 caracteres')
+  if (!clean || clean.length > 2000) throw new Error(t('postLength'))
   const { data, error } = await supabase.from('social_posts').insert({
     author_profile_id: user.id,
     post_type: 'text',
@@ -28,23 +30,25 @@ export async function createPost(content: string, title?: string) {
 }
 
 export async function addComment(postId: string, content: string) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
+  if (!user) throw new Error(t('authRequired'))
   const clean = content.trim()
-  if (!clean || clean.length > 600) throw new Error('El comentario debe tener entre 1 y 600 caracteres')
+  if (!clean || clean.length > 600) throw new Error(t('commentLength'))
   const { error } = await supabase.from('social_comments').insert({ post_id: postId, author_profile_id: user.id, body: clean, status: 'visible' })
   if (error) throw new Error(toSafeMessage(error, 'social.addComment'))
   return true
 }
 
 export async function toggleFollow(followingId: string) {
+  const t = await getTranslations('Errors')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Debes iniciar sesión')
-  if (user.id === followingId) throw new Error('No puedes seguirte a ti mismo')
+  if (!user) throw new Error(t('authRequired'))
+  if (user.id === followingId) throw new Error(t('cannotFollowSelf'))
   const { data: blocked } = await supabase.from('user_blocks').select('blocker_profile_id').or(`and(blocker_profile_id.eq.${user.id},blocked_profile_id.eq.${followingId}),and(blocker_profile_id.eq.${followingId},blocked_profile_id.eq.${user.id})`).limit(1)
-  if (blocked && blocked.length) throw new Error('No puedes seguir a este jugador')
+  if (blocked && blocked.length) throw new Error(t('cannotFollowBlocked'))
   const { data: existing } = await supabase.from('social_follows').select('id').eq('follower_profile_id', user.id).eq('followed_profile_id', followingId).maybeSingle()
   if (existing) {
     const { error } = await supabase.from('social_follows').delete().eq('follower_profile_id', user.id).eq('followed_profile_id', followingId)
@@ -59,15 +63,17 @@ export async function toggleFollow(followingId: string) {
 
 
 export async function toggleLike(postId: string) {
-  const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error('Debes iniciar sesión')
+  const t = await getTranslations('Errors')
+  const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error(t('authRequired'))
   const {data:existing}=await supabase.from('social_reactions').select('id').eq('post_id',postId).eq('profile_id',user.id).eq('reaction_type','like').maybeSingle()
   if(existing){ const {error}=await supabase.from('social_reactions').delete().eq('post_id',postId).eq('profile_id',user.id).eq('reaction_type','like'); if(error) throw new Error(toSafeMessage(error, 'social.toggleLike.unlike')); revalidatePath('/'); return false }
   const {error}=await supabase.from('social_reactions').insert({post_id:postId,profile_id:user.id,reaction_type:'like'}); if(error) throw new Error(toSafeMessage(error, 'social.toggleLike.like')); revalidatePath('/'); return true
 }
 
 export async function markNotificationRead(notificationId: string) {
-  const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error('Debes iniciar sesión')
+  const t = await getTranslations('Errors')
+  const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error(t('authRequired'))
   const {error}=await supabase.rpc('mark_notification_read',{p_notification_id:notificationId}); if(error) throw new Error(toSafeMessage(error, 'social.markNotificationRead')); revalidatePath('/notifications')
 }
 
-export async function markAllNotificationsRead(){ const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error('Debes iniciar sesión'); const {error}=await supabase.rpc('mark_all_notifications_read'); if(error) throw new Error(toSafeMessage(error, 'social.markAllNotificationsRead')); revalidatePath('/notifications'); return true }
+export async function markAllNotificationsRead(){ const t = await getTranslations('Errors'); const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error(t('authRequired')); const {error}=await supabase.rpc('mark_all_notifications_read'); if(error) throw new Error(toSafeMessage(error, 'social.markAllNotificationsRead')); revalidatePath('/notifications'); return true }
