@@ -477,7 +477,8 @@
   "set3Placeholder": "Set 3 · optional",
   "saving": "SAVING...",
   "saveResultBtn": "SAVE RESULT",
-  "resultRegistered": "Result recorded: {id}"
+  "resultRegistered": "Result recorded: {id}",
+  "cardSectionTitle": "YOUR CARD FOR THIS CHALLENGE"
  },
  "Competitions": {
   "tag": "TOURNAMENT OS",
@@ -564,7 +565,12 @@
   "matchesPlayed": "{count} matches · {wins}W / {losses}L",
   "emptyRivalries": "No rivalries recorded yet.",
   "following": "✓ Following",
-  "follow": "Follow"
+  "follow": "Follow",
+  "level": "LEVEL",
+  "xp": "XP",
+  "rating": "RATING",
+  "rank": "RANK #",
+  "myCardTitle": "My card"
  },
  "Business": {
   "tag": "DYNASTY BUSINESS ENGINE",
@@ -821,5 +827,11 @@
   "privacyLink": "Privacy Policy",
   "registerNote": "By creating an account you agree to our",
   "and": "and"
+ },
+ "PlayerCard": {
+  "title": "DYNASTY CARD",
+  "shareBtn": "Share",
+  "downloadBtn": "Download",
+  "shareText": "Check out my Challenge Dynasty card, {name}"
  }
 }

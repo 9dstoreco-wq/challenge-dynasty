@@ -477,7 +477,8 @@
   "set3Placeholder": "Set 3 · opcional",
   "saving": "GUARDANDO...",
   "saveResultBtn": "GUARDAR RESULTADO",
-  "resultRegistered": "Resultado registrado: {id}"
+  "resultRegistered": "Resultado registrado: {id}",
+  "cardSectionTitle": "TU CARTA DE ESTE RETO"
  },
  "Competitions": {
   "tag": "TOURNAMENT OS",
@@ -564,7 +565,12 @@
   "matchesPlayed": "{count} partidos · {wins}V / {losses}D",
   "emptyRivalries": "Aún no hay rivalidades registradas.",
   "following": "✓ Siguiendo",
-  "follow": "Seguir"
+  "follow": "Seguir",
+  "level": "NIVEL",
+  "xp": "XP",
+  "rating": "RATING",
+  "rank": "RANKING #",
+  "myCardTitle": "Mi carta"
  },
  "Business": {
   "tag": "DYNASTY BUSINESS ENGINE",
@@ -821,5 +827,11 @@
   "privacyLink": "Política de Privacidad",
   "registerNote": "Al crear una cuenta aceptas nuestros",
   "and": "y"
+ },
+ "PlayerCard": {
+  "title": "CARTA DYNASTY",
+  "shareBtn": "Compartir",
+  "downloadBtn": "Descargar",
+  "shareText": "Mira mi carta en Challenge Dynasty, {name}"
  }
 }

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import ChallengeActions from '@/components/ChallengeActions'
 import MatchResultForm from '@/components/MatchResultForm'
+import PlayerCard from '@/components/PlayerCard'
 import PageHero from '@/components/PageHero'
 import { getTranslations } from 'next-intl/server'
 
@@ -108,6 +109,18 @@ export default async function ChallengePage({ params, searchParams }: { params: 
         scoreSet2={scoreSet2}
         scoreSet3={scoreSet3}
       />
+    )}
+
+    {result?.status === 'confirmed' && user && (
+      <div className="mt-8">
+        <div className="text-xs tracking-[.2em] text-[#D4AF37] font-black mb-3">{t('cardSectionTitle')}</div>
+        <PlayerCard
+          profileId={user.id}
+          playerName={user.id === challenge.creator_id ? creator?.display_name : rival?.display_name}
+          result={result.winner_profile_id === user.id ? 'win' : 'loss'}
+          opponent={user.id === challenge.creator_id ? rival?.display_name : creator?.display_name}
+        />
+      </div>
     )}
   </section></main>
 }
