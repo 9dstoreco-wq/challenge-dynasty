@@ -323,8 +323,11 @@
  },
  "Missions": {
   "title": "MISIONES",
-  "subtitle": "El sistema de misiones todavía no existe como módulo oficial en el backend vivo.",
-  "notice": "No mostramos progreso ni puntos inventados."
+  "subtitle": "Cada partido confirmado avanza tus misiones automaticamente.",
+  "loginNotice": "Inicia sesion para ver el progreso de tus misiones.",
+  "loginLink": "Iniciar sesion",
+  "inProgress": "En progreso",
+  "empty": "No hay misiones activas por ahora."
  },
  "Rewards": {
   "title": "RECOMPENSAS",

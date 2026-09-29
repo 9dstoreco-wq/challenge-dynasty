@@ -323,8 +323,11 @@
  },
  "Missions": {
   "title": "MISSIONS",
-  "subtitle": "The missions system doesn't exist yet as an official module in the live backend.",
-  "notice": "We don't show fabricated progress or points."
+  "subtitle": "Every confirmed match advances your missions automatically.",
+  "loginNotice": "Sign in to see your mission progress.",
+  "loginLink": "Sign in",
+  "inProgress": "In progress",
+  "empty": "No active missions right now."
  },
  "Rewards": {
   "title": "REWARDS",
