@@ -1,8 +1,12 @@
-// Shared row-resolution logic for every "pay for X" checkout entrypoint (Wompi, Mercado
-// Pago, and any future provider). Each provider's own route handler (e.g.
-// app/api/checkout/wompi/route.ts, app/api/checkout/mercadopago/route.ts) imports this so
-// the "which row is this payment for, how much is owed, does this user own it" logic is
-// written exactly once and can't drift between providers.
+// Shared row-resolution logic for every "pay for X" checkout entrypoint (Mercado Pago, and
+// any future provider). Each provider's own route handler (e.g.
+// app/api/checkout/mercadopago/route.ts) imports this so the "which row is this payment
+// for, how much is owed, does this user own it" logic is written exactly once and can't
+// drift between providers.
+//
+// 2026-09-29: Wompi was removed from the platform (merchant account blocked on Camara de
+// Comercio renewal, decided not worth chasing) -- Mercado Pago is the only payment
+// provider now. See lib/dynasty/mercadopago.ts and supabase/functions/mercadopago-webhook.
 //
 // IMPORTANT (2026-09-29 audit): `resolveBooking` reads amount/currency/payment_status
 // directly off `bookings`, NOT `booking_payment_records`. `create_atomic_booking` (the only

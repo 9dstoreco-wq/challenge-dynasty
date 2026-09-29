@@ -2,13 +2,13 @@
 // import this from a server file (a Route Handler, a Server Action) -- MERCADOPAGO_ACCESS_TOKEN
 // must never reach the browser bundle.
 //
-// Added 2026-09-29 as a fallback payment provider alongside Wompi: the merchant's Wompi
-// account is blocked pending a Camara de Comercio renewal, and Mercado Pago's persona
-// natural signup (cedula + NIT only, no Camara de Comercio) is not blocked on that. Kept
-// side-by-side with lib/dynasty/wompi.ts -- same `dyn:<domain>:<row_id>` reference
-// convention (shared with the webhook that reconciles payment status back onto each
-// domain's row), same env-var-missing error shape, so a domain can offer either button
-// without any resolver-side changes (see lib/dynasty/checkout-resolvers.ts).
+// Added 2026-09-29, and as of the same week the platform's only payment provider: Wompi
+// was dropped (merchant account blocked on a Camara de Comercio renewal that wasn't worth
+// chasing), and Mercado Pago's persona natural signup (cedula + NIT only, no Camara de
+// Comercio) covers it. Uses the same `dyn:<domain>:<row_id>` reference convention (shared
+// with the webhook that reconciles payment status back onto each domain's row) and the same
+// env-var-missing error shape as the resolver layer expects (see
+// lib/dynasty/checkout-resolvers.ts).
 //
 //   dyn:<domain>:<row_id>
 //

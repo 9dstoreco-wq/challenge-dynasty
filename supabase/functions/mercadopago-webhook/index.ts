@@ -3,12 +3,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // CHALLENGE DYNASTY -- Mercado Pago payment webhook (platform-wide).
 //
-// Sibling of supabase/functions/wompi-webhook/index.ts: same receiving role, same
-// `dyn:<domain>:<row_id>` reference convention set as `external_reference` when the
-// preference is created (see lib/dynasty/mercadopago.ts), different provider so a
-// different signature scheme and a different upstream API to fetch the actual payment
-// status from (Mercado Pago's webhook body only carries a payment id -- the status has to
-// be fetched from /v1/payments/{id}).
+// This is the platform's single payment webhook: Wompi was removed (merchant account
+// blocked on a Camara de Comercio renewal that wasn't worth chasing), so Mercado Pago is
+// the only payment provider now. Receives payment notifications for every domain and
+// routes by the `dyn:<domain>:<row_id>` reference convention set as `external_reference`
+// when the preference is created (see lib/dynasty/mercadopago.ts). The webhook body only
+// carries a payment id -- the actual status has to be fetched from /v1/payments/{id}.
 //
 // Needs two Supabase Edge Function secrets set from the Mercado Pago developer panel
 // (Tus integraciones > <app> > Webhooks):
@@ -18,14 +18,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //                                  Webhooks screen. NOT the access token -- a separate value.
 // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 //
-// 2026-09-29: for the `booking` domain this calls `apply_payment_result`, the hardened
-// SECURITY DEFINER RPC that validates the amount against `bookings` and is the same RPC
-// this same change points the Wompi webhook at (it previously wrote directly to
-// `booking_payment_records`, a table `create_atomic_booking` never populates -- see the
-// comment on resolveBooking in lib/dynasty/checkout-resolvers.ts for the full story). Other
-// domains call their own hardened confirm_* RPC where one exists (shop, marketplace,
-// tournament); `billing` has no dedicated RPC yet, so it keeps the direct-update shape the
-// Wompi webhook already used for that domain.
+// For the `booking` domain this calls `apply_payment_result`, the hardened SECURITY
+// DEFINER RPC that validates the amount against `bookings` directly (see the comment on
+// resolveBooking in lib/dynasty/checkout-resolvers.ts for why it reads from `bookings` and
+// not `booking_payment_records`). Other domains call their own hardened confirm_* RPC
+// where one exists (shop, marketplace, tournament); `billing` has no dedicated RPC yet, so
+// it keeps a direct table update for that domain.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -208,8 +206,8 @@ Deno.serve(async (req) => {
         break;
       }
       case "billing": {
-        // No dedicated confirm_* RPC exists yet for billing invoices -- same direct-update
-        // shape the Wompi webhook uses for this domain.
+        // No dedicated confirm_* RPC exists yet for billing invoices -- direct table
+        // update for this domain until one exists.
         const { error } = await supabase
           .from("billing_invoices")
           .update({

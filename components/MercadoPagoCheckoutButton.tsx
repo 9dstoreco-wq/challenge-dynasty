@@ -23,7 +23,7 @@ interface MercadoPagoCheckoutButtonProps {
  * Checkout Pro preference for it -- the preference (and the amount it's for) is always
  * computed server-side from lib/dynasty/checkout-resolvers.ts, never from anything the
  * browser sends. Once the preference comes back, clicking the button navigates the browser
- * to Mercado Pago's hosted checkout (init_point); there is no widget to mount, unlike Wompi.
+ * to Mercado Pago's hosted checkout (init_point); there is no widget to mount.
  */
 export function MercadoPagoCheckoutButton({ domain, rowId, className }: MercadoPagoCheckoutButtonProps) {
   const t = useTranslations("Checkout");
