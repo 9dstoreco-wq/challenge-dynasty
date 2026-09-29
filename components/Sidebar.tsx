@@ -16,11 +16,16 @@ const groups = [
 export default function Sidebar() {
   const t = useTranslations('Sidebar')
   const [isMaster, setIsMaster] = useState(false)
+  const [club, setClub] = useState<{ ownsClub: boolean; organizationId: string | null }>({ ownsClub: false, organizationId: null })
   useEffect(() => {
     let cancelled = false
     fetch('/api/master/status')
       .then((res) => (res.ok ? res.json() : { isAdmin: false }))
       .then((data) => { if (!cancelled) setIsMaster(Boolean(data?.isAdmin)) })
+      .catch(() => {})
+    fetch('/api/club/status')
+      .then((res) => (res.ok ? res.json() : { ownsClub: false, organizationId: null }))
+      .then((data) => { if (!cancelled) setClub({ ownsClub: Boolean(data?.ownsClub), organizationId: data?.organizationId ?? null }) })
       .catch(() => {})
     return () => { cancelled = true }
   }, [])
@@ -45,6 +50,14 @@ export default function Sidebar() {
             </div>
           </div>
         ))}
+        {club.ownsClub ? (
+          <div>
+            <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{t('groups.miClubGroup')}</div>
+            <div className="space-y-1">
+              <Link href={`/clubs/manage/${club.organizationId}`} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[#D4AF37] hover:bg-white/5"><Building2 size={18} />{t('items.miClub')}</Link>
+            </div>
+          </div>
+        ) : null}
         {isMaster ? (
           <div>
             <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{t('groups.plataforma')}</div>

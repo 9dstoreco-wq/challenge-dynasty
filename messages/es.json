@@ -6,7 +6,8 @@
    "negocio": "Negocio",
    "comercio": "Comercio",
    "cuenta": "Cuenta",
-   "plataforma": "Plataforma"
+   "plataforma": "Plataforma",
+   "miClubGroup": "Mi Club"
   },
   "items": {
    "inicio": "Inicio",
@@ -29,7 +30,8 @@
    "finanzas": "Finanzas",
    "marketplace": "Marketplace",
    "miPerfil": "Mi perfil",
-   "master": "Master"
+   "master": "Master",
+   "miClub": "Mi Club"
   },
   "retar": "RETAR",
   "profileCard": {
@@ -190,7 +192,8 @@
   "subtitle": "Organizaciones, canchas, reservas, coaches y torneos desde un mismo espacio.",
   "locationUnknown": "Ubicación no definida",
   "defaultDescription": "Club Dynasty",
-  "empty": "Todavía no hay organizaciones activas registradas en Supabase."
+  "empty": "Todavía no hay organizaciones activas registradas en Supabase.",
+  "registerCta": "🏢 Registrar mi club"
  },
  "Coaches": {
   "title": "Entrena. Gestiona. Crece.",
@@ -833,5 +836,53 @@
   "shareBtn": "Compartir",
   "downloadBtn": "Descargar",
   "shareText": "Mira mi carta en Challenge Dynasty, {name}"
+ },
+ "ClubRegister": {
+  "tag": "CLUB OS · AUTOREGISTRO",
+  "title": "Registra tu club",
+  "subtitle": "Crea tu organizacion y empieza a publicar tus canchas para que la comunidad las reserve.",
+  "nameLabel": "NOMBRE DEL CLUB",
+  "namePlaceholder": "Ej. Club Padel Bogota",
+  "descLabel": "DESCRIPCION",
+  "descPlaceholder": "Cuenta que hace unico a tu club",
+  "cityLabel": "CIUDAD",
+  "cityPlaceholder": "Ej. Bogota",
+  "countryLabel": "PAIS (CODIGO)",
+  "countryPlaceholder": "CO",
+  "submitBtn": "CREAR MI CLUB",
+  "submitting": "CREANDO...",
+  "errNameRequired": "El nombre del club es obligatorio.",
+  "errCreateFailed": "No se pudo crear el club",
+  "errAuthRequired": "Debes iniciar sesion para registrar un club."
+ },
+ "ClubDashboard": {
+  "tag": "CLUB OS",
+  "resourcesTitle": "Mis canchas / recursos",
+  "emptyResources": "Todavia no has publicado ninguna cancha.",
+  "addTitle": "Publicar nueva cancha",
+  "nameLabel": "NOMBRE",
+  "namePlaceholder": "Ej. Cancha 1 - Techada",
+  "typeLabel": "TIPO",
+  "typePlaceholder": "Ej. cancha_padel",
+  "sportLabel": "DEPORTE",
+  "selectSport": "Selecciona un deporte",
+  "capacityLabel": "CAPACIDAD",
+  "priceLabel": "PRECIO POR RESERVA",
+  "currencyLabel": "MONEDA",
+  "modeLabel": "MODO DE RESERVA",
+  "modeInstant": "Instantanea",
+  "modeApproval": "Requiere aprobacion",
+  "submitBtn": "+ PUBLICAR CANCHA",
+  "submitting": "PUBLICANDO...",
+  "statusActive": "ACTIVA",
+  "statusPaused": "PAUSADA",
+  "pauseBtn": "Pausar",
+  "activateBtn": "Activar",
+  "errCreateFailed": "No se pudo publicar la cancha",
+  "errNameRequired": "El nombre es obligatorio.",
+  "errPriceInvalid": "El precio debe ser mayor o igual a 0.",
+  "notOwnerTitle": "No tienes acceso a este club",
+  "notOwnerBody": "Solo el dueno de la organizacion puede administrar este panel.",
+  "backToClubs": "← Volver a clubes"
  }
 }

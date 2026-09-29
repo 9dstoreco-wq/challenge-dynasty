@@ -6,7 +6,8 @@
    "negocio": "Business",
    "comercio": "Commerce",
    "cuenta": "Account",
-   "plataforma": "Platform"
+   "plataforma": "Platform",
+   "miClubGroup": "My Club"
   },
   "items": {
    "inicio": "Home",
@@ -29,7 +30,8 @@
    "finanzas": "Finance",
    "marketplace": "Marketplace",
    "miPerfil": "My profile",
-   "master": "Master"
+   "master": "Master",
+   "miClub": "My Club"
   },
   "retar": "CHALLENGE",
   "profileCard": {
@@ -190,7 +192,8 @@
   "subtitle": "Organizations, courts, bookings, coaches and tournaments from one place.",
   "locationUnknown": "Location not set",
   "defaultDescription": "Dynasty Club",
-  "empty": "No active organizations registered yet."
+  "empty": "No active organizations registered yet.",
+  "registerCta": "🏢 Register my club"
  },
  "Coaches": {
   "title": "Train. Manage. Grow.",
@@ -833,5 +836,53 @@
   "shareBtn": "Share",
   "downloadBtn": "Download",
   "shareText": "Check out my Challenge Dynasty card, {name}"
+ },
+ "ClubRegister": {
+  "tag": "CLUB OS · SELF-SERVICE",
+  "title": "Register your club",
+  "subtitle": "Create your organization and start publishing your courts so the community can book them.",
+  "nameLabel": "CLUB NAME",
+  "namePlaceholder": "E.g. Bogota Padel Club",
+  "descLabel": "DESCRIPTION",
+  "descPlaceholder": "Tell players what makes your club unique",
+  "cityLabel": "CITY",
+  "cityPlaceholder": "E.g. Bogota",
+  "countryLabel": "COUNTRY (CODE)",
+  "countryPlaceholder": "CO",
+  "submitBtn": "CREATE MY CLUB",
+  "submitting": "CREATING...",
+  "errNameRequired": "The club name is required.",
+  "errCreateFailed": "Could not create the club",
+  "errAuthRequired": "You must sign in to register a club."
+ },
+ "ClubDashboard": {
+  "tag": "CLUB OS",
+  "resourcesTitle": "My courts / resources",
+  "emptyResources": "You haven't published any courts yet.",
+  "addTitle": "Publish a new court",
+  "nameLabel": "NAME",
+  "namePlaceholder": "E.g. Court 1 - Indoor",
+  "typeLabel": "TYPE",
+  "typePlaceholder": "E.g. padel_court",
+  "sportLabel": "SPORT",
+  "selectSport": "Select a sport",
+  "capacityLabel": "CAPACITY",
+  "priceLabel": "PRICE PER BOOKING",
+  "currencyLabel": "CURRENCY",
+  "modeLabel": "BOOKING MODE",
+  "modeInstant": "Instant",
+  "modeApproval": "Requires approval",
+  "submitBtn": "+ PUBLISH COURT",
+  "submitting": "PUBLISHING...",
+  "statusActive": "ACTIVE",
+  "statusPaused": "PAUSED",
+  "pauseBtn": "Pause",
+  "activateBtn": "Activate",
+  "errCreateFailed": "Could not publish the court",
+  "errNameRequired": "Name is required.",
+  "errPriceInvalid": "Price must be 0 or greater.",
+  "notOwnerTitle": "You don't have access to this club",
+  "notOwnerBody": "Only the organization owner can manage this panel.",
+  "backToClubs": "← Back to clubs"
  }
 }
