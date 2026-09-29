@@ -495,7 +495,8 @@
   "fixturesTitle": "Fixtures",
   "fixturesRegistered": "{count} registered",
   "noFixtures": "No fixtures generated yet.",
-  "tbd": "TBD"
+  "tbd": "TBD",
+  "organizeCta": "🏆 Organize a tournament"
  },
  "Onboarding": {
   "step": "FIRST STEP",
@@ -884,5 +885,57 @@
   "notOwnerTitle": "You don't have access to this club",
   "notOwnerBody": "Only the organization owner can manage this panel.",
   "backToClubs": "← Back to clubs"
+ },
+ "TournamentOrganizer": {
+  "tcTitle": "Scheduling engine",
+  "tcSubtitle": "Generate, validate and publish your tournament match schedule automatically.",
+  "tcSelectTournament": "Select a tournament",
+  "tcPreview": "Preview",
+  "tcValidate": "Validate",
+  "tcPublish": "Publish schedule",
+  "tcEngineResult": "Engine result"
+ },
+ "TournamentCreate": {
+  "title": "Create tournament",
+  "nameLabel": "TOURNAMENT NAME",
+  "namePlaceholder": "E.g. Dynasty Cup Bogota",
+  "sportLabel": "SPORT",
+  "selectSport": "Select a sport",
+  "formatLabel": "FORMAT",
+  "formatSingleElim": "Single elimination",
+  "formatDoubleElim": "Double elimination",
+  "formatRoundRobin": "Round robin",
+  "formatGroups": "Groups + knockout",
+  "formatLadder": "Ladder",
+  "participantModeLabel": "MODE",
+  "modeIndividual": "Individual",
+  "modePair": "Pairs",
+  "modeTeam": "Teams",
+  "visibilityLabel": "VISIBILITY",
+  "visibilityPublic": "Public",
+  "visibilityUnlisted": "Unlisted",
+  "visibilityPrivate": "Private",
+  "startsLabel": "START DATE",
+  "locationLabel": "LOCATION",
+  "locationPlaceholder": "E.g. Bogota Padel Club",
+  "capacityLabel": "SLOTS",
+  "entryFeeLabel": "ENTRY FEE",
+  "currencyLabel": "CURRENCY",
+  "attachToClub": "Attach to my club",
+  "submitBtn": "+ CREATE TOURNAMENT",
+  "submitting": "CREATING...",
+  "errTitleRequired": "The tournament name is required.",
+  "errAuthRequired": "You must sign in to create a tournament.",
+  "errCreateFailed": "Could not create the tournament"
+ },
+ "TournamentsMine": {
+  "tag": "TOURNAMENT OS · ORGANIZER",
+  "title": "My tournaments",
+  "subtitle": "Create tournaments, generate the match schedule and publish it. Only you see this panel.",
+  "listTitle": "Tournaments I organize",
+  "empty": "You haven't created any tournaments yet.",
+  "dateTBD": "Date TBD",
+  "authRequiredTitle": "You must sign in",
+  "loginLink": "Go to sign in"
  }
 }

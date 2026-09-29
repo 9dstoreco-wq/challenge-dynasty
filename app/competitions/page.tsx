@@ -5,6 +5,7 @@ import BottomNav from '@/components/BottomNav'
 import { createClient } from '@/lib/supabase/server'
 import PageHero from '@/components/PageHero'
 import { getTranslations } from 'next-intl/server'
+import Link from 'next/link'
 
 export default async function CompetitionsPage() {
   const supabase = await createClient()
@@ -25,7 +26,9 @@ export default async function CompetitionsPage() {
           <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{t('title')}</h1>
           <p className="text-white/50 mt-2">
             {t('subtitle')}
-          </p></PageHero>
+          </p>
+          <Link href="/competitions/organize" className="inline-flex mt-5 rounded-xl bg-[#D4AF37] text-black px-5 py-3 font-black">{t('organizeCta')}</Link>
+          </PageHero>
 
           <div className="grid md:grid-cols-2 gap-4 mt-7">
             {tournaments.map((t2: {id:string;title:string;status:string;starts_at:string|null;ends_at:string|null}) => (

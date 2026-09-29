@@ -495,7 +495,8 @@
   "fixturesTitle": "Fixtures",
   "fixturesRegistered": "{count} registrados",
   "noFixtures": "Todavía no hay fixtures generados.",
-  "tbd": "TBD"
+  "tbd": "TBD",
+  "organizeCta": "🏆 Organizar torneo"
  },
  "Onboarding": {
   "step": "PRIMER PASO",
@@ -884,5 +885,57 @@
   "notOwnerTitle": "No tienes acceso a este club",
   "notOwnerBody": "Solo el dueno de la organizacion puede administrar este panel.",
   "backToClubs": "← Volver a clubes"
+ },
+ "TournamentOrganizer": {
+  "tcTitle": "Motor de programacion",
+  "tcSubtitle": "Genera, valida y publica el calendario de partidos de tu torneo automaticamente.",
+  "tcSelectTournament": "Selecciona un torneo",
+  "tcPreview": "Previsualizar",
+  "tcValidate": "Validar",
+  "tcPublish": "Publicar calendario",
+  "tcEngineResult": "Resultado del motor"
+ },
+ "TournamentCreate": {
+  "title": "Crear torneo",
+  "nameLabel": "NOMBRE DEL TORNEO",
+  "namePlaceholder": "Ej. Copa Dynasty Bogota",
+  "sportLabel": "DEPORTE",
+  "selectSport": "Selecciona un deporte",
+  "formatLabel": "FORMATO",
+  "formatSingleElim": "Eliminacion simple",
+  "formatDoubleElim": "Eliminacion doble",
+  "formatRoundRobin": "Todos contra todos",
+  "formatGroups": "Grupos + eliminacion",
+  "formatLadder": "Escalera",
+  "participantModeLabel": "MODALIDAD",
+  "modeIndividual": "Individual",
+  "modePair": "Parejas",
+  "modeTeam": "Equipos",
+  "visibilityLabel": "VISIBILIDAD",
+  "visibilityPublic": "Publico",
+  "visibilityUnlisted": "No listado",
+  "visibilityPrivate": "Privado",
+  "startsLabel": "FECHA DE INICIO",
+  "locationLabel": "LUGAR",
+  "locationPlaceholder": "Ej. Club Padel Bogota",
+  "capacityLabel": "CUPOS",
+  "entryFeeLabel": "COSTO DE INSCRIPCION",
+  "currencyLabel": "MONEDA",
+  "attachToClub": "Vincular a mi club",
+  "submitBtn": "+ CREAR TORNEO",
+  "submitting": "CREANDO...",
+  "errTitleRequired": "El nombre del torneo es obligatorio.",
+  "errAuthRequired": "Debes iniciar sesion para crear un torneo.",
+  "errCreateFailed": "No se pudo crear el torneo"
+ },
+ "TournamentsMine": {
+  "tag": "TOURNAMENT OS · ORGANIZADOR",
+  "title": "Mis torneos",
+  "subtitle": "Crea torneos, genera el calendario de partidos y publicalo. Solo tu ves este panel.",
+  "listTitle": "Torneos que organizo",
+  "empty": "Todavia no has creado ningun torneo.",
+  "dateTBD": "Fecha por definir",
+  "authRequiredTitle": "Debes iniciar sesion",
+  "loginLink": "Ir a iniciar sesion"
  }
 }
