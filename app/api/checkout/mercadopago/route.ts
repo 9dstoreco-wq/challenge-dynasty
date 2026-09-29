@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { toSafeMessage } from "@/lib/safe-error";
-import { buildWompiCheckoutConfig, type WompiDomain } from "@/lib/dynasty/wompi";
+import { buildMercadoPagoPreference, type MercadoPagoDomain } from "@/lib/dynasty/mercadopago";
 import { ALLOWED_CHECKOUT_DOMAINS, CHECKOUT_RESOLVERS, CheckoutError } from "@/lib/dynasty/checkout-resolvers";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const domain = typeof body?.domain === "string" ? (body.domain as WompiDomain) : undefined;
+  const domain = typeof body?.domain === "string" ? (body.domain as MercadoPagoDomain) : undefined;
   const rowId = typeof body?.rowId === "string" ? body.rowId : "";
 
   if (!domain || !ALLOWED_CHECKOUT_DOMAINS.has(domain)) {
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const resolved = await resolver(supabase, user.id, rowId);
 
     const origin = request.headers.get("origin") ?? new URL(request.url).origin;
-    const config = await buildWompiCheckoutConfig({
+    const config = await buildMercadoPagoPreference({
       domain,
       rowId,
       amount: resolved.amount,
@@ -47,13 +47,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
     const message = err instanceof Error ? err.message : "CHECKOUT_INIT_FAILED";
-    if (message === "WOMPI_PUBLIC_KEY_MISSING" || message === "WOMPI_INTEGRITY_SECRET_MISSING") {
+    if (message === "MERCADOPAGO_ACCESS_TOKEN_MISSING" || message === "SUPABASE_URL_MISSING") {
       return NextResponse.json({ error: "PAYMENT_PROVIDER_NOT_CONFIGURED" }, { status: 503 });
     }
     if (message === "UNSUPPORTED_CURRENCY" || message === "INVALID_AMOUNT") {
       return NextResponse.json({ error: message }, { status: 422 });
     }
-    console.error("checkout/wompi: unexpected error", err);
-    return NextResponse.json({ error: toSafeMessage(err, "checkout/wompi") }, { status: 500 });
+    console.error("checkout/mercadopago: unexpected error", err);
+    return NextResponse.json({ error: toSafeMessage(err, "checkout/mercadopago") }, { status: 500 });
   }
 }

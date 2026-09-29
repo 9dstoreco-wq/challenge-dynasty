@@ -757,14 +757,18 @@
   "ogDescription": "La red competitiva para todos tus deportes.",
   "twitterDescription": "Reta, compite y construye tu reputación deportiva."
  },
- "WompiCheckout": {
+ "Checkout": {
   "authRequired": "Inicia sesión para pagar.",
   "alreadyPaid": "Esto ya está pagado.",
   "forbidden": "No tienes acceso a este pago.",
   "notConfigured": "Pagos aún no disponibles.",
   "invalidAmount": "Monto inválido para cobrar.",
+  "bookingCancelled": "Esta reserva fue cancelada.",
+  "paymentNotRequired": "Esta reserva no requiere pago.",
   "genericError": "No se pudo iniciar el pago. Intenta de nuevo.",
-  "preparing": "Preparando pago…"
+  "preparing": "Preparando pago…",
+  "payWithWompi": "Pagar con Wompi",
+  "payWithMercadoPago": "Pagar con Mercado Pago"
  },
  "LegalTerms": {
   "title": "Términos de Servicio",

@@ -28,13 +28,15 @@ interface WompiCheckoutButtonProps {
  * which renders the actual payment button and opens Wompi's modal on click.
  */
 export function WompiCheckoutButton({ domain, rowId, className }: WompiCheckoutButtonProps) {
-  const t = useTranslations("WompiCheckout");
+  const t = useTranslations("Checkout");
   const ERROR_LABELS: Record<string, string> = {
     AUTH_REQUIRED: t("authRequired"),
     ALREADY_PAID: t("alreadyPaid"),
     FORBIDDEN: t("forbidden"),
     PAYMENT_PROVIDER_NOT_CONFIGURED: t("notConfigured"),
     INVALID_AMOUNT: t("invalidAmount"),
+    BOOKING_CANCELLED: t("bookingCancelled"),
+    PAYMENT_NOT_REQUIRED: t("paymentNotRequired"),
   };
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [config, setConfig] = useState<WompiCheckoutConfig | null>(null);

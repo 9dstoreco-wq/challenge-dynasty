@@ -757,14 +757,18 @@
   "ogDescription": "The competitive network for all your sports.",
   "twitterDescription": "Challenge, compete, and build your sports reputation."
  },
- "WompiCheckout": {
+ "Checkout": {
   "authRequired": "Sign in to pay.",
   "alreadyPaid": "This is already paid.",
   "forbidden": "You don't have access to this payment.",
   "notConfigured": "Payments not available yet.",
   "invalidAmount": "Invalid amount to charge.",
+  "bookingCancelled": "This booking was cancelled.",
+  "paymentNotRequired": "This booking doesn't require payment.",
   "genericError": "Could not start the payment. Try again.",
-  "preparing": "Preparing payment…"
+  "preparing": "Preparing payment…",
+  "payWithWompi": "Pay with Wompi",
+  "payWithMercadoPago": "Pay with Mercado Pago"
  },
  "LegalTerms": {
   "title": "Terms of Service",

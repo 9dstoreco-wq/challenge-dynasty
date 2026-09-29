@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// CHALLENGE DYNASTY — Wompi payment webhook (platform-wide).
+// CHALLENGE DYNASTY -- Wompi payment webhook (platform-wide).
 //
 // This is the single receiving endpoint for every domain that can take a Wompi payment:
 // Dynasty Shop, court/resource bookings, tournament entry fees, marketplace orders, and
@@ -14,11 +14,29 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //   row_id  = the id of the row in that domain's *_orders / bookings / tournament_entries /
 //             billing_invoices table that this payment is for.
 //
-// Nothing calls this yet — the checkout-creation side (building the reference + the
-// server-side integrity signature required by Wompi's Web Checkout widget) is a separate,
-// still-to-build piece per domain. This function only needs WOMPI_EVENTS_SECRET, set as a
-// Supabase Edge Function secret from Wompi's dashboard (My account > Secrets of technical
-// integration > Events). SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected automatically.
+// Needs WOMPI_EVENTS_SECRET, set as a Supabase Edge Function secret from Wompi's dashboard
+// (My account > Secrets of technical integration > Events). SUPABASE_URL /
+// SUPABASE_SERVICE_ROLE_KEY are injected automatically.
+//
+// 2026-09-29 fix: every domain branch below now calls that domain's hardened SECURITY
+// DEFINER confirm/apply RPC instead of writing to its payment table directly. The previous
+// version wrote straight to `booking_payment_records` for the `booking` domain -- a table
+// `create_atomic_booking` never populates (bookings created through the normal reserve flow
+// have amount/currency/payment_status on `bookings` itself), so a real Wompi payment for a
+// real booking would have updated a row that doesn't exist and silently never confirmed the
+// booking. It also wrote directly to shop_order_payments/marketplace_order_payments instead
+// of confirm_shop_order_payment/confirm_marketplace_payment, which additionally
+// consume/release inventory reservations and enforce amount/currency matching -- a direct
+// update skipped all of that. See lib/dynasty/checkout-resolvers.ts for the full story on
+// the booking side, and supabase/functions/mercadopago-webhook/index.ts (added the same day,
+// as a fallback provider) for the sibling implementation this now matches.
+//
+// Also switched provider_event_id from the constant string `event` (Wompi's `event` field
+// is always literally "transaction.updated" -- the same string for every event of every
+// transaction, so it was never actually unique) to the signature checksum Wompi sends per
+// delivery, which is unique per distinct (properties, timestamp) payload and stable across
+// retries of the exact same delivery -- the idempotency behaviour `apply_payment_result` /
+// `confirm_shop_order_payment` / `confirm_marketplace_payment` actually expect.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -44,10 +62,16 @@ function getByPath(obj: unknown, path: string): unknown {
 
 type Domain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
 
-function normalizeStatus(wompiStatus: string): "paid" | "failed" | "voided" | "pending" {
+// Wompi's own vocabulary (APPROVED/DECLINED/ERROR/VOIDED/PENDING) collapsed to the subset
+// every downstream RPC/CHECK constraint actually allows. Deliberately never emits
+// 'cancelled': apply_payment_result's non-paid branch does `bookings.payment_status =
+// p_status` for 'failed' or 'cancelled', but bookings_payment_status_check has no
+// 'cancelled' value -- VOIDED (a reversed/voided approved transaction) maps to 'refunded'
+// instead, which the constraint does allow and which is the accurate description anyway.
+function normalizeStatus(wompiStatus: string): "paid" | "failed" | "refunded" | "pending" {
   if (wompiStatus === "APPROVED") return "paid";
   if (wompiStatus === "DECLINED" || wompiStatus === "ERROR") return "failed";
-  if (wompiStatus === "VOIDED") return "voided";
+  if (wompiStatus === "VOIDED") return "refunded";
   return "pending";
 }
 
@@ -62,7 +86,7 @@ Deno.serve(async (req) => {
   if (!body || typeof body !== "object") return json({ error: "INVALID_JSON" }, 400);
 
   // Wompi tells us, per event, exactly which fields (and in what order) it hashed into the
-  // checksum, plus the timestamp it used — so we recompute from that instead of hardcoding
+  // checksum, plus the timestamp it used -- so we recompute from that instead of hardcoding
   // an assumed field list, which would silently break if Wompi changes it per event type.
   const properties: string[] = Array.isArray(body?.signature?.properties) ? body.signature.properties : [];
   const providedChecksum: string = typeof body?.signature?.checksum === "string" ? body.signature.checksum : "";
@@ -92,8 +116,13 @@ Deno.serve(async (req) => {
   const reference = String(tx.reference ?? "");
   const wompiStatus = String(tx.status ?? "");
   const providerPaymentId = String(tx.id ?? "");
+  // Unique per distinct delivery (same properties+timestamp => same checksum => same event
+  // id on a retry of the exact same delivery); see the file header for why this replaced
+  // the constant `eventType` string.
+  const providerEventId = providedChecksum;
   const amountInCents = Number(tx.amount_in_cents ?? 0);
   const amount = amountInCents / 100;
+  const currencyCode = String(tx.currency ?? "COP").toUpperCase();
   const status = normalizeStatus(wompiStatus);
 
   const parts = reference.split(":");
@@ -111,35 +140,53 @@ Deno.serve(async (req) => {
 
   try {
     switch (domain) {
-      case "shop": {
-        const { error } = await supabase
-          .from("shop_order_payments")
-          .update({ status, provider: "wompi", provider_payment_id: providerPaymentId, provider_event_id: eventType, amount })
-          .eq("order_id", rowId);
+      case "booking": {
+        const { error } = await supabase.rpc("apply_payment_result", {
+          p_provider: "wompi",
+          p_provider_payment_id: providerPaymentId,
+          p_provider_event_id: providerEventId,
+          p_booking_id: rowId,
+          p_amount: amount,
+          p_currency_code: currencyCode,
+          p_status: status,
+          p_raw_payload: tx,
+        });
         if (error) throw error;
         break;
       }
-      case "booking": {
-        const { error } = await supabase
-          .from("booking_payment_records")
-          .update({ payment_status: status, amount_paid: status === "paid" ? amount : undefined })
-          .eq("booking_id", rowId);
+      case "shop": {
+        if (status !== "paid") break; // confirm_shop_order_payment is success-only.
+        const { error } = await supabase.rpc("confirm_shop_order_payment", {
+          p_order_id: rowId,
+          p_provider: "wompi",
+          p_provider_payment_id: providerPaymentId,
+          p_provider_event_id: providerEventId,
+          p_amount: amount,
+          p_currency_code: currencyCode,
+          p_raw_payload: tx,
+        });
         if (error) throw error;
         break;
       }
       case "tournament": {
-        const { error } = await supabase
-          .from("tournament_registration_payments")
-          .update({ status, amount_paid: status === "paid" ? amount : undefined })
-          .eq("entry_id", rowId);
+        if (status !== "paid") break; // confirm_tournament_registration_payment is success-only.
+        const { error } = await supabase.rpc("confirm_tournament_registration_payment", {
+          p_entry_id: rowId,
+          p_amount_paid: amount,
+        });
         if (error) throw error;
         break;
       }
       case "marketplace": {
-        const { error } = await supabase
-          .from("marketplace_order_payments")
-          .update({ status, provider: "wompi", provider_payment_id: providerPaymentId, provider_event_id: eventType })
-          .eq("order_id", rowId);
+        if (status !== "paid") break; // confirm_marketplace_payment is success-only.
+        const { error } = await supabase.rpc("confirm_marketplace_payment", {
+          p_order_id: rowId,
+          p_provider: "wompi",
+          p_provider_payment_id: providerPaymentId,
+          p_provider_event_id: providerEventId,
+          p_amount: amount,
+          p_currency_code: currencyCode,
+        });
         if (error) throw error;
         break;
       }
@@ -165,7 +212,7 @@ Deno.serve(async (req) => {
         return json({ ok: true, unrouted: reference });
     }
   } catch (err) {
-    console.error("wompi-webhook: DB update failed", domain, rowId, err instanceof Error ? err.message : err);
+    console.error("wompi-webhook: RPC/DB update failed", domain, rowId, err instanceof Error ? err.message : err);
     return json({ error: "DB_UPDATE_FAILED" }, 500);
   }
 
