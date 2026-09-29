@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { toSafeMessage } from "@/lib/safe-error";
-import { buildMercadoPagoPreference, type MercadoPagoDomain } from "@/lib/dynasty/mercadopago";
+import { buildEpaycoCheckout, type EpaycoDomain } from "@/lib/dynasty/epayco";
 import { ALLOWED_CHECKOUT_DOMAINS, CHECKOUT_RESOLVERS, CheckoutError } from "@/lib/dynasty/checkout-resolvers";
 
 export const dynamic = "force-dynamic";
@@ -16,8 +16,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "AUTH_REQUIRED" }, { status: 401 });
   }
 
+  // NEXT_PUBLIC_EPAYCO_PUBLIC_KEY is what the client actually needs to open the widget, but
+  // checking it here too means a missing/unconfigured key surfaces as the same
+  // PAYMENT_PROVIDER_NOT_CONFIGURED shape every other checkout error goes through, instead
+  // of a raw ePayco script failure with no context.
+  if (!process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY) {
+    return NextResponse.json({ error: "PAYMENT_PROVIDER_NOT_CONFIGURED" }, { status: 503 });
+  }
+
   const body = await request.json().catch(() => ({}));
-  const domain = typeof body?.domain === "string" ? (body.domain as MercadoPagoDomain) : undefined;
+  const domain = typeof body?.domain === "string" ? (body.domain as EpaycoDomain) : undefined;
   const rowId = typeof body?.rowId === "string" ? body.rowId : "";
 
   if (!domain || !ALLOWED_CHECKOUT_DOMAINS.has(domain)) {
@@ -32,7 +40,7 @@ export async function POST(request: Request) {
     const resolved = await resolver(supabase, user.id, rowId);
 
     const origin = request.headers.get("origin") ?? new URL(request.url).origin;
-    const config = await buildMercadoPagoPreference({
+    const config = buildEpaycoCheckout({
       domain,
       rowId,
       amount: resolved.amount,
@@ -47,13 +55,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: err.message }, { status: err.status });
     }
     const message = err instanceof Error ? err.message : "CHECKOUT_INIT_FAILED";
-    if (message === "MERCADOPAGO_ACCESS_TOKEN_MISSING" || message === "SUPABASE_URL_MISSING") {
-      return NextResponse.json({ error: "PAYMENT_PROVIDER_NOT_CONFIGURED" }, { status: 503 });
-    }
     if (message === "UNSUPPORTED_CURRENCY" || message === "INVALID_AMOUNT") {
       return NextResponse.json({ error: message }, { status: 422 });
     }
-    console.error("checkout/mercadopago: unexpected error", err);
-    return NextResponse.json({ error: toSafeMessage(err, "checkout/mercadopago") }, { status: 500 });
+    console.error("checkout/epayco: unexpected error", err);
+    return NextResponse.json({ error: toSafeMessage(err, "checkout/epayco") }, { status: 500 });
   }
 }
