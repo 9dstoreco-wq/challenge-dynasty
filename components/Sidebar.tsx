@@ -2,13 +2,12 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, Store, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, Bot, LayoutGrid, History, ShieldCheck } from 'lucide-react'
+import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, Store, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, LayoutGrid, History, ShieldCheck } from 'lucide-react'
 import LocaleSwitcher from './LocaleSwitcher'
 
 const groups = [
   { group: 'jugar', items: [['inicio', Home, '/'], ['retos', Swords, '/challenge/new'], ['deportes', LayoutGrid, '/sports'], ['trucos', Sparkles, '/tricks'], ['ranking', Trophy, '/ranking'], ['historial', History, '/history'], ['arena', Radio, '/arena']] },
   { group: 'comunidad', items: [['jugadores', Users, '/players'], ['partners', Users, '/partners'], ['notificaciones', Bell, '/notifications']] },
-  { group: 'dynastyAi', items: [['dynastyAi', Bot, '/intelligence']] },
   { group: 'negocio', items: [['clubes', Building2, '/clubs'], ['coaches', GraduationCap, '/coaches'], ['miCoachOs', GraduationCap, '/coaches/dashboard'], ['competiciones', Medal, '/competitions'], ['reservas', CalendarDays, '/bookings'], ['promote', Megaphone, '/promote'], ['planes', CreditCard, '/business'], ['finanzas', WalletCards, '/finance']] },
   { group: 'comercio', items: [['marketplace', ShoppingBag, '/marketplace'], ['dynastyShop', Store, '/shop'], ['miTienda', Store, '/shop/admin']] },
   { group: 'cuenta', items: [['miPerfil', UserRound, '/settings']] },
