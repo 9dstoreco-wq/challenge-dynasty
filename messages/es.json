@@ -175,7 +175,12 @@
   "rankingStats": "{points} PTS · {wins} victorias",
   "rankingEmpty": "Configura un deporte y juega tu primer partido.",
   "defaultUsername": "jugador",
-  "defaultDisplayName": "Jugador"
+  "defaultDisplayName": "Jugador",
+  "myLevelTitle": "⚡ TU NIVEL",
+  "levelBadge": "NIVEL {level}",
+  "xpStats": "{xp} XP · racha {streak}",
+  "levelEmpty": "Juega tu primer partido para empezar a subir de nivel.",
+  "viewCard": "Ver mi carta"
  },
  "Arena": {
   "title": "Competencia en vivo",
