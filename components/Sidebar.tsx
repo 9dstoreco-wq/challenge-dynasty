@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, LayoutGrid, History, ShieldCheck } from 'lucide-react'
 import LocaleSwitcher from './LocaleSwitcher'
@@ -15,6 +16,8 @@ const groups = [
 
 export default function Sidebar() {
   const t = useTranslations('Sidebar')
+  const pathname = usePathname() ?? ''
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/'))
   const [isMaster, setIsMaster] = useState(false)
   const [club, setClub] = useState<{ ownsClub: boolean; organizationId: string | null }>({ ownsClub: false, organizationId: null })
   useEffect(() => {
@@ -30,7 +33,7 @@ export default function Sidebar() {
     return () => { cancelled = true }
   }, [])
   return (
-    <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 border-r border-white/10 bg-[#0A0A0C]/95 p-5 flex-col z-40">
+    <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 border-r border-[#D4AF37]/15 bg-[#0A0A0C]/95 backdrop-blur p-5 flex-col z-40">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <img src="/dynasty-badge.png" alt="Challenge Dynasty" className="w-11 h-11 object-contain glow" />
@@ -38,14 +41,14 @@ export default function Sidebar() {
         </div>
       </div>
       <div className="mb-4"><LocaleSwitcher /></div>
-      <Link href="/challenge/new" className="w-full rounded-2xl bg-[#D4AF37] text-black font-extrabold py-3 flex items-center justify-center gap-2 mb-6 glow"><Zap size={18} /> {t('retar')}</Link>
+      <Link href="/challenge/new" className="btn-gold shine w-full py-3 mb-6"><Zap size={18} /> {t('retar')}</Link>
       <nav className="space-y-4 overflow-y-auto">
         {groups.map(({ group, items }) => (
           <div key={group}>
             <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{t(`groups.${group}`)}</div>
             <div className="space-y-1">
               {items.map(([itemKey, Icon, href]) => (
-                <Link key={itemKey} href={href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:bg-white/5 hover:text-white"><Icon size={18} />{t(`items.${itemKey}`)}</Link>
+                <Link key={itemKey} href={href} aria-current={isActive(href) ? 'page' : undefined} className={`relative flex items-center gap-3 px-3 py-2.5 text-sm transition ${isActive(href) ? 'bg-gradient-to-r from-[#D4AF37]/20 to-transparent text-white font-bold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[3px] before:bg-[#D4AF37] before:shadow-[0_0_10px_#D4AF37]' : 'text-white/65 hover:bg-white/5 hover:text-white hover:translate-x-0.5'}`}><Icon size={18} className={isActive(href) ? 'text-[#D4AF37]' : ''} />{t(`items.${itemKey}`)}</Link>
               ))}
             </div>
           </div>
@@ -54,7 +57,7 @@ export default function Sidebar() {
           <div>
             <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{t('groups.miClubGroup')}</div>
             <div className="space-y-1">
-              <Link href={`/clubs/manage/${club.organizationId}`} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[#D4AF37] hover:bg-white/5"><Building2 size={18} />{t('items.miClub')}</Link>
+              <Link href={`/clubs/manage/${club.organizationId}`} className="flex items-center gap-3 px-3 py-2.5 text-sm text-[#D4AF37] hover:bg-white/5"><Building2 size={18} />{t('items.miClub')}</Link>
             </div>
           </div>
         ) : null}
@@ -62,16 +65,16 @@ export default function Sidebar() {
           <div>
             <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{t('groups.plataforma')}</div>
             <div className="space-y-1">
-              <Link href="/master" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-[#D4AF37] hover:bg-white/5"><ShieldCheck size={18} />{t('items.master')}</Link>
+              <Link href="/master" className="flex items-center gap-3 px-3 py-2.5 text-sm text-[#D4AF37] hover:bg-white/5"><ShieldCheck size={18} />{t('items.master')}</Link>
             </div>
           </div>
         ) : null}
       </nav>
-      <div className="mt-auto rounded-2xl bg-[#161616] p-4">
+      <div className="card-fut mt-auto"><div className="card-fut-in p-4">
         <div className="text-xs text-white/50">{t('profileCard.kicker')}</div>
         <div className="font-bold mt-1">{t('profileCard.title')}</div>
         <div className="text-[#D4AF37] font-black mt-2">{t('profileCard.badge')}</div>
-      </div>
+      </div></div>
     </aside>
   )
 }

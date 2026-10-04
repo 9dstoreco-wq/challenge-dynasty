@@ -24,3 +24,75 @@ button,input{font:inherit}
 a, button, [role="button"], .transition-base{transition:background-color .18s ease,border-color .18s ease,color .18s ease,opacity .18s ease,transform .18s ease,box-shadow .18s ease}
 a:active, button:active{transform:scale(.98)}
 article.rounded-3xl, .rounded-3xl{transition:border-color .2s ease,transform .2s ease,box-shadow .2s ease}
+
+/* ============================================================
+   DINASTY ARENA -- sistema visual "videojuego competitivo"
+   Todo en CSS/SVG puro (sin imagenes ni dependencias nuevas).
+   ============================================================ */
+:root{--gold:#D4AF37;--gold-hi:#F6E6B3;--gold-lo:#8A6418;--ink:#0A0A0C;--panel:#121214;--ice:#7FD7FF;--fire:#FF3D00}
+
+/* Fondo ambiental animado: auroras doradas + rayas diagonales + vineta */
+.arena-bg{position:relative;isolation:isolate;background:radial-gradient(1200px 600px at 85% -10%,rgba(212,175,55,.16),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(255,61,0,.10),transparent 60%),#0A0A0C}
+.arena-bg::before{content:"";position:fixed;inset:-20%;z-index:-2;pointer-events:none;background:conic-gradient(from 0deg at 70% 20%,rgba(212,175,55,.09),transparent 25%,rgba(255,61,0,.06) 50%,transparent 75%,rgba(212,175,55,.09));animation:arena-spin 38s linear infinite;filter:blur(40px)}
+.arena-bg::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:repeating-linear-gradient(115deg,rgba(255,255,255,.018) 0 2px,transparent 2px 22px),radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+@keyframes arena-spin{to{transform:rotate(360deg)}}
+
+/* Tarjeta tipo carta de juego: esquinas cortadas y borde dorado en degradado */
+.card-fut{--cut:16px;position:relative;background:linear-gradient(160deg,#1c1b14 0%,#141416 55%,#0c0c0e 100%);clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));border:0;padding:1px}
+.card-fut>.card-fut-in{background:linear-gradient(160deg,#17161a 0%,#101012 100%);clip-path:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));height:100%}
+.card-fut::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(246,230,179,.9),rgba(212,175,55,.35) 40%,rgba(138,100,24,.15) 70%,rgba(246,230,179,.6));z-index:0}
+.card-fut>*{position:relative;z-index:1}
+.card-fut{transition:transform .25s ease,filter .25s ease}
+.card-fut:hover{transform:translateY(-4px);filter:drop-shadow(0 12px 28px rgba(212,175,55,.28))}
+
+/* Barrido de brillo */
+.shine{position:relative;overflow:hidden}
+.shine::after{content:"";position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:rotate(18deg);animation:shine-sweep 5.5s ease-in-out infinite}
+@keyframes shine-sweep{0%,55%{left:-60%}100%{left:130%}}
+
+/* Boton principal con corte diagonal */
+.btn-gold{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-weight:900;letter-spacing:.04em;color:#0A0A0C;background:linear-gradient(135deg,#F6E6B3 0%,#D4AF37 50%,#B8902A 100%);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);padding:.8rem 1.6rem;box-shadow:0 0 0 1px rgba(246,230,179,.4) inset;transition:filter .2s ease,transform .2s ease}
+.btn-gold:hover{filter:brightness(1.1) drop-shadow(0 0 14px rgba(212,175,55,.55));transform:translateY(-1px)}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-weight:800;letter-spacing:.04em;color:#fff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);padding:.8rem 1.4rem}
+.btn-ghost:hover{background:rgba(212,175,55,.12);border-color:rgba(212,175,55,.5)}
+
+/* Barra de XP animada */
+.xp-track{height:12px;background:rgba(255,255,255,.07);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);overflow:hidden;position:relative}
+.xp-fill{height:100%;background:linear-gradient(90deg,#8A6418,#D4AF37 55%,#F6E6B3);width:var(--xp,0%);animation:xp-grow 1.4s cubic-bezier(.2,.8,.2,1) both;position:relative}
+.xp-fill::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.28) 0 6px,transparent 6px 14px);animation:xp-flow 1.2s linear infinite;mix-blend-mode:overlay}
+@keyframes xp-grow{from{width:0}to{width:var(--xp,0%)}}
+@keyframes xp-flow{to{background-position:28px 0}}
+
+/* Insignia de nivel hexagonal */
+.hex{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(160deg,#F6E6B3,#D4AF37 55%,#8A6418);color:#0A0A0C}
+
+.card-fut-plain{clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+
+/* Entradas escalonadas */
+.reveal{opacity:0;transform:translateY(18px);animation:reveal-up .7s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i,0)*90ms)}
+@keyframes reveal-up{to{opacity:1;transform:none}}
+
+/* Flotar / pulso */
+.float-y{animation:float-y 5s ease-in-out infinite}
+@keyframes float-y{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.pulse-ring{position:absolute;inset:0;border-radius:9999px;border:2px solid rgba(212,175,55,.5);animation:pulse-ring 2.6s ease-out infinite}
+@keyframes pulse-ring{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.5);opacity:0}}
+.spin-slow{animation:arena-spin 24s linear infinite}
+
+/* VS electrico */
+.vs-bolt{background:linear-gradient(135deg,#FF3D00,#D4AF37);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 24px rgba(255,61,0,.35);animation:vs-flicker 3.2s steps(1) infinite}
+@keyframes vs-flicker{0%,92%,100%{opacity:1}94%{opacity:.55}96%{opacity:1}98%{opacity:.7}}
+
+/* Marcas de esquina HUD */
+.hud-corners{position:relative}
+.hud-corners::before,.hud-corners::after{content:"";position:absolute;width:22px;height:22px;border:2px solid rgba(212,175,55,.7);pointer-events:none}
+.hud-corners::before{top:18px;left:18px;border-right:0;border-bottom:0}
+.hud-corners::after{bottom:18px;right:18px;border-left:0;border-top:0}
+
+/* Rarezas */
+.rarity-legend{--r:#FF3D00}.rarity-gold{--r:#D4AF37}.rarity-silver{--r:#C7CCD6}.rarity-bronze{--r:#C27C4A}
+
+@media (prefers-reduced-motion:reduce){
+  .arena-bg::before,.shine::after,.xp-fill,.xp-fill::after,.reveal,.float-y,.pulse-ring,.spin-slow,.vs-bolt{animation:none!important}
+  .reveal{opacity:1;transform:none}
+}
