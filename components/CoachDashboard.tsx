@@ -171,7 +171,7 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
     <div className="space-y-6">
       {error && <div className="rounded-2xl border border-red-400/30 bg-red-400/10 p-4 text-sm text-red-300">{error}</div>}
 
-      <div className="rounded-3xl border border-white/10 bg-[#161616] p-6">
+      <div className="card-fut-plain border border-white/10 bg-[#141416] p-6">
         <h2 className="font-black text-xl">{profile ? t('profileTitleExisting') : t('profileTitleNew')}</h2>
         <p className="text-sm text-white/40 mt-1">{profile ? t('profileSubtitleExisting') : t('profileSubtitleNew')}</p>
         <form onSubmit={saveProfile} className="grid md:grid-cols-2 gap-3 mt-5">
@@ -190,12 +190,12 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
       {profile && (
         <>
           <div className="grid md:grid-cols-3 gap-4">
-            <div className="rounded-3xl border border-white/10 bg-[#161616] p-6"><div className="text-xs text-white/40 tracking-widest">{t('paidRevenue')}</div><div className="text-2xl font-display font-black tracking-wide mt-2">{paidTotal.toLocaleString('es-CO')} {currency}</div></div>
-            <div className="rounded-3xl border border-white/10 bg-[#161616] p-6"><div className="text-xs text-white/40 tracking-widest">{t('upcomingSessions')}</div><div className="text-2xl font-display font-black tracking-wide mt-2">{upcomingCount}</div></div>
-            <div className="rounded-3xl border border-white/10 bg-[#161616] p-6"><div className="text-xs text-white/40 tracking-widest">{t('completedSessions')}</div><div className="text-2xl font-display font-black tracking-wide mt-2">{completedCount}</div></div>
+            <div className="card-fut-plain border border-white/10 bg-[#141416] p-6"><div className="text-xs text-white/40 tracking-widest">{t('paidRevenue')}</div><div className="text-2xl font-display font-black tracking-wide mt-2">{paidTotal.toLocaleString('es-CO')} {currency}</div></div>
+            <div className="card-fut-plain border border-white/10 bg-[#141416] p-6"><div className="text-xs text-white/40 tracking-widest">{t('upcomingSessions')}</div><div className="text-2xl font-display font-black tracking-wide mt-2">{upcomingCount}</div></div>
+            <div className="card-fut-plain border border-white/10 bg-[#141416] p-6"><div className="text-xs text-white/40 tracking-widest">{t('completedSessions')}</div><div className="text-2xl font-display font-black tracking-wide mt-2">{completedCount}</div></div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#161616] p-6">
+          <div className="card-fut-plain border border-white/10 bg-[#141416] p-6">
             <h2 className="font-black text-xl">{t('myServicesTitle')}</h2>
             <p className="text-sm text-white/40 mt-1">{t('myServicesSubtitle')}</p>
             <form onSubmit={addService} className="grid md:grid-cols-5 gap-2 mt-5">
@@ -224,7 +224,7 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#161616] p-6">
+          <div className="card-fut-plain border border-white/10 bg-[#141416] p-6">
             <h2 className="font-black text-xl">{t('bookingsTitle')}</h2>
             <p className="text-sm text-white/40 mt-1">{t('bookingsSubtitle')}</p>
             <div className="mt-5 space-y-2 max-h-96 overflow-auto">

@@ -42,7 +42,7 @@ export default function LegalDocument({
   eyebrow: string
 }) {
   return (
-    <main className="min-h-screen bg-[#0A0A0C] text-white">
+    <main className="min-h-screen arena-bg text-white">
       <div className="max-w-3xl mx-auto px-4 md:px-6 py-10">
         <section className="rounded-3xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#1B1A12] via-[#161616] to-[#0A0A0C] p-6 md:p-10 overflow-hidden relative mb-8">
           <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-gold-400/10 blur-3xl" />

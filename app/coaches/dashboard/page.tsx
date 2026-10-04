@@ -54,7 +54,7 @@ export default async function CoachDashboardPage(){
     }
   }
 
-  return <main className="min-h-screen bg-[#0A0A0C] text-white grid-bg"><Sidebar/><section className="lg:pl-64 p-6 lg:p-12 max-w-[1400px] mx-auto">
+  return <main className="min-h-screen arena-bg text-white "><Sidebar/><section className="lg:pl-64 p-6 lg:p-12 max-w-[1400px] mx-auto">
     <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">{t('tag')}</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{t('title')}</h1></PageHero>
     <div className="mt-8"><CoachDashboard profile={profile ?? null} services={services} bookings={bookings} myProfileId={user.id} /></div>
   </section></main>

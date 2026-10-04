@@ -15,7 +15,7 @@ export default async function OrganizeTournamentsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0A0A0C] text-white grid-bg">
+      <div className="min-h-screen arena-bg text-white ">
         <Sidebar />
         <main className="lg:pl-64 pb-20 lg:pb-0">
           <div className="max-w-2xl mx-auto px-4 md:px-6 py-16 text-center">
@@ -41,7 +41,7 @@ export default async function OrganizeTournamentsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-[#0A0A0C] text-white grid-bg">
+    <div className="min-h-screen arena-bg text-white ">
       <Sidebar />
       <main className="lg:pl-64 pb-20 lg:pb-0">
         <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">

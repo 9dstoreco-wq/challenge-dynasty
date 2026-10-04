@@ -6,6 +6,8 @@ import ChallengeActions from '@/components/ChallengeActions'
 import MatchResultForm from '@/components/MatchResultForm'
 import PlayerCard from '@/components/PlayerCard'
 import PageHero from '@/components/PageHero'
+import CardStakePanel from '@/components/CardStakePanel'
+import { getChallengeStakes, getPlayerCards } from '@/lib/dynasty/cards'
 import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
@@ -35,7 +37,7 @@ export default async function ChallengePage({ params, searchParams }: { params: 
     .maybeSingle()
 
   if (!challenge) {
-    return <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center p-6"><div className="rounded-3xl border border-white/10 bg-[#161616] p-8 text-center"><h1 className="text-2xl font-black">{t('notFoundTitle')}</h1><p className="text-white/50 mt-2">{t('notFoundBody')}</p></div></main>
+    return <main className="min-h-screen arena-bg text-white grid place-items-center p-6"><div className="card-fut-plain border border-white/10 bg-[#141416] p-8 text-center"><h1 className="text-2xl font-black">{t('notFoundTitle')}</h1><p className="text-white/50 mt-2">{t('notFoundBody')}</p></div></main>
   }
 
   const { data: participants } = await supabase
@@ -71,6 +73,15 @@ export default async function ChallengePage({ params, searchParams }: { params: 
         .maybeSingle()
     : { data: null }
 
+  const myParticipant = user ? (participants ?? []).find((p) => p.profile_id === user.id && p.status === 'accepted') : null
+  const stakes = await getChallengeStakes(supabase, challenge.id, t('defaultPlayer'))
+  const myStake = stakes?.find((s) => s.profileId === user?.id)?.card ?? null
+  const theirStake = stakes?.find((s) => s.profileId !== user?.id)?.card ?? null
+  const stakesSettled = Boolean(stakes?.length) && stakes!.every((s) => s.status === 'settled')
+  const canStake = Boolean(myParticipant) && !result && ['open', 'accepted', 'active'].includes(challenge.status)
+  const eligibleCards = canStake && user
+    ? (await getPlayerCards(supabase, user.id, t('defaultPlayer'))).filter((c) => !c.isProtected && c.sportId === challenge.sport_id && c.id !== myStake?.id)
+    : []
   const creator = relatedRow(challenge.creator)
   const rival = relatedRow(opponent?.profile)
   const currentInvitationStatus = challenge.creator_id === user?.id ? 'creator' : invitation?.status ?? opponent?.status ?? 'none'
@@ -79,7 +90,7 @@ export default async function ChallengePage({ params, searchParams }: { params: 
   const scoreSet2 = typeof resultData.score_set2 === 'string' ? resultData.score_set2 : ''
   const scoreSet3 = typeof resultData.score_set3 === 'string' ? resultData.score_set3 : ''
 
-  return <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center p-6"><section className="w-full max-w-3xl rounded-[32px] border border-gold-400/20 bg-gradient-to-br from-[#161616] to-[#0A0A0C] p-8">
+  return <main className="min-h-screen arena-bg text-white grid place-items-center p-6"><section className="w-full max-w-3xl card-fut-plain border border-gold-400/25 bg-gradient-to-br from-[#161616] to-[#0A0A0C] p-8">
     <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">⚔️ CHALLENGE DYNASTY</div>
     <h1 className="text-5xl font-display font-black tracking-wide mt-4 text-center">{creator?.display_name ?? t('defaultPlayer')} <span className="text-white/20">VS</span> {rival?.display_name ?? t('defaultRival')}</h1></PageHero>
     <div className="text-center text-white/50 mt-3">{challenge.title} · {challenge.status}</div>
@@ -91,6 +102,10 @@ export default async function ChallengePage({ params, searchParams }: { params: 
       <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('dateLabel')}</div><div className="text-lg font-bold mt-1">{challenge.scheduled_at ? new Date(challenge.scheduled_at).toLocaleString('es-CO') : t('dateTBD')}</div></div>
       <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('statusLabel')}</div><div className="text-lg font-black mt-1 text-[#00E676]">{result?.status === 'confirmed' ? t('completed') : currentInvitationStatus}</div></div>
     </div>
+
+    {stakes !== null && user && (myParticipant || stakes.length > 0) && (
+      <CardStakePanel challengeId={challenge.id} mine={myStake} theirs={theirStake} eligible={eligibleCards} canEdit={canStake} settled={stakesSettled} />
+    )}
 
     {match && user && result?.status !== 'confirmed' && (
       <MatchResultForm

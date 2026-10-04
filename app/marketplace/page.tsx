@@ -36,7 +36,7 @@ export default async function MarketplacePage() {
   const listings = (data ?? []) as Listing[]
 
   return (
-    <main className="min-h-screen bg-[#0A0A0C] text-white grid-bg">
+    <main className="min-h-screen arena-bg text-white ">
       <Sidebar />
       <section className="lg:pl-64 p-6 lg:p-12 max-w-[1500px] mx-auto">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">

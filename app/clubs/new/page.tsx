@@ -8,7 +8,7 @@ import { getTranslations } from 'next-intl/server'
 export default async function ClubRegisterPage() {
   const t = await getTranslations('ClubRegister')
   return (
-    <div className="min-h-screen bg-[#0A0A0C] text-white grid-bg">
+    <div className="min-h-screen arena-bg text-white ">
       <Sidebar />
       <main className="lg:pl-64 pb-20 lg:pb-0">
         <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">

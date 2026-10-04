@@ -3,18 +3,21 @@ export const dynamic = 'force-dynamic'
 import { createClient } from '@/lib/supabase/server'
 import FollowButton from '@/components/FollowButton'
 import PlayerCard from '@/components/PlayerCard'
+import CardShowcase from '@/components/CardShowcase'
+import { getPlayerCards } from '@/lib/dynasty/cards'
 import { getTranslations } from 'next-intl/server'
 
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
   const t = await getTranslations('Profile')
+  const tCards = await getTranslations('Cards')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const { data: p } = await supabase.from('profiles').select('*').eq('username', username).maybeSingle()
 
   if (!p) {
     return (
-      <main className="min-h-screen bg-[#0A0A0C] text-white grid place-items-center">
+      <main className="min-h-screen arena-bg text-white grid place-items-center">
         <div className="text-center">
           <h1 className="text-3xl font-display font-black tracking-wide">{t('notFoundTitle')}</h1>
           <Link href="/players" className="text-[#D4AF37] mt-4 inline-block">{t('explorePlayers')}</Link>
@@ -66,6 +69,8 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
     }
   })
 
+  const collection = await getPlayerCards(supabase, p.id, t('defaultRivalName'))
+
   const statBlocks: [string, string | number][] = [
     [t('wins'), totalWins],
     [t('losses'), totalLosses],
@@ -76,12 +81,12 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   ]
 
   return (
-    <main className="min-h-screen bg-[#0A0A0C] p-4 md:p-10 text-white">
+    <main className="min-h-screen arena-bg p-4 md:p-10 text-white">
       <div className="max-w-5xl mx-auto">
         <Link href="/" className="text-sm text-white/50">{t('backLink')}</Link>
-        <section className="mt-6 rounded-[32px] border border-[#D4AF37]/20 bg-gradient-to-br from-[#1B1A12] via-[#161616] to-[#0A0A0C] p-6 md:p-8 relative overflow-hidden">
+        <section className="hud-corners mt-6 border border-[#D4AF37]/30 bg-gradient-to-br from-[#221F0F] via-[#141416] to-[#0A0A0C] p-6 md:p-8 relative overflow-hidden [clip-path:polygon(28px_0,100%_0,100%_calc(100%-28px),calc(100%-28px)_100%,0_100%,0_28px)]">
           <div className="flex flex-col md:flex-row gap-6 items-start">
-            <div className="h-24 w-24 rounded-3xl bg-gradient-to-br from-gold-300 to-gold-600" />
+            <div className="hex grid h-24 w-24 place-items-center font-display text-5xl">{(p.display_name || p.username || '?').trim()[0]?.toUpperCase()}</div>
             <div className="flex-1">
               <div className="text-xs tracking-[.25em] text-[#D4AF37] font-bold">{t('tag')}</div>
               <h1 className="text-4xl font-display font-black tracking-wide mt-2">{p.display_name}</h1>
@@ -93,7 +98,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
                 </div>
               )}
               <div className="flex gap-2 mt-4">
-                <Link href={`/challenge/new?player=${p.id}`} className="rounded-xl bg-[#D4AF37] text-black px-4 py-2 font-black">{t('challengeBtn')}</Link>
+                <Link href={`/challenge/new?player=${p.id}`} className="btn-gold">{t('challengeBtn')}</Link>
                 {user && !isOwnProfile && <FollowButton targetId={p.id} initialFollowing={Boolean(follow)} />}
               </div>
             </div>
@@ -106,9 +111,9 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
 
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mt-8">
             {statBlocks.map(([label, value]) => (
-              <div key={label} className="rounded-2xl bg-white/5 p-4">
+              <div key={label} className="card-fut-plain bg-white/5 p-4">
                 <div className="text-xs text-white/40">{label}</div>
-                <div className="text-2xl font-black mt-1">{value}</div>
+                <div className="font-display text-4xl leading-none mt-1">{value}</div>
               </div>
             ))}
           </div>
@@ -116,6 +121,10 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
           <div className="mt-8">
             <div className="font-black mb-3">{isOwnProfile ? t('myCardTitle') : t('tag')}</div>
             <PlayerCard profileId={p.id} playerName={p.display_name} />
+          </div>
+
+          <div className="mt-8">
+            <CardShowcase cards={collection} title={isOwnProfile ? undefined : tCards('collectionOf', { name: p.display_name })} />
           </div>
 
           <div className="mt-8">

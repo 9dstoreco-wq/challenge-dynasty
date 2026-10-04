@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, LayoutGrid, History, ShieldCheck } from 'lucide-react'
+import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, LayoutGrid, History, ShieldCheck, Layers } from 'lucide-react'
 import LocaleSwitcher from './LocaleSwitcher'
 
 const groups = [
-  { group: 'jugar', items: [['inicio', Home, '/'], ['retos', Swords, '/challenge/new'], ['deportes', LayoutGrid, '/sports'], ['trucos', Sparkles, '/tricks'], ['ranking', Trophy, '/ranking'], ['historial', History, '/history'], ['arena', Radio, '/arena']] },
+  { group: 'jugar', items: [['inicio', Home, '/'], ['retos', Swords, '/challenge/new'], ['deportes', LayoutGrid, '/sports'], ['trucos', Sparkles, '/tricks'], ['ranking', Trophy, '/ranking'], ['cartas', Layers, '/cards'], ['historial', History, '/history'], ['arena', Radio, '/arena']] },
   { group: 'comunidad', items: [['jugadores', Users, '/players'], ['partners', Users, '/partners'], ['notificaciones', Bell, '/notifications']] },
   { group: 'negocio', items: [['clubes', Building2, '/clubs'], ['coaches', GraduationCap, '/coaches'], ['miCoachOs', GraduationCap, '/coaches/dashboard'], ['competiciones', Medal, '/competitions'], ['reservas', CalendarDays, '/bookings'], ['promote', Megaphone, '/promote'], ['planes', CreditCard, '/business'], ['finanzas', WalletCards, '/finance']] },
   { group: 'comercio', items: [['marketplace', ShoppingBag, '/marketplace']] },

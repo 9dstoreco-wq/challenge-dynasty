@@ -57,6 +57,7 @@ const root = path.resolve(SCRIPT_DIR, '..')
 // catch the already-sanitized Error thrown by the named app/actions/*.ts
 // function(s) -- never a direct supabase.from/.rpc call of their own.
 const KNOWN_SAFE_PASSTHROUGH = {
+  'components/CardStakePanel.tsx': ['app/actions/cards.ts'],
   'components/ChallengeActions.tsx': ['app/actions/challenges.ts'],
   'components/CreateSkillChallengeForm.tsx': ['app/actions/skills.ts'],
   'components/MatchResultForm.tsx': ['app/actions/challenges.ts'],

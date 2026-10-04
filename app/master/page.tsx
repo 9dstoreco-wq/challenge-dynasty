@@ -53,7 +53,7 @@ export default async function MasterPage() {
   const data = (overview ?? null) as PlatformOverview | null;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0C] text-white grid-bg">
+    <div className="min-h-screen arena-bg text-white ">
       <Sidebar />
       <main className="lg:pl-64 pb-20 lg:pb-0">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
@@ -87,7 +87,7 @@ export default async function MasterPage() {
                     {t("emptyOrganizations")}
                   </div>
                 ) : (
-                  <div className="rounded-3xl border border-white/10 bg-[#161616] overflow-hidden">
+                  <div className="card-fut-plain border border-white/10 bg-[#141416] overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="text-left text-white/40 text-xs uppercase tracking-wider">
@@ -126,7 +126,7 @@ export default async function MasterPage() {
 
 function StatCard({ label, value, sub, isText }: { label: string; value: number | string; sub?: string; isText?: boolean }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-[#161616] p-5">
+    <div className="card-fut-plain border border-white/10 bg-[#141416] p-5">
       <div className="text-xs text-[#D4AF37] font-black tracking-widest">{label}</div>
       <div className={`font-display font-black tracking-wide mt-2 ${isText ? "text-2xl md:text-3xl" : "text-4xl"}`}>
         {value}

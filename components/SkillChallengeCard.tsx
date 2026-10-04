@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 
 export default function SkillChallengeCard({title,user,rank,votes,difficulty,points,category,accent}:{title:string;user:string;rank:string;votes:number;difficulty:string;points:number;category:string;accent:string}){
   const t=useTranslations('Tricks')
-  return <article className="rounded-3xl border border-white/10 bg-[#161616] overflow-hidden hover:border-gold-300/30 transition group">
+  return <article className="card-fut-plain border border-white/10 bg-[#141416] overflow-hidden hover:border-gold-300/30 transition group">
     <div className={`aspect-[16/9] bg-gradient-to-br ${accent} relative flex items-center justify-center`}>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,255,255,.10),transparent_48%)]"/>
       <div className="absolute top-4 left-4 rounded-full bg-black/45 border border-white/10 px-3 py-1 text-[10px] font-black tracking-wider">{difficulty}</div>

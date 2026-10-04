@@ -37,7 +37,7 @@ export default async function Missions() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0A0A0C] text-white grid-bg">
+      <div className="min-h-screen arena-bg text-white ">
         <Sidebar />
         <main className="lg:pl-64 pb-20 lg:pb-0">
           <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
@@ -46,7 +46,7 @@ export default async function Missions() {
               <h1 className="text-4xl md:text-5xl font-display font-black tracking-wide mt-2">{t('title')}</h1>
               <p className="text-white/45 mt-2">{t('subtitle')}</p>
             </PageHero>
-            <div className="rounded-3xl border border-white/10 bg-[#161616] p-8 text-center mt-7">
+            <div className="card-fut-plain border border-white/10 bg-[#141416] p-8 text-center mt-7">
               <p className="text-white/45">{t('loginNotice')}</p>
               <Link href="/login" className="text-[#D4AF37] mt-3 inline-block font-bold">{t('loginLink')}</Link>
             </div>
@@ -58,7 +58,7 @@ export default async function Missions() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0C] text-white grid-bg">
+    <div className="min-h-screen arena-bg text-white ">
       <Sidebar />
       <main className="lg:pl-64 pb-20 lg:pb-0">
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
@@ -90,7 +90,7 @@ export default async function Missions() {
               </div>
             ))}
             {rows.length === 0 && (
-              <div className="sm:col-span-2 rounded-3xl border border-white/10 bg-[#161616] p-8 text-center text-white/45">{t('empty')}</div>
+              <div className="sm:col-span-2 card-fut-plain border border-white/10 bg-[#141416] p-8 text-center text-white/45">{t('empty')}</div>
             )}
           </div>
         </div>

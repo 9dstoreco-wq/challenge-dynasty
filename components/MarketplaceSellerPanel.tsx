@@ -63,7 +63,7 @@ export function MarketplaceCreateSellerProfile({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-[#161616] p-6">
+    <div className="card-fut-plain border border-white/10 bg-[#141416] p-6">
       <div className="flex items-center gap-3"><Store className="text-[#D4AF37]" /><h2 className="font-black text-xl">{t('activarTitulo')}</h2></div>
       <p className="text-white/45 text-sm mt-2">{t('activarBody')}</p>
       <div className="grid sm:grid-cols-2 gap-4 mt-5">
@@ -156,7 +156,7 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
   if (!sellerProfile) return null
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-[#161616] p-6 mt-6">
+    <div className="card-fut-plain border border-white/10 bg-[#141416] p-6 mt-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3"><Store className="text-[#D4AF37]" /><h2 className="font-black text-xl">{t('misPublicaciones')} ({sellerProfile.display_name})</h2></div>
         <button onClick={() => setShowForm((v) => !v)} className="rounded-2xl bg-[#D4AF37] text-black font-black px-5 py-3 inline-flex items-center gap-2"><PlusCircle size={17} /> {showForm ? t('cancelar') : t('publicarNueva')}</button>

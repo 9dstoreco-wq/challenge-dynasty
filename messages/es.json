@@ -31,7 +31,8 @@
       "marketplace": "Marketplace",
       "miPerfil": "Mi perfil",
       "master": "Master",
-      "miClub": "Mi Club"
+      "miClub": "Mi Club",
+      "cartas": "Cartas"
     },
     "retar": "RETAR",
     "profileCard": {
@@ -948,5 +949,48 @@
     "dateTBD": "Fecha por definir",
     "authRequiredTitle": "Debes iniciar sesion",
     "loginLink": "Ir a iniciar sesion"
+  },
+  "Cards": {
+    "showcaseTitle": "Mi colección",
+    "collectionOf": "Colección de {name}",
+    "count": "{count} cartas",
+    "empty": "Todavía no hay cartas aquí. Se ganan jugando: gana retos y quédate con la carta de tus rivales.",
+    "ratingShort": "OVR",
+    "levelShort": "NIV",
+    "rarity": {
+      "common": "Común",
+      "rare": "Rara",
+      "epic": "Épica",
+      "legendary": "Legendaria"
+    },
+    "baseTag": "Base",
+    "trophyTag": "Trofeo",
+    "pageTag": "COLECCIÓN",
+    "pageTitle": "MIS CARTAS",
+    "pageSubtitle": "Tu carta base nunca se pierde. Las demás las ganas jugando y puedes ponerlas en juego en un reto.",
+    "loginRequired": "Inicia sesión para ver tu colección.",
+    "loginBtn": "ENTRAR",
+    "historyTitle": "Últimos traspasos",
+    "historyEmpty": "Todavía no hay traspasos. Pon una carta en juego en tu próximo reto.",
+    "historyWon": "Ganaste la carta de {name} a {rival}",
+    "historyLost": "{rival} se quedó con tu carta de {name}",
+    "stake": {
+      "kicker": "⚔️ APUESTA DE CARTA",
+      "title": "Carta en juego",
+      "intro": "Es opcional. Solo cuenta si los dos ponen una carta: quien gane el reto confirmado se queda con la carta del rival. Tu carta base está protegida.",
+      "mine": "Tu carta",
+      "theirs": "Carta del rival",
+      "empty": "Sin carta",
+      "waiting": "Esperando la carta del rival",
+      "locked": "Apuesta acordada: las dos cartas están bloqueadas",
+      "settled": "Apuesta resuelta",
+      "needBoth": "Sin carta de ambos, el reto es normal",
+      "pick": "Elige una carta para poner en juego",
+      "place": "PONER EN JUEGO",
+      "saving": "GUARDANDO...",
+      "withdraw": "Retirar mi carta",
+      "noCards": "Todavía no tienes cartas para poner en juego. Las cartas se ganan ganando retos.",
+      "errorGeneric": "No se pudo actualizar la carta. Intenta de nuevo."
+    }
   }
 }

@@ -96,3 +96,22 @@ article.rounded-3xl, .rounded-3xl{transition:border-color .2s ease,transform .2s
   .arena-bg::before,.shine::after,.xp-fill,.xp-fill::after,.reveal,.float-y,.pulse-ring,.spin-slow,.vs-bolt{animation:none!important}
   .reveal{opacity:1;transform:none}
 }
+
+/* ===== Cartas coleccionables (DynastyCard) ===== */
+.dcard{--r:#C7CCD6;--mx:50%;--my:50%;--tx:0deg;--ty:0deg;position:relative;aspect-ratio:2/3;width:100%;max-width:260px;perspective:900px}
+.dcard.r-rare{--r:#D4AF37}.dcard.r-epic{--r:#B65CFF}.dcard.r-legendary{--r:#FF5A1F}
+.dcard-body{position:absolute;inset:0;transform:rotateX(var(--tx)) rotateY(var(--ty));transition:transform .15s ease-out;transform-style:preserve-3d;
+  clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--r) 90%,#fff),var(--r) 35%,color-mix(in srgb,var(--r) 45%,#000) 100%);padding:2px}
+.dcard-in{position:relative;height:100%;overflow:hidden;
+  clip-path:polygon(17px 0,100% 0,100% calc(100% - 17px),calc(100% - 17px) 100%,0 100% ,0 17px);
+  background:radial-gradient(120% 70% at 50% 0%,color-mix(in srgb,var(--r) 38%,transparent),transparent 60%),linear-gradient(170deg,#1a1a1f,#0c0c0f 70%)}
+.dcard-in::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);pointer-events:none}
+.dcard-holo{position:absolute;inset:0;pointer-events:none;mix-blend-mode:color-dodge;opacity:.0;transition:opacity .2s;
+  background:radial-gradient(circle at var(--mx) var(--my),rgba(255,255,255,.55),transparent 38%),conic-gradient(from 210deg at var(--mx) var(--my),#ff7ad9,#7af0ff,#fff27a,#8aff7a,#ff7ad9)}
+.dcard:hover .dcard-holo{opacity:.32}
+.dcard.r-legendary .dcard-body{animation:dcard-fire 2.6s ease-in-out infinite}
+@keyframes dcard-fire{0%,100%{filter:drop-shadow(0 0 10px rgba(255,90,31,.45))}50%{filter:drop-shadow(0 0 22px rgba(255,150,40,.8))}}
+.dcard.r-epic .dcard-body{filter:drop-shadow(0 0 12px rgba(182,92,255,.45))}
+.dcard.r-rare .dcard-body{filter:drop-shadow(0 0 10px rgba(212,175,55,.35))}
+@media (prefers-reduced-motion:reduce){.dcard.r-legendary .dcard-body{animation:none}.dcard-body{transition:none}}

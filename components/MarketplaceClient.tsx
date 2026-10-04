@@ -85,7 +85,7 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
 
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
         {filtered.map((x) => (
-          <article key={x.id} className="rounded-3xl border border-white/10 bg-[#161616] p-6 flex flex-col">
+          <article key={x.id} className="card-fut-plain border border-white/10 bg-[#141416] p-6 flex flex-col">
             <div className="flex items-center justify-between gap-3">
               <div className="text-xs text-[#D4AF37] font-black uppercase tracking-widest">{x.listing_type}</div>
               {x.is_featured ? <span className="text-[10px] rounded-full border border-[#D4AF37]/30 px-2 py-1 text-[#D4AF37] font-black">{t('destacado')}</span> : null}

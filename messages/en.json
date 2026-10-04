@@ -31,7 +31,8 @@
       "marketplace": "Marketplace",
       "miPerfil": "My profile",
       "master": "Master",
-      "miClub": "My Club"
+      "miClub": "My Club",
+      "cartas": "Cards"
     },
     "retar": "CHALLENGE",
     "profileCard": {
@@ -948,5 +949,48 @@
     "dateTBD": "Date TBD",
     "authRequiredTitle": "You must sign in",
     "loginLink": "Go to sign in"
+  },
+  "Cards": {
+    "showcaseTitle": "My collection",
+    "collectionOf": "{name}'s collection",
+    "count": "{count} cards",
+    "empty": "No cards here yet. They are won by playing: win challenges and take your rivals' cards.",
+    "ratingShort": "OVR",
+    "levelShort": "LVL",
+    "rarity": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "baseTag": "Base",
+    "trophyTag": "Trophy",
+    "pageTag": "COLLECTION",
+    "pageTitle": "MY CARDS",
+    "pageSubtitle": "Your base card can never be lost. You win the rest by playing and can put them on the line in a challenge.",
+    "loginRequired": "Log in to see your collection.",
+    "loginBtn": "LOG IN",
+    "historyTitle": "Latest transfers",
+    "historyEmpty": "No transfers yet. Put a card on the line in your next challenge.",
+    "historyWon": "You won {name}'s card from {rival}",
+    "historyLost": "{rival} took your {name} card",
+    "stake": {
+      "kicker": "⚔️ CARD STAKE",
+      "title": "Card on the line",
+      "intro": "It's optional. It only counts if both players put a card in: whoever wins the confirmed challenge keeps the rival's card. Your base card is protected.",
+      "mine": "Your card",
+      "theirs": "Rival's card",
+      "empty": "No card",
+      "waiting": "Waiting for the rival's card",
+      "locked": "Stake agreed: both cards are locked",
+      "settled": "Stake settled",
+      "needBoth": "Without a card from both, it's a normal challenge",
+      "pick": "Pick a card to put on the line",
+      "place": "PUT ON THE LINE",
+      "saving": "SAVING...",
+      "withdraw": "Withdraw my card",
+      "noCards": "You don't have cards to put on the line yet. Cards are won by winning challenges.",
+      "errorGeneric": "Could not update the card. Try again."
+    }
   }
 }
