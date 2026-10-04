@@ -992,5 +992,24 @@
       "noCards": "Todavía no tienes cartas para poner en juego. Las cartas se ganan ganando retos.",
       "errorGeneric": "No se pudo actualizar la carta. Intenta de nuevo."
     }
+  },
+  "ClubIncome": {
+    "tag": "INGRESOS",
+    "title": "Ingresos del club",
+    "subtitle": "Pagos de reservas de tus canchas. Solo tú ves esta información.",
+    "collected": "COBRADO",
+    "thisMonth": "ESTE MES",
+    "pending": "POR COBRAR",
+    "paidBookings": "RESERVAS PAGADAS",
+    "recentTitle": "Últimos pagos",
+    "empty": "Todavía no hay pagos de reservas. Aparecerán aquí cuando alguien pague una cancha.",
+    "status": {
+      "unpaid": "Sin pagar",
+      "deposit_paid": "Anticipo pagado",
+      "partially_paid": "Pago parcial",
+      "paid": "Pagada",
+      "refunded": "Reembolsada",
+      "waived": "Exenta"
+    }
   }
 }

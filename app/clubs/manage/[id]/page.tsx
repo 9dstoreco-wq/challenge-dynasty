@@ -4,6 +4,7 @@ import Sidebar from '@/components/Sidebar'
 import BottomNav from '@/components/BottomNav'
 import PageHero from '@/components/PageHero'
 import ClubDashboard from '@/components/ClubDashboard'
+import ClubIncomePanel from '@/components/ClubIncomePanel'
 import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 
@@ -76,6 +77,9 @@ export default async function ClubManagePage({ params }: { params: Promise<{ id:
             <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{organization.name}</h1>
             <p className="text-white/50 mt-2">{organization.city ?? ''} {organization.country_code ? `· ${organization.country_code}` : ''}</p>
           </PageHero>
+          <div className="mt-7">
+            <ClubIncomePanel organizationId={organization.id} />
+          </div>
           <div className="mt-7">
             <ClubDashboard organizationId={organization.id} sports={sports ?? []} resources={resourceRows} />
           </div>

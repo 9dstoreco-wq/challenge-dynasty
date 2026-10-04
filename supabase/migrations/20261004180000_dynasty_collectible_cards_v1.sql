@@ -35,6 +35,7 @@ create unique index if not exists dynasty_cards_one_reward_per_match
 create index if not exists dynasty_cards_owner_idx on public.dynasty_cards (owner_profile_id);
 create index if not exists dynasty_cards_original_idx on public.dynasty_cards (original_profile_id);
 create index if not exists dynasty_cards_sport_idx on public.dynasty_cards (sport_id);
+create index if not exists dynasty_cards_source_match_idx on public.dynasty_cards (source_match_id);
 
 create table if not exists public.dynasty_card_transfers (
   id uuid primary key default gen_random_uuid(),
@@ -178,7 +179,8 @@ begin
   select count(*) into v_locked from public.challenge_card_stakes where challenge_id = p_challenge_id and status = 'locked';
   if v_locked >= 2 then raise exception 'Las cartas de este reto ya están bloqueadas'; end if;
 
-  delete from public.challenge_card_stakes where challenge_id = p_challenge_id and profile_id = v_uid and status = 'locked';
+  update public.challenge_card_stakes set status = 'released', settled_at = now()
+    where challenge_id = p_challenge_id and profile_id = v_uid and status = 'locked';
   begin
     insert into public.challenge_card_stakes(challenge_id, profile_id, card_id)
     values (p_challenge_id, v_uid, p_card_id) returning * into v_stake;

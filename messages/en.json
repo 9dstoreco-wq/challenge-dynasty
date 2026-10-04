@@ -992,5 +992,24 @@
       "noCards": "You don't have cards to put on the line yet. Cards are won by winning challenges.",
       "errorGeneric": "Could not update the card. Try again."
     }
+  },
+  "ClubIncome": {
+    "tag": "INCOME",
+    "title": "Club income",
+    "subtitle": "Payments for your court bookings. Only you can see this.",
+    "collected": "COLLECTED",
+    "thisMonth": "THIS MONTH",
+    "pending": "OUTSTANDING",
+    "paidBookings": "PAID BOOKINGS",
+    "recentTitle": "Recent payments",
+    "empty": "No booking payments yet. They will show up here when someone pays for a court.",
+    "status": {
+      "unpaid": "Unpaid",
+      "deposit_paid": "Deposit paid",
+      "partially_paid": "Partially paid",
+      "paid": "Paid",
+      "refunded": "Refunded",
+      "waived": "Waived"
+    }
   }
 }
