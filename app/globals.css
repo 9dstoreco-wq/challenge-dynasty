@@ -115,3 +115,6 @@ article.rounded-3xl, .rounded-3xl{transition:border-color .2s ease,transform .2s
 .dcard.r-epic .dcard-body{filter:drop-shadow(0 0 12px rgba(182,92,255,.45))}
 .dcard.r-rare .dcard-body{filter:drop-shadow(0 0 10px rgba(212,175,55,.35))}
 @media (prefers-reduced-motion:reduce){.dcard.r-legendary .dcard-body{animation:none}.dcard-body{transition:none}}
+
+/* Opciones de <select> legibles: el fondo translucido del select deja la lista blanca con texto blanco en Chrome/Windows */
+select option,select optgroup{background-color:#141416;color:#fff}
