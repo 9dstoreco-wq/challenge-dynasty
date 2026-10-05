@@ -42,7 +42,7 @@ export default async function ChallengePage({ params, searchParams }: { params: 
     return <main className="min-h-screen arena-bg text-white grid place-items-center p-6"><div className="card-fut-plain border border-white/10 bg-[#141416] p-8 text-center"><h1 className="text-2xl font-black">{t('notFoundTitle')}</h1><p className="text-white/50 mt-2">{t('notFoundBody')}</p></div></main>
   }
 
-  const { data: sportRow } = await supabase.from('sports').select('name,icon').eq('id', challenge.sport_id).maybeSingle()
+  const { data: sportRow } = await supabase.from('sports').select('name,icon,slug').eq('id', challenge.sport_id).maybeSingle()
 
   const { data: participants } = await supabase
     .from('challenge_participants')
@@ -132,6 +132,7 @@ export default async function ChallengePage({ params, searchParams }: { params: 
         scoreSet1={scoreSet1}
         scoreSet2={scoreSet2}
         scoreSet3={scoreSet3}
+        sportSlug={sportRow?.slug}
       />
     )}
 

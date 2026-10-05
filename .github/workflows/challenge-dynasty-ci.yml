@@ -9,6 +9,9 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ggkthvewxmsmtupjzfnk.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_g6H3tifZdc0ucoxIrwUayg_xazuUb1l
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

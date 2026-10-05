@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { toSafeMessage } from '@/lib/safe-error'
-import { actionError, actionOk, type ActionResult } from '@/lib/action-result'
+import { actionError, actionOk, safeRun, type ActionResult } from '@/lib/action-result'
 import { getTranslations } from 'next-intl/server'
 
 export async function createSkillChallenge(input: {
@@ -37,29 +37,33 @@ export async function createSkillChallenge(input: {
   }
 }
 
-export async function submitSkillChallenge(input: { challengeId: string; videoUrl: string; caption?: string }) {
-  const t = await getTranslations('Errors')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error(t('authRequired'))
-  const { data, error } = await supabase.rpc('submit_skill_challenge', {
-    p_challenge_id: input.challengeId,
-    p_video_url: input.videoUrl,
-    p_caption: input.caption ?? null,
+export async function submitSkillChallenge(input: { challengeId: string; videoUrl: string; caption?: string }): Promise<ActionResult<string>> {
+  return safeRun('skills.submitSkillChallenge', async () => {
+    const t = await getTranslations('Errors')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error(t('authRequired'))
+    const { data, error } = await supabase.rpc('submit_skill_challenge', {
+      p_challenge_id: input.challengeId,
+      p_video_url: input.videoUrl,
+      p_caption: input.caption ?? null,
+    })
+    if (error) throw new Error(toSafeMessage(error, 'skills.submitSkillChallenge'))
+    return data as string
   })
-  if (error) throw new Error(toSafeMessage(error, 'skills.submitSkillChallenge'))
-  return data as string
 }
 
-export async function voteSkillSubmission(submissionId: string, score: number) {
-  const t = await getTranslations('Errors')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error(t('authRequired'))
-  const { error } = await supabase.rpc('vote_skill_submission', {
-    p_submission_id: submissionId,
-    p_value: score,
+export async function voteSkillSubmission(submissionId: string, score: number): Promise<ActionResult<boolean>> {
+  return safeRun('skills.voteSkillSubmission', async () => {
+    const t = await getTranslations('Errors')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error(t('authRequired'))
+    const { error } = await supabase.rpc('vote_skill_submission', {
+      p_submission_id: submissionId,
+      p_value: score,
+    })
+    if (error) throw new Error(toSafeMessage(error, 'skills.voteSkillSubmission'))
+    return true
   })
-  if (error) throw new Error(toSafeMessage(error, 'skills.voteSkillSubmission'))
-  return true
 }

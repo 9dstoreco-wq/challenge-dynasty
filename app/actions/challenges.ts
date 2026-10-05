@@ -97,6 +97,9 @@ export async function submitMatchResult(input: {
     const invalidField = (field: string) => t('invalidField', { field })
     assertUuidLike(input.matchId, t('fieldMatch'), invalidField)
     assertUuidLike(input.winnerId, t('fieldWinner'), invalidField)
+    for (const sc of [input.scoreSet1, input.scoreSet2, input.scoreSet3]) {
+      if (sc && !/^\d{1,3}[-:]\d{1,3}$/.test(sc.trim())) throw new Error(t('invalidField', { field: t('fieldResult') }))
+    }
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))

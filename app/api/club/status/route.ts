@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { toSafeMessage } from "@/lib/safe-error";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    console.error("club/status: organizations lookup failed", error.message);
+    toSafeMessage(error, "club.status.organizationsLookup"); // registra el detalle solo en logs del servidor
     return NextResponse.json({ ownsClub: false, organizationId: null, organizationName: null });
   }
 

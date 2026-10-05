@@ -2,6 +2,7 @@
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { toSafeMessage } from '@/lib/safe-error'
 import { useTranslations } from 'next-intl'
 
 type Profile = {
@@ -159,7 +160,7 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
     setBusy(true); setError(null)
     const { error: rpcError } = await supabase.rpc('complete_provider_booking', { p_booking_id: bookingId })
     setBusy(false)
-    if (rpcError) { setError(friendlyError(rpcError.message)); return }
+    if (rpcError) { setError(friendlyError(toSafeMessage(rpcError, 'coach.completeBooking'))); return }
     router.refresh()
   }
 

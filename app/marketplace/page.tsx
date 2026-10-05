@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
 import MarketplaceClient from '@/components/MarketplaceClient'
-import { Search, ShieldCheck, ShoppingBag, PackageCheck } from 'lucide-react'
+import { Search, ShieldCheck, PackageCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import PageHero from '@/components/PageHero'
 import { getTranslations } from 'next-intl/server'
@@ -47,7 +47,6 @@ export default async function MarketplacePage() {
           </div>
           <div className="flex gap-3">
             <Link href="/marketplace/orders" className="rounded-2xl border border-white/10 bg-white/[.04] font-black px-5 py-3 inline-flex items-center justify-center gap-2">{t('misOrdenes')}</Link><Link href="/marketplace/seller" className="rounded-2xl border border-white/10 bg-white/[.04] font-black px-5 py-3 inline-flex items-center justify-center gap-2">{t('vender')}</Link>
-            <Link href="/shop" className="rounded-2xl bg-[#D4AF37] text-black font-black px-6 py-3 inline-flex items-center justify-center gap-2"><ShoppingBag size={18}/> {t('irATienda')}</Link>
           </div>
         </div>
 

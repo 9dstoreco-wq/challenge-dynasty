@@ -125,10 +125,20 @@ for (const file of files) {
       const allowed = contract[key]
       if (!allowed) continue
       checkedStatements++
-      const LIT_RE = new RegExp(`\\b${column}\\s*(?:=|<>)\\s*'([a-z_0-9]+)'`, 'gi')
+      // Alias-aware: `cp2.status = 'accepted'` pertenece a la tabla enlazada a `cp2`, no a la tabla
+      // que abre la sentencia. Solo se compara contra el contrato de ESTA tabla cuando el calificador
+      // apunta a ella (o no es un alias conocido, p. ej. NEW/OLD o una variable).
+      const aliasToTable = new Map()
+      for (const am of stmt.matchAll(/\b(?:from|join|update)\s+public\.(\w+)(?:\s+(?:as\s+)?(?!(?:where|set|join|left|right|inner|on|using|returning|order|group|limit|cross|full|for)\b)(\w+))?/gi)) {
+        aliasToTable.set(am[2] || am[1], am[1])
+        aliasToTable.set(am[1], am[1])
+      }
+      const LIT_RE = new RegExp(`(?:\\b(\\w+)\\.)?\\b${column}\\s*(?:=|<>)\\s*'([a-z_0-9]+)'`, 'gi')
       let lm
       while ((lm = LIT_RE.exec(stmt))) {
-        const value = lm[1]
+        const qualifier = lm[1]
+        if (qualifier && aliasToTable.has(qualifier) && aliasToTable.get(qualifier) !== table) continue
+        const value = lm[2]
         if (!allowed.includes(value)) {
           const line = lineOf(src, um.index + lm.index)
           violations.push(

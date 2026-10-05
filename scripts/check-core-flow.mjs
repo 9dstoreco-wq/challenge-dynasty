@@ -18,16 +18,16 @@ const action = fs.readFileSync(path.join(root, 'app/actions/challenges.ts'), 'ut
 const page = fs.readFileSync(path.join(root, 'app/challenge/[id]/page.tsx'), 'utf8')
 const actionsUi = fs.readFileSync(path.join(root, 'components/ChallengeActions.tsx'), 'utf8')
 const form = fs.readFileSync(path.join(root, 'components/MatchResultForm.tsx'), 'utf8')
-for (const name of ['createChallenge','respondToChallenge','submitMatchResult','confirmMatch']) {
+for (const name of ['createChallenge','respondToChallenge','cancelChallenge','submitMatchResult','confirmMatch']) {
   if (!action.includes(`export async function ${name}`)) throw new Error(`MISSING ACTION ${name}`)
 }
 for (const marker of ["from('challenge_participants')", "from('challenge_invitations')", "from('matches')", "from('match_results')", 'MatchResultForm']) {
   if (!page.includes(marker)) throw new Error(`MISSING LIVE FLOW ${marker}`)
 }
-for (const marker of ['respondToChallenge','ACEPTAR RETO']) {
+for (const marker of ['respondToChallenge','cancelChallenge','acceptBtn']) {
   if (!actionsUi.includes(marker)) throw new Error(`MISSING CHALLENGE UI ${marker}`)
 }
-for (const marker of ['submitMatchResult','confirmMatch','RESULTADO PENDIENTE','CONFIRMAR RESULTADO']) {
+for (const marker of ['submitMatchResult','confirmMatch','pendingResult','confirmResultBtn','disputeBtn']) {
   if (!form.includes(marker)) throw new Error(`MISSING RESULT UI ${marker}`)
 }
 console.log('CORE FLOW: PASS')

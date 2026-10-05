@@ -65,7 +65,7 @@ export default async function MasterPage() {
 
           {error || !data ? (
             <div className="mt-8 rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-8 text-center text-white/45">
-              {t("loadError", { detail: error ? `: ${error.message}` : "." })}
+              {t("loadError", { detail: "." })}
             </div>
           ) : (
             <>

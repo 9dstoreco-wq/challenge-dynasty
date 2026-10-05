@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
+import { toSafeMessage } from '@/lib/safe-error'
 
 type Sport = { id: string; name: string }
 type ResourceRow = {
@@ -63,7 +64,7 @@ export default function ClubDashboard({
 
     if (rpcError || !resource) {
       setBusy(false)
-      setError(rpcError?.message || t('errCreateFailed'))
+      setError(rpcError ? toSafeMessage(rpcError, 'club.createResource', t('errCreateFailed')) : t('errCreateFailed'))
       return
     }
 

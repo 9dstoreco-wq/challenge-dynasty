@@ -18,6 +18,17 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //   EPAYCO_P_KEY              -- the "P_KEY" / llave secreta shown on the same page.
 // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 //
+// HARDENING (2026-10-05 audit):
+//   * Signature + SERVER-SIDE VERIFICATION: the signature only covers ref/transaction/amount/
+//     currency, not the payment state or the invoice reference. So after the signature check we
+//     ask ePayco's own validation endpoint for the transaction and use ITS state, amount,
+//     currency and invoice reference -- never the ones in the posted body.
+//   * Test transactions (x_test_request = TRUE) are ignored unless the secret EPAYCO_ALLOW_TEST
+//     is set to "true" (leave it unset in production).
+//   * Only COP is accepted.
+//   * Billing: the invoice amount is compared with the payment, and an invoice already marked
+//     paid is never overwritten by a late failed/pending event.
+//
 // For the `booking` domain this calls `apply_payment_result`, the hardened SECURITY
 // DEFINER RPC that validates the amount against `bookings` directly (see the comment on
 // resolveBooking in lib/dynasty/checkout-resolvers.ts for why it reads from `bookings` and
@@ -88,6 +99,28 @@ async function parseFields(req: Request): Promise<Record<string, string>> {
   return out;
 }
 
+
+// Asks ePayco itself for the transaction, so the state/amount/invoice we act on come from
+// ePayco's servers and not from the posted body.
+async function fetchVerifiedTransaction(refPayco: string): Promise<Record<string, string> | null> {
+  try {
+    const res = await fetch(`https://secure.epayco.co/validation/v1/reference/${encodeURIComponent(refPayco)}`, {
+      headers: { Accept: "application/json" },
+    });
+    if (!res.ok) return null;
+    const body = await res.json().catch(() => null) as { success?: boolean; data?: Record<string, unknown> } | null;
+    if (!body || body.success === false || !body.data || typeof body.data !== "object") return null;
+    const out: Record<string, string> = {};
+    for (const [k, v] of Object.entries(body.data)) out[k] = String(v ?? "");
+    return out;
+  } catch (err) {
+    console.error("epayco-webhook: validation lookup failed", err instanceof Error ? err.message : err);
+    return null;
+  }
+}
+
+const SAME_AMOUNT = (a: string, b: string) => Number(a) === Number(b) && Number.isFinite(Number(a));
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "METHOD_NOT_ALLOWED" }, 405);
@@ -123,7 +156,35 @@ Deno.serve(async (req) => {
     return json({ error: "INVALID_SIGNATURE" }, 401);
   }
 
-  const reference = invoice;
+  // Server-side verification (see HARDENING above). Fail closed: if ePayco can't confirm the
+  // transaction we answer 502 so ePayco retries later, and nothing is marked paid.
+  const verified = await fetchVerifiedTransaction(refPayco);
+  if (!verified) return json({ error: "VERIFICATION_UNAVAILABLE" }, 502);
+  const vRef = verified["x_ref_payco"] ?? "";
+  const vAmount = verified["x_amount"] ?? verified["x_amount_ok"] ?? "";
+  if ((vRef && vRef !== refPayco) || !vAmount || !SAME_AMOUNT(vAmount, amountRaw)) {
+    console.error("epayco-webhook: verification mismatch", { refPayco, posted: amountRaw, verified: vAmount });
+    return json({ error: "VERIFICATION_MISMATCH" }, 422);
+  }
+  const vCurrency = (verified["x_currency_code"] ?? currencyCode).toUpperCase();
+  if (vCurrency !== "COP" || currencyCode !== "COP") {
+    console.error("epayco-webhook: unsupported currency", currencyCode, vCurrency);
+    return json({ ok: true, ignored: "UNSUPPORTED_CURRENCY" });
+  }
+  const isTest = (verified["x_test_request"] ?? fields["x_test_request"] ?? "").toLowerCase() === "true";
+  if (isTest && Deno.env.get("EPAYCO_ALLOW_TEST") !== "true") {
+    console.error("epayco-webhook: test transaction ignored", refPayco);
+    return json({ ok: true, ignored: "TEST_TRANSACTION" });
+  }
+  const vCod = verified["x_cod_response"] ?? verified["x_cod_transaction_state"] ?? "";
+  const vText = verified["x_response"] ?? verified["x_transaction_state"] ?? "";
+  if (!vCod && !vText) return json({ error: "VERIFICATION_NO_STATE" }, 422);
+  const vInvoice = verified["x_id_invoice"] ?? verified["x_extra1"] ?? "";
+  const reference = vInvoice || invoice;
+  if (vInvoice && invoice && vInvoice !== invoice) {
+    console.error("epayco-webhook: invoice mismatch between body and ePayco", { invoice, vInvoice });
+    return json({ error: "VERIFICATION_MISMATCH" }, 422);
+  }
   const refParts = reference.split(":");
   if (refParts.length !== 3 || refParts[0] !== "dyn") {
     console.error("epayco-webhook: unrecognized reference format", reference);
@@ -132,14 +193,15 @@ Deno.serve(async (req) => {
   const domain = refParts[1] as Domain;
   const rowId = refParts[2];
 
-  const amount = Number(amountRaw);
-  const status = normalizeStatus(codResponse, responseText);
+  const amount = Number(vAmount);
+  // State comes from ePayco's own validation response, not from the posted body.
+  const status = normalizeStatus(vCod, vText);
   const providerPaymentId = refPayco;
   // No separate per-delivery notification id is documented for ePayco (unlike Mercado
   // Pago's own top-level webhook `id`) -- derive a stable-per-status event id instead, so
   // identical retries of the same status are idempotent while a genuine status change
   // (pending -> paid) still registers as a new event.
-  const providerEventId = `${refPayco}:${transactionId}:${codResponse || responseText}`;
+  const providerEventId = `${refPayco}:${transactionId}:${vCod || vText}`;
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -201,8 +263,22 @@ Deno.serve(async (req) => {
         break;
       }
       case "billing": {
-        // No dedicated confirm_* RPC exists yet for billing invoices -- direct table
-        // update for this domain until one exists.
+        // No dedicated confirm_* RPC exists yet for billing invoices, so the checks live here:
+        // compare the amount with the invoice and never overwrite an already-paid invoice.
+        const { data: invoice, error: invErr } = await supabase
+          .from("billing_invoices")
+          .select("id, status, amount_due, currency_code")
+          .eq("id", rowId)
+          .maybeSingle();
+        if (invErr) throw invErr;
+        if (!invoice) return json({ ok: true, unrouted: reference });
+        if (invoice.status === "paid") break; // late/duplicate events never change a paid invoice.
+        if (status === "paid") {
+          if (!SAME_AMOUNT(String(invoice.amount_due), String(amount)) || (invoice.currency_code ?? "COP").toUpperCase() !== "COP") {
+            console.error("epayco-webhook: billing amount mismatch", rowId, invoice.amount_due, amount);
+            return json({ error: "AMOUNT_MISMATCH" }, 422);
+          }
+        }
         const { error } = await supabase
           .from("billing_invoices")
           .update({
@@ -212,7 +288,8 @@ Deno.serve(async (req) => {
             provider_invoice_reference: providerPaymentId,
             paid_at: status === "paid" ? new Date().toISOString() : null,
           })
-          .eq("id", rowId);
+          .eq("id", rowId)
+          .neq("status", "paid");
         if (error) throw error;
         break;
       }

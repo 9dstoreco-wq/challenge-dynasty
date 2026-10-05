@@ -28,7 +28,7 @@ export default function NotificationActions({ item, all }: { item?: Item; all?: 
 
   async function open() {
     if (!item) return
-    if (!read) { try { await markNotificationRead(item.id); setRead(true) } catch {} }
+    if (!read) { try { const r = await markNotificationRead(item.id); if (r.ok) setRead(true) } catch {} }
     if (item.href) router.push(item.href)
   }
 

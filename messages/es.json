@@ -374,6 +374,7 @@
     "addMoreSportsHint": "Puedes añadir más deportes desde esta misma lógica; el principal es el que alimenta el descubrimiento por defecto."
   },
   "Social": {
+    "errGeneric": "No se pudo completar la acción. Intenta de nuevo.",
     "title": "Feed competitivo",
     "subtitle": "Resultados, publicaciones y actividad de la comunidad.",
     "createChallenge": "CREAR RETO",
@@ -503,7 +504,14 @@
     "cancelled": "Reto cancelado",
     "creatorNotice2": "Esperando a que tu rival responda.",
     "newCardTitle": "Nueva carta en tu colección",
-    "viewCards": "Ver mis cartas"
+    "viewCards": "Ver mis cartas",
+    "scoreFormatPoints": "El marcador debe tener formato 3-1.",
+    "drawNotAllowed": "Un reto no puede terminar empatado: registra quién ganó.",
+    "winnerMismatch": "El ganador no coincide con el marcador que escribiste.",
+    "scoreOrderHint": "Escribe cada marcador en el orden {a} - {b}.",
+    "scorePlaceholder": "Marcador · 3-1",
+    "setsNeedWinner": "Con esos sets no hay un ganador claro: revisa los marcadores.",
+    "noScoreHint": "Para este deporte solo se registra quién ganó."
   },
   "Competitions": {
     "tag": "TOURNAMENT OS",
@@ -535,6 +543,7 @@
     "goToChallenge": "IR A CHALLENGE"
   },
   "Tricks": {
+    "errVoteFailed": "No se pudo registrar tu voto. Intenta de nuevo.",
     "tag": "SKILL CHALLENGES",
     "title": "RETOS DE HABILIDAD",
     "subtitle": "Crea una prueba, sube tu ejecución y deja que la comunidad la valore.",
@@ -573,6 +582,7 @@
     "publishBtn": "PUBLICAR CHALLENGE"
   },
   "Profile": {
+    "errGeneric": "No se pudo completar la acción. Intenta de nuevo.",
     "notFoundTitle": "Jugador no encontrado",
     "explorePlayers": "Explorar jugadores",
     "backLink": "← Volver",

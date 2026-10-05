@@ -12,3 +12,15 @@ export function actionOk<T>(data: T): ActionResult<T> {
 export function actionError(error: string): ActionResult<never> {
   return { ok: false, error }
 }
+
+// Ejecuta el cuerpo de una accion y convierte cualquier error en un ActionResult con un mensaje seguro.
+// (importa toSafeMessage de forma perezosa para no crear dependencias circulares)
+import { toSafeMessage } from '@/lib/safe-error'
+
+export async function safeRun<T>(context: string, fn: () => Promise<T>): Promise<ActionResult<T>> {
+  try {
+    return actionOk(await fn())
+  } catch (e) {
+    return actionError(toSafeMessage(e, context))
+  }
+}

@@ -374,6 +374,7 @@
     "addMoreSportsHint": "You can add more sports through this same flow; the main one feeds default discovery."
   },
   "Social": {
+    "errGeneric": "Couldn't complete the action. Please try again.",
     "title": "Competitive feed",
     "subtitle": "Results, posts and community activity.",
     "createChallenge": "CREATE CHALLENGE",
@@ -503,7 +504,14 @@
     "cancelled": "Challenge cancelled",
     "creatorNotice2": "Waiting for your rival to respond.",
     "newCardTitle": "New card in your collection",
-    "viewCards": "View my cards"
+    "viewCards": "View my cards",
+    "scoreFormatPoints": "The score must look like 3-1.",
+    "drawNotAllowed": "A challenge can't end in a draw: record who won.",
+    "winnerMismatch": "The winner doesn't match the score you entered.",
+    "scoreOrderHint": "Write each score in the order {a} - {b}.",
+    "scorePlaceholder": "Score · 3-1",
+    "setsNeedWinner": "Those sets don't give a clear winner: check the scores.",
+    "noScoreHint": "For this sport only the winner is recorded."
   },
   "Competitions": {
     "tag": "TOURNAMENT OS",
@@ -535,6 +543,7 @@
     "goToChallenge": "GO TO CHALLENGE"
   },
   "Tricks": {
+    "errVoteFailed": "Couldn't register your vote. Please try again.",
     "tag": "SKILL CHALLENGES",
     "title": "SKILL CHALLENGES",
     "subtitle": "Create a test, upload your attempt and let the community rate it.",
@@ -573,6 +582,7 @@
     "publishBtn": "PUBLISH CHALLENGE"
   },
   "Profile": {
+    "errGeneric": "Couldn't complete the action. Please try again.",
     "notFoundTitle": "Player not found",
     "explorePlayers": "Explore players",
     "backLink": "← Back",
