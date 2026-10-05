@@ -32,14 +32,18 @@
       "miPerfil": "Mi perfil",
       "master": "Master",
       "miClub": "Mi Club",
-      "cartas": "Cartas"
+      "cartas": "Cartas",
+      "misRetos": "Mis retos"
     },
     "retar": "RETAR",
     "profileCard": {
       "kicker": "SPORTS + PLAYER",
       "title": "Tu perfil",
       "badge": "PASAPORTE"
-    }
+    },
+    "menu": "Menú",
+    "close": "Cerrar",
+    "signIn": "Entrar"
   },
   "LocaleSwitcher": {
     "label": "Idioma"
@@ -491,7 +495,15 @@
     "saving": "GUARDANDO...",
     "saveResultBtn": "GUARDAR RESULTADO",
     "resultRegistered": "Resultado registrado: {id}",
-    "cardSectionTitle": "TU CARTA DE ESTE RETO"
+    "cardSectionTitle": "TU CARTA DE ESTE RETO",
+    "disputeBtn": "❌ NO ESTOY DE ACUERDO",
+    "disputedByRival": "Tu rival no está de acuerdo con el resultado. Espera a que envíe su versión.",
+    "disputedEnterYours": "No estás de acuerdo con el resultado. Envía el marcador correcto abajo y tu rival deberá confirmarlo.",
+    "cancelConfirm": "¿Seguro que quieres cancelar este reto? Las cartas en juego se liberarán.",
+    "cancelled": "Reto cancelado",
+    "creatorNotice2": "Esperando a que tu rival responda.",
+    "newCardTitle": "Nueva carta en tu colección",
+    "viewCards": "Ver mis cartas"
   },
   "Competitions": {
     "tag": "TOURNAMENT OS",
@@ -742,7 +754,12 @@
     "postLength": "El post debe tener entre 1 y 2000 caracteres",
     "commentLength": "El comentario debe tener entre 1 y 600 caracteres",
     "cannotFollowSelf": "No puedes seguirte a ti mismo",
-    "cannotFollowBlocked": "No puedes seguir a este jugador"
+    "cannotFollowBlocked": "No puedes seguir a este jugador",
+    "fieldInvitation": "invitación",
+    "fieldChallenge": "reto",
+    "fieldMatch": "partido",
+    "fieldWinner": "ganador",
+    "fieldResult": "resultado"
   },
   "AppError": {
     "title": "Algo salió mal.",
@@ -849,6 +866,9 @@
     "title": "CARTA DYNASTY",
     "shareBtn": "Compartir",
     "downloadBtn": "Descargar",
+    "copyLink": "Copiar enlace",
+    "linkCopied": "Enlace copiado",
+    "imageHint": "Para Instagram o TikTok: descarga la imagen y súbela desde tu app.",
     "shareText": "Mira mi carta en Challenge Dynasty, {name}"
   },
   "ClubRegister": {
@@ -1035,5 +1055,27 @@
     "saving": "GUARDANDO...",
     "done": "Listo, tu contraseña quedó cambiada.",
     "continue": "CONTINUAR"
+  },
+  "MyChallenges": {
+    "title": "Mis retos",
+    "subtitle": "Todos tus retos: por responder, en juego y cerrados.",
+    "newBtn": "NUEVO RETO",
+    "toAnswer": "Esperan tu respuesta",
+    "playing": "En juego",
+    "closed": "Cerrados",
+    "empty": "Todavía no tienes retos. Reta a alguien para empezar.",
+    "vs": "vs {name}",
+    "rivalTBD": "Rival por definir",
+    "dateTBD": "Fecha por definir",
+    "loginRequired": "Inicia sesión para ver tus retos.",
+    "login": "Entrar",
+    "status": {
+      "open": "ABIERTO",
+      "accepted": "ACEPTADO",
+      "scheduled": "PROGRAMADO",
+      "active": "EN JUEGO",
+      "completed": "TERMINADO",
+      "cancelled": "CANCELADO"
+    }
   }
 }

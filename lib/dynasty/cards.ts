@@ -147,3 +147,33 @@ export async function getRecentTransfers(supabase: SupabaseClient, profileId: st
     return []
   }
 }
+
+// Cartas que el jugador gano con un reto concreto: la carta trofeo acunada al ganar
+// o la carta que le paso su rival al perder la apuesta.
+export async function getCardsWonInChallenge(
+  supabase: SupabaseClient,
+  challengeId: string,
+  matchId: string,
+  profileId: string,
+  fallbackName: string,
+): Promise<DynastyCardView[]> {
+  try {
+    const [minted, transferred] = await Promise.all([
+      supabase.from('dynasty_cards').select(SELECT).eq('source_match_id', matchId).eq('owner_profile_id', profileId),
+      supabase
+        .from('dynasty_card_transfers')
+        .select(`card:dynasty_cards(${SELECT})`)
+        .eq('challenge_id', challengeId)
+        .eq('to_profile_id', profileId),
+    ])
+    const out = new Map<string, DynastyCardView>()
+    for (const r of (minted.data ?? []) as unknown as Row[]) out.set(r.id, toCardView(r, fallbackName))
+    for (const r of (transferred.data ?? []) as unknown as { card: Row | Row[] | null }[]) {
+      const c = one(r.card)
+      if (c && c.owner_profile_id === profileId) out.set(c.id, toCardView(c, fallbackName))
+    }
+    return [...out.values()]
+  } catch {
+    return []
+  }
+}

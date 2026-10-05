@@ -6,6 +6,27 @@ import PlayerCard from '@/components/PlayerCard'
 import CardShowcase from '@/components/CardShowcase'
 import { getPlayerCards } from '@/lib/dynasty/cards'
 import { getTranslations } from 'next-intl/server'
+import { headers } from 'next/headers'
+import type { Metadata } from 'next'
+
+// Al pegar el enlace del perfil en WhatsApp/Facebook/X/Telegram se muestra la carta del jugador.
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
+  const { username } = await params
+  const supabase = await createClient()
+  const { data: p } = await supabase.from('profiles').select('id,display_name,username').eq('username', username).maybeSingle()
+  if (!p) return {}
+  const h = await headers()
+  const host = h.get('x-forwarded-host') ?? h.get('host')
+  const proto = h.get('x-forwarded-proto') ?? 'https'
+  const origin = host ? `${proto}://${host}` : ''
+  const image = `${origin}/api/cards/${p.id}`
+  const title = `${p.display_name} (@${p.username}) · Challenge Dynasty`
+  return {
+    title,
+    openGraph: { title, siteName: 'Challenge Dynasty', type: 'profile', images: [{ url: image, width: 1200, height: 630 }] },
+    twitter: { card: 'summary_large_image', title, images: [image] },
+  }
+}
 
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
@@ -120,7 +141,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
 
           <div className="mt-8">
             <div className="font-black mb-3">{isOwnProfile ? t('myCardTitle') : t('tag')}</div>
-            <PlayerCard profileId={p.id} playerName={p.display_name} />
+            <PlayerCard profileId={p.id} playerName={p.display_name} username={p.username} />
           </div>
 
           <div className="mt-8">

@@ -6,8 +6,8 @@ import { useTranslations } from 'next-intl'
 import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, LayoutGrid, History, ShieldCheck, Layers } from 'lucide-react'
 import LocaleSwitcher from './LocaleSwitcher'
 
-const groups = [
-  { group: 'jugar', items: [['inicio', Home, '/'], ['retos', Swords, '/challenge/new'], ['deportes', LayoutGrid, '/sports'], ['trucos', Sparkles, '/tricks'], ['ranking', Trophy, '/ranking'], ['cartas', Layers, '/cards'], ['historial', History, '/history'], ['arena', Radio, '/arena']] },
+export const navGroups = [
+  { group: 'jugar', items: [['inicio', Home, '/'], ['retos', Swords, '/challenge/new'], ['misRetos', Swords, '/challenges'], ['deportes', LayoutGrid, '/sports'], ['trucos', Sparkles, '/tricks'], ['ranking', Trophy, '/ranking'], ['cartas', Layers, '/cards'], ['historial', History, '/history'], ['arena', Radio, '/arena']] },
   { group: 'comunidad', items: [['jugadores', Users, '/players'], ['partners', Users, '/partners'], ['notificaciones', Bell, '/notifications']] },
   { group: 'negocio', items: [['clubes', Building2, '/clubs'], ['coaches', GraduationCap, '/coaches'], ['miCoachOs', GraduationCap, '/coaches/dashboard'], ['competiciones', Medal, '/competitions'], ['reservas', CalendarDays, '/bookings'], ['promote', Megaphone, '/promote'], ['planes', CreditCard, '/business'], ['finanzas', WalletCards, '/finance']] },
   { group: 'comercio', items: [['marketplace', ShoppingBag, '/marketplace']] },
@@ -43,7 +43,7 @@ export default function Sidebar() {
       <div className="mb-4"><LocaleSwitcher /></div>
       <Link href="/challenge/new" className="btn-gold shine w-full py-3 mb-6"><Zap size={18} /> {t('retar')}</Link>
       <nav className="space-y-4 overflow-y-auto">
-        {groups.map(({ group, items }) => (
+        {navGroups.map(({ group, items }) => (
           <div key={group}>
             <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{t(`groups.${group}`)}</div>
             <div className="space-y-1">

@@ -7,7 +7,9 @@ import MatchResultForm from '@/components/MatchResultForm'
 import PlayerCard from '@/components/PlayerCard'
 import PageHero from '@/components/PageHero'
 import CardStakePanel from '@/components/CardStakePanel'
-import { getChallengeStakes, getPlayerCards } from '@/lib/dynasty/cards'
+import { getCardsWonInChallenge, getChallengeStakes, getPlayerCards } from '@/lib/dynasty/cards'
+import DynastyCard from '@/components/DynastyCard'
+import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
@@ -39,6 +41,8 @@ export default async function ChallengePage({ params, searchParams }: { params: 
   if (!challenge) {
     return <main className="min-h-screen arena-bg text-white grid place-items-center p-6"><div className="card-fut-plain border border-white/10 bg-[#141416] p-8 text-center"><h1 className="text-2xl font-black">{t('notFoundTitle')}</h1><p className="text-white/50 mt-2">{t('notFoundBody')}</p></div></main>
   }
+
+  const { data: sportRow } = await supabase.from('sports').select('name,icon').eq('id', challenge.sport_id).maybeSingle()
 
   const { data: participants } = await supabase
     .from('challenge_participants')
@@ -84,7 +88,12 @@ export default async function ChallengePage({ params, searchParams }: { params: 
     : []
   const creator = relatedRow(challenge.creator)
   const rival = relatedRow(opponent?.profile)
-  const currentInvitationStatus = challenge.creator_id === user?.id ? 'creator' : invitation?.status ?? opponent?.status ?? 'none'
+  const baseStatus = challenge.creator_id === user?.id ? 'creator' : invitation?.status ?? opponent?.status ?? 'none'
+  // Un reto cancelado, terminado o con resultado ya no se puede cancelar ni responder.
+  const currentInvitationStatus = challenge.status === 'cancelled' ? 'cancelled' : challenge.status === 'completed' || result ? 'locked' : baseStatus
+  const wonCards = result?.status === 'confirmed' && user && match && myParticipant
+    ? await getCardsWonInChallenge(supabase, challenge.id, match.id, user.id, t('defaultPlayer'))
+    : []
   const resultData = (result?.result_data ?? {}) as Record<string, unknown>
   const scoreSet1 = typeof resultData.score_set1 === 'string' ? resultData.score_set1 : ''
   const scoreSet2 = typeof resultData.score_set2 === 'string' ? resultData.score_set2 : ''
@@ -93,14 +102,14 @@ export default async function ChallengePage({ params, searchParams }: { params: 
   return <main className="min-h-screen arena-bg text-white grid place-items-center p-6"><section className="w-full max-w-3xl card-fut-plain border border-gold-400/25 bg-gradient-to-br from-[#161616] to-[#0A0A0C] p-8">
     <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">⚔️ CHALLENGE DYNASTY</div>
     <h1 className="text-5xl font-display font-black tracking-wide mt-4 text-center">{creator?.display_name ?? t('defaultPlayer')} <span className="text-white/20">VS</span> {rival?.display_name ?? t('defaultRival')}</h1></PageHero>
-    <div className="text-center text-white/50 mt-3">{challenge.title} · {challenge.status}</div>
+    <div className="text-center text-white/50 mt-3">{challenge.title} · {challenge.status === 'cancelled' ? t('cancelled') : challenge.status}</div>
 
     <ChallengeActions challengeId={challenge.id} status={currentInvitationStatus} currentUserId={user?.id} challengerId={challenge.creator_id} invitationId={invitation?.id ?? undefined} />
 
     <div className="grid md:grid-cols-3 gap-3 mt-8">
-      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('sportLabel')}</div><div className="text-lg font-black mt-1">{challenge.sport_id}</div></div>
+      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('sportLabel')}</div><div className="text-lg font-black mt-1">{sportRow ? `${sportRow.icon ?? ''} ${sportRow.name}`.trim() : challenge.sport_id}</div></div>
       <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('dateLabel')}</div><div className="text-lg font-bold mt-1">{challenge.scheduled_at ? new Date(challenge.scheduled_at).toLocaleString('es-CO') : t('dateTBD')}</div></div>
-      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('statusLabel')}</div><div className="text-lg font-black mt-1 text-[#00E676]">{result?.status === 'confirmed' ? t('completed') : currentInvitationStatus}</div></div>
+      <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('statusLabel')}</div><div className="text-lg font-black mt-1 text-[#00E676]">{result?.status === 'confirmed' ? t('completed') : challenge.status === 'cancelled' ? t('cancelled') : currentInvitationStatus === 'locked' ? challenge.status : currentInvitationStatus}</div></div>
     </div>
 
     {stakes !== null && user && (myParticipant || stakes.length > 0) && (
@@ -126,15 +135,23 @@ export default async function ChallengePage({ params, searchParams }: { params: 
       />
     )}
 
-    {result?.status === 'confirmed' && user && (
+    {result?.status === 'confirmed' && user && myParticipant && (
       <div className="mt-8">
         <div className="text-xs tracking-[.2em] text-[#D4AF37] font-black mb-3">{t('cardSectionTitle')}</div>
         <PlayerCard
           profileId={user.id}
           playerName={user.id === challenge.creator_id ? creator?.display_name : rival?.display_name}
+          username={user.id === challenge.creator_id ? creator?.username : rival?.username}
           result={result.winner_profile_id === user.id ? 'win' : 'loss'}
           opponent={user.id === challenge.creator_id ? rival?.display_name : creator?.display_name}
         />
+        {wonCards.length > 0 && (
+          <div className="mt-8 text-center">
+            <div className="text-xs tracking-[.2em] text-[#00E676] font-black mb-3">{t('newCardTitle')}</div>
+            <div className="flex flex-wrap justify-center gap-4">{wonCards.map((c) => <DynastyCard key={c.id} card={c} />)}</div>
+            <Link href="/cards" className="inline-block mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-black">{t('viewCards')}</Link>
+          </div>
+        )}
       </div>
     )}
   </section></main>

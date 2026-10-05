@@ -32,14 +32,18 @@
       "miPerfil": "My profile",
       "master": "Master",
       "miClub": "My Club",
-      "cartas": "Cards"
+      "cartas": "Cards",
+      "misRetos": "My challenges"
     },
     "retar": "CHALLENGE",
     "profileCard": {
       "kicker": "SPORTS + PLAYER",
       "title": "Your profile",
       "badge": "PASSPORT"
-    }
+    },
+    "menu": "Menu",
+    "close": "Close",
+    "signIn": "Sign in"
   },
   "LocaleSwitcher": {
     "label": "Language"
@@ -491,7 +495,15 @@
     "saving": "SAVING...",
     "saveResultBtn": "SAVE RESULT",
     "resultRegistered": "Result recorded: {id}",
-    "cardSectionTitle": "YOUR CARD FOR THIS CHALLENGE"
+    "cardSectionTitle": "YOUR CARD FOR THIS CHALLENGE",
+    "disputeBtn": "❌ I DISAGREE",
+    "disputedByRival": "Your rival disagrees with the result. Wait for them to submit their version.",
+    "disputedEnterYours": "You disagree with the result. Submit the correct score below and your rival will have to confirm it.",
+    "cancelConfirm": "Are you sure you want to cancel this challenge? Cards at stake will be released.",
+    "cancelled": "Challenge cancelled",
+    "creatorNotice2": "Waiting for your rival to respond.",
+    "newCardTitle": "New card in your collection",
+    "viewCards": "View my cards"
   },
   "Competitions": {
     "tag": "TOURNAMENT OS",
@@ -742,7 +754,12 @@
     "postLength": "Post must be between 1 and 2000 characters",
     "commentLength": "Comment must be between 1 and 600 characters",
     "cannotFollowSelf": "You can't follow yourself",
-    "cannotFollowBlocked": "You can't follow this player"
+    "cannotFollowBlocked": "You can't follow this player",
+    "fieldInvitation": "invitation",
+    "fieldChallenge": "challenge",
+    "fieldMatch": "match",
+    "fieldWinner": "winner",
+    "fieldResult": "result"
   },
   "AppError": {
     "title": "Something went wrong.",
@@ -849,6 +866,9 @@
     "title": "DYNASTY CARD",
     "shareBtn": "Share",
     "downloadBtn": "Download",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
+    "imageHint": "For Instagram or TikTok: download the image and upload it from your app.",
     "shareText": "Check out my Challenge Dynasty card, {name}"
   },
   "ClubRegister": {
@@ -1035,5 +1055,27 @@
     "saving": "SAVING...",
     "done": "Done, your password has been changed.",
     "continue": "CONTINUE"
+  },
+  "MyChallenges": {
+    "title": "My challenges",
+    "subtitle": "All your challenges: awaiting reply, in play and closed.",
+    "newBtn": "NEW CHALLENGE",
+    "toAnswer": "Waiting for your reply",
+    "playing": "In play",
+    "closed": "Closed",
+    "empty": "You have no challenges yet. Challenge someone to get started.",
+    "vs": "vs {name}",
+    "rivalTBD": "Rival TBD",
+    "dateTBD": "Date TBD",
+    "loginRequired": "Sign in to see your challenges.",
+    "login": "Sign in",
+    "status": {
+      "open": "OPEN",
+      "accepted": "ACCEPTED",
+      "scheduled": "SCHEDULED",
+      "active": "IN PLAY",
+      "completed": "COMPLETED",
+      "cancelled": "CANCELLED"
+    }
   }
 }

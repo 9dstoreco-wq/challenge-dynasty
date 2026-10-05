@@ -33,6 +33,23 @@ const SCREAMING_CASE_PATTERN = /^[A-Z][A-Z0-9_]*$/
 
 export const DEFAULT_SAFE_FALLBACK = 'No se pudo completar la acción. Intenta de nuevo.'
 
+const KNOWN_RPC_MESSAGES: Record<string, string> = {
+  'Not authorized': 'No tienes permiso para hacer esto.',
+  'Invitation not found': 'No encontramos esa invitación.',
+  'Invitation is not pending': 'Esta invitación ya fue respondida.',
+  'Challenge not found': 'No encontramos ese reto.',
+  'Challenge is not open': 'El reto ya no está abierto.',
+  'Challenge match not found': 'No encontramos el partido de este reto.',
+  'Not an accepted challenge participant': 'Solo los participantes del reto pueden hacer esto.',
+  'Winner must be a participant': 'El ganador debe ser uno de los participantes del reto.',
+  'Match is not active': 'El partido ya no está activo.',
+  'Result not found': 'No encontramos ese resultado.',
+  'Result is not pending': 'Este resultado ya fue revisado.',
+  'Result already confirmed': 'El resultado ya fue confirmado.',
+  'Submitter cannot review own result': 'No puedes confirmar tu propio resultado: debe hacerlo tu rival.',
+  'Existing result was submitted by you': 'Ya enviaste un resultado. Espera a que tu rival lo revise.',
+}
+
 /**
  * Converts a Supabase/Postgres error (or any thrown value) into a message
  * that is safe to render to an end user: no table/column/constraint names,
@@ -64,6 +81,10 @@ export function toSafeMessage(
 
   if (!raw) return fallback
   if (SQL_INTERNAL_PATTERN.test(raw)) return fallback
+
+  // Mensajes en ingles que lanzan las funciones de la base de datos: se muestran en espanol.
+  const known = KNOWN_RPC_MESSAGES[raw.trim()]
+  if (known) return known
 
   if (SCREAMING_CASE_PATTERN.test(raw)) {
     return raw.replace(/_/g, ' ').toLowerCase().replace(/^./, (c) => c.toUpperCase()) + '.'

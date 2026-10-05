@@ -1,4 +1,5 @@
 'use client'
+import { toSafeMessage } from '@/lib/safe-error'
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -18,6 +19,7 @@ export default function ClubRegisterForm() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
+    if (busy) return
     setError(null)
     if (!name.trim()) { setError(t('errNameRequired')); return }
 
@@ -39,9 +41,9 @@ export default function ClubRegisterForm() {
       .select('id')
       .single()
 
-    setBusy(false)
     if (insertError || !data) {
-      setError(insertError?.message || t('errCreateFailed'))
+      setBusy(false)
+      setError(insertError ? toSafeMessage(insertError, 'club.register', t('errCreateFailed')) : t('errCreateFailed'))
       return
     }
     router.push(`/clubs/manage/${data.id}`)

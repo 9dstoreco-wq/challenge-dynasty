@@ -47,6 +47,7 @@ export function MarketplaceCreateSellerProfile({ userId }: { userId: string }) {
   const [error, setError] = useState<string | null>(null)
 
   async function createProfile() {
+    if (busy) return
     if (!displayName.trim()) { setError(t('escribeNombre')); return }
     setBusy(true)
     setError(null)
@@ -58,7 +59,7 @@ export function MarketplaceCreateSellerProfile({ userId }: { userId: string }) {
       city: city.trim() || null,
     })
     setBusy(false)
-    if (insertError) { setError(/permission|policy|rls/i.test(insertError.message) ? t('noPermiso') : insertError.message || t('errorInesperado')); return }
+    if (insertError) { setError(/permission|policy|rls/i.test(insertError.message) ? t('noPermiso') : t('errorInesperado')); return }
     router.refresh()
   }
 
@@ -121,7 +122,7 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
   )
 
   async function publish() {
-    if (!sellerProfile) return
+    if (busy || !sellerProfile) return
     if (!title.trim()) { setError(t('escribeTitulo')); return }
     setBusy(true)
     setError(null)

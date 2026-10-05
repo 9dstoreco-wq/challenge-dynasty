@@ -2,11 +2,17 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { toSafeMessage } from '@/lib/safe-error'
+import { actionError, actionOk, type ActionResult } from '@/lib/action-result'
 import { getTranslations } from 'next-intl/server'
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 function assertUuidLike(value: string, field: string, invalidFieldMessage: (field: string) => string) {
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) throw new Error(invalidFieldMessage(field))
+  if (!UUID_PATTERN.test(value)) throw new Error(invalidFieldMessage(field))
 }
+
+// Todas estas acciones DEVUELVEN { ok, data | error } en vez de lanzar errores: en produccion Next.js
+// oculta los mensajes lanzados desde acciones del servidor y el usuario solo veria un error generico.
 
 export async function createChallenge(input: {
   challengedId: string
@@ -15,42 +21,67 @@ export async function createChallenge(input: {
   clubId?: string
   matchType?: 'DIRECT' | 'INSTANT'
   points?: number
-}) {
-  const t = await getTranslations('Errors')
-  const invalidField = (field: string) => t('invalidField', { field })
-  assertUuidLike(input.challengedId, t('fieldOpponent'), invalidField)
-  assertUuidLike(input.sportId, t('fieldSport'), invalidField)
-  const parsedDate = new Date(input.matchDate)
-  if (Number.isNaN(parsedDate.getTime())) throw new Error(t('invalidDate'))
-  if (parsedDate.getTime() <= Date.now()) throw new Error(t('challengeDateMustBeFuture'))
-  if (input.points !== undefined && (!Number.isInteger(input.points) || input.points < 1 || input.points > 5000)) throw new Error(t('pointsRange'))
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error(t('authRequired'))
+}): Promise<ActionResult<string>> {
+  try {
+    const t = await getTranslations('Errors')
+    const invalidField = (field: string) => t('invalidField', { field })
+    assertUuidLike(input.challengedId, t('fieldOpponent'), invalidField)
+    assertUuidLike(input.sportId, t('fieldSport'), invalidField)
+    const parsedDate = new Date(input.matchDate)
+    if (Number.isNaN(parsedDate.getTime())) throw new Error(t('invalidDate'))
+    if (parsedDate.getTime() <= Date.now()) throw new Error(t('challengeDateMustBeFuture'))
+    if (input.points !== undefined && (!Number.isInteger(input.points) || input.points < 1 || input.points > 5000)) throw new Error(t('pointsRange'))
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error(t('authRequired'))
 
-  const { data, error } = await supabase.rpc('create_challenge', {
-    p_challenged_id: input.challengedId,
-    p_sport_id: input.sportId,
-    p_match_date: input.matchDate,
-    p_club_id: input.clubId ?? null,
-    p_match_type: input.matchType ?? 'DIRECT',
-    p_points: input.points ?? 100,
-  })
-  if (error) throw new Error(toSafeMessage(error, 'challenges.createChallenge'))
-  return data as string
+    const { data, error } = await supabase.rpc('create_challenge', {
+      p_challenged_id: input.challengedId,
+      p_sport_id: input.sportId,
+      p_match_date: input.matchDate,
+      p_club_id: input.clubId ?? null,
+      p_match_type: input.matchType ?? 'DIRECT',
+      p_points: input.points ?? 100,
+    })
+    if (error) throw error
+    return actionOk(data as string)
+  } catch (e) {
+    return actionError(toSafeMessage(e, 'challenges.createChallenge'))
+  }
 }
 
-export async function respondToChallenge(invitationId: string, accept: boolean) {
-  const t = await getTranslations('Errors')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error(t('authRequired'))
-  const { error } = await supabase.rpc('respond_to_challenge_invitation', {
-    p_invitation_id: invitationId,
-    p_accept: accept,
-  })
-  if (error) throw new Error(toSafeMessage(error, 'challenges.respondToChallenge'))
-  return true
+export async function respondToChallenge(invitationId: string, accept: boolean): Promise<ActionResult> {
+  try {
+    const t = await getTranslations('Errors')
+    assertUuidLike(invitationId, t('fieldInvitation'), (field) => t('invalidField', { field }))
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error(t('authRequired'))
+    const { error } = await supabase.rpc('respond_to_challenge_invitation', {
+      p_invitation_id: invitationId,
+      p_accept: accept,
+    })
+    if (error) throw error
+    return actionOk(true as const)
+  } catch (e) {
+    return actionError(toSafeMessage(e, 'challenges.respondToChallenge'))
+  }
+}
+
+// El creador cancela su reto. La base de datos libera automaticamente las cartas que estuvieran en juego.
+export async function cancelChallenge(challengeId: string): Promise<ActionResult> {
+  try {
+    const t = await getTranslations('Errors')
+    assertUuidLike(challengeId, t('fieldChallenge'), (field) => t('invalidField', { field }))
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error(t('authRequired'))
+    const { error } = await supabase.rpc('cancel_challenge', { p_challenge_id: challengeId })
+    if (error) throw error
+    return actionOk(true as const)
+  } catch (e) {
+    return actionError(toSafeMessage(e, 'challenges.cancelChallenge'))
+  }
 }
 
 export async function submitMatchResult(input: {
@@ -60,31 +91,44 @@ export async function submitMatchResult(input: {
   scoreSet3?: string | null
   winnerId: string
   resultData?: Record<string, unknown>
-}) {
-  const t = await getTranslations('Errors')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error(t('authRequired'))
-  const { data, error } = await supabase.rpc('submit_challenge_result', {
-    p_match_id: input.matchId,
-    p_winner_profile_id: input.winnerId,
-    p_result_data: {
-      ...(input.resultData ?? {}),
-      score_set1: input.scoreSet1 ?? '',
-      score_set2: input.scoreSet2 ?? '',
-      score_set3: input.scoreSet3 ?? null,
-    },
-  })
-  if (error) throw new Error(toSafeMessage(error, 'challenges.submitMatchResult'))
-  return data as string
+}): Promise<ActionResult<string>> {
+  try {
+    const t = await getTranslations('Errors')
+    const invalidField = (field: string) => t('invalidField', { field })
+    assertUuidLike(input.matchId, t('fieldMatch'), invalidField)
+    assertUuidLike(input.winnerId, t('fieldWinner'), invalidField)
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error(t('authRequired'))
+    const { data, error } = await supabase.rpc('submit_challenge_result', {
+      p_match_id: input.matchId,
+      p_winner_profile_id: input.winnerId,
+      p_result_data: {
+        // Solo se aceptan los marcadores: sin llaves libres del cliente.
+        score_set1: (input.scoreSet1 ?? '').slice(0, 8),
+        score_set2: (input.scoreSet2 ?? '').slice(0, 8),
+        score_set3: input.scoreSet3 ? input.scoreSet3.slice(0, 8) : null,
+      },
+    })
+    if (error) throw error
+    return actionOk(data as string)
+  } catch (e) {
+    return actionError(toSafeMessage(e, 'challenges.submitMatchResult'))
+  }
 }
 
-export async function confirmMatch(resultId: string, confirm: boolean) {
-  const t = await getTranslations('Errors')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error(t('authRequired'))
-  const { error } = await supabase.rpc('review_challenge_result', { p_result_id: resultId, p_confirm: confirm })
-  if (error) throw new Error(toSafeMessage(error, 'challenges.confirmMatch'))
-  return true
+// confirm = true confirma el resultado; confirm = false lo disputa (el rival puede enviar su version).
+export async function confirmMatch(resultId: string, confirm: boolean): Promise<ActionResult> {
+  try {
+    const t = await getTranslations('Errors')
+    assertUuidLike(resultId, t('fieldResult'), (field) => t('invalidField', { field }))
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error(t('authRequired'))
+    const { error } = await supabase.rpc('review_challenge_result', { p_result_id: resultId, p_confirm: confirm })
+    if (error) throw error
+    return actionOk(true as const)
+  } catch (e) {
+    return actionError(toSafeMessage(e, 'challenges.confirmMatch'))
+  }
 }

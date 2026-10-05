@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { toSafeMessage } from '@/lib/safe-error'
+import { actionError, actionOk, type ActionResult } from '@/lib/action-result'
 import { getTranslations } from 'next-intl/server'
 
 export async function createSkillChallenge(input: {
@@ -13,23 +14,27 @@ export async function createSkillChallenge(input: {
   points?: number
   targetVotes?: number
   expiresAt?: string | null
-}) {
-  const t = await getTranslations('Errors')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error(t('authRequired'))
-  const { data, error } = await supabase.rpc('create_skill_challenge', {
-    p_sport_id: input.sportId,
-    p_title: input.title,
-    p_description: input.description ?? null,
-    p_category: input.category,
-    p_difficulty: input.difficulty,
-    p_points: input.points ?? 100,
-    p_target_votes: input.targetVotes ?? 100,
-    p_expires_at: input.expiresAt ?? null,
-  })
-  if (error) throw new Error(toSafeMessage(error, 'skills.createSkillChallenge'))
-  return data as string
+}): Promise<ActionResult<string>> {
+  try {
+    const t = await getTranslations('Errors')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error(t('authRequired'))
+    const { data, error } = await supabase.rpc('create_skill_challenge', {
+      p_sport_id: input.sportId,
+      p_title: input.title,
+      p_description: input.description ?? null,
+      p_category: input.category,
+      p_difficulty: input.difficulty,
+      p_points: input.points ?? 100,
+      p_target_votes: input.targetVotes ?? 100,
+      p_expires_at: input.expiresAt ?? null,
+    })
+    if (error) throw error
+    return actionOk(data as string)
+  } catch (e) {
+    return actionError(toSafeMessage(e, 'skills.createSkillChallenge'))
+  }
 }
 
 export async function submitSkillChallenge(input: { challengeId: string; videoUrl: string; caption?: string }) {

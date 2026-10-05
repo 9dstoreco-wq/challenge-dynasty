@@ -31,15 +31,17 @@ export default function CardStakePanel({
   const [error, setError] = useState('')
   const bothIn = Boolean(mine && theirs)
 
-  async function run(fn: () => Promise<unknown>) {
+  async function run(fn: () => Promise<{ ok: boolean; error?: string }>) {
+    if (busy) return
     setBusy(true)
     setError('')
     try {
-      await fn()
+      const res = await fn()
+      if (!res.ok) { setError(res.error || t('stake.errorGeneric')); return }
       setPick(null)
       router.refresh()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t('stake.errorGeneric'))
+    } catch {
+      setError(t('stake.errorGeneric'))
     } finally {
       setBusy(false)
     }
