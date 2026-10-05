@@ -258,7 +258,8 @@
     "loggingIn": "LOGGING IN...",
     "submitBtn": "LOG IN",
     "noAccount": "Don't have an account?",
-    "createAccount": "Create account"
+    "createAccount": "Create account",
+    "forgotPassword": "Forgot your password?"
   },
   "Register": {
     "title": "Create account",
@@ -1011,5 +1012,28 @@
       "refunded": "Refunded",
       "waived": "Waived"
     }
+  },
+  "ForgotPassword": {
+    "title": "Reset password",
+    "subtitle": "Enter your email and we'll send you a link to set a new password.",
+    "emailPlaceholder": "Email",
+    "submitBtn": "SEND LINK",
+    "sending": "SENDING...",
+    "sent": "If that email has an account, we sent you a link to change your password. Check your inbox and spam folder.",
+    "backToLogin": "Back to sign in"
+  },
+  "ResetPassword": {
+    "title": "New password",
+    "checking": "Checking your link...",
+    "invalid": "This link is invalid or has expired. Request a new one.",
+    "requestNew": "Request a new link",
+    "passwordPlaceholder": "New password (at least 8 characters)",
+    "confirmPlaceholder": "Repeat the password",
+    "tooShort": "Password must be at least 8 characters.",
+    "mismatch": "Passwords do not match.",
+    "submitBtn": "SAVE PASSWORD",
+    "saving": "SAVING...",
+    "done": "Done, your password has been changed.",
+    "continue": "CONTINUE"
   }
 }

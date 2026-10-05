@@ -258,7 +258,8 @@
     "loggingIn": "ENTRANDO...",
     "submitBtn": "ENTRAR",
     "noAccount": "¿No tienes cuenta?",
-    "createAccount": "Crear cuenta"
+    "createAccount": "Crear cuenta",
+    "forgotPassword": "¿Olvidaste tu contraseña?"
   },
   "Register": {
     "title": "Crear cuenta",
@@ -1011,5 +1012,28 @@
       "refunded": "Reembolsada",
       "waived": "Exenta"
     }
+  },
+  "ForgotPassword": {
+    "title": "Recuperar contraseña",
+    "subtitle": "Escribe tu correo y te enviaremos un enlace para crear una contraseña nueva.",
+    "emailPlaceholder": "Correo",
+    "submitBtn": "ENVIAR ENLACE",
+    "sending": "ENVIANDO...",
+    "sent": "Si ese correo tiene una cuenta, te enviamos un enlace para cambiar la contraseña. Revisa tu bandeja y la carpeta de spam.",
+    "backToLogin": "Volver a entrar"
+  },
+  "ResetPassword": {
+    "title": "Contraseña nueva",
+    "checking": "Verificando el enlace...",
+    "invalid": "Este enlace no es válido o ya venció. Pide uno nuevo.",
+    "requestNew": "Pedir un enlace nuevo",
+    "passwordPlaceholder": "Contraseña nueva (mínimo 8 caracteres)",
+    "confirmPlaceholder": "Repite la contraseña",
+    "tooShort": "La contraseña debe tener al menos 8 caracteres.",
+    "mismatch": "Las contraseñas no coinciden.",
+    "submitBtn": "GUARDAR CONTRASEÑA",
+    "saving": "GUARDANDO...",
+    "done": "Listo, tu contraseña quedó cambiada.",
+    "continue": "CONTINUAR"
   }
 }
