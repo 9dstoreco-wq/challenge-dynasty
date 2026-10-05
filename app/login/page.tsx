@@ -16,6 +16,8 @@ export default function LoginPage() {
     e.preventDefault(); setError(''); setLoading(true)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
+    // Recarga completa a proposito: asegura que el servidor lea la cookie de sesion recien creada.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     if (error) setError(toSafeMessage(error,'auth.signIn')); else window.location.href='/onboarding'
     setLoading(false)
   }

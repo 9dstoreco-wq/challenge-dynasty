@@ -75,7 +75,6 @@ export function toSafeMessage(
 
   if (raw) {
     // Full detail stays in logs only — this is the one place allowed to see it.
-    // eslint-disable-next-line no-console
     console.error(`[safe-error:${context}]`, raw)
   }
 

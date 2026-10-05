@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: `${challenge?.title ?? t('notFoundTitle')} · CHALLENGE DYNASTY`, description: t('metaDescription', { name: a }) }
 }
 
-export default async function ChallengePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function ChallengePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createClient()
   const t = await getTranslations('Challenge')
@@ -104,7 +104,7 @@ export default async function ChallengePage({ params, searchParams }: { params: 
     <h1 className="text-5xl font-display font-black tracking-wide mt-4 text-center">{creator?.display_name ?? t('defaultPlayer')} <span className="text-white/20">VS</span> {rival?.display_name ?? t('defaultRival')}</h1></PageHero>
     <div className="text-center text-white/50 mt-3">{challenge.title} · {challenge.status === 'cancelled' ? t('cancelled') : challenge.status}</div>
 
-    <ChallengeActions challengeId={challenge.id} status={currentInvitationStatus} currentUserId={user?.id} challengerId={challenge.creator_id} invitationId={invitation?.id ?? undefined} />
+    <ChallengeActions challengeId={challenge.id} status={currentInvitationStatus} invitationId={invitation?.id ?? undefined} />
 
     <div className="grid md:grid-cols-3 gap-3 mt-8">
       <div className="bg-white/5 rounded-2xl p-4"><div className="text-xs text-white/40">{t('sportLabel')}</div><div className="text-lg font-black mt-1">{sportRow ? `${sportRow.icon ?? ''} ${sportRow.name}`.trim() : challenge.sport_id}</div></div>

@@ -1,5 +1,5 @@
 'use client'
-import { Flame, Heart, MessageCircle, Play, Swords, Trophy, Zap } from 'lucide-react'
+import { Flame, Heart, MessageCircle, Play, Swords, Zap } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 export default function SkillChallengeCard({title,user,rank,votes,difficulty,points,category,accent}:{title:string;user:string;rank:string;votes:number;difficulty:string;points:number;category:string;accent:string}){

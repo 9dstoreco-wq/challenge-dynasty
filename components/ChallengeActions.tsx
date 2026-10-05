@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { cancelChallenge, respondToChallenge } from '@/app/actions/challenges'
 import { useTranslations } from 'next-intl'
 
-export default function ChallengeActions({challengeId,status,currentUserId,challengerId,invitationId}:{challengeId:string;status:string;currentUserId?:string;challengerId?:string;invitationId?:string}){
+export default function ChallengeActions({challengeId,status,invitationId}:{challengeId:string;status:string;invitationId?:string}){
   const t=useTranslations('Challenge')
   const [busy,setBusy]=useState(false); const [message,setMessage]=useState('')
   async function respond(accept:boolean){

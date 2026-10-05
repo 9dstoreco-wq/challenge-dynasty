@@ -43,5 +43,10 @@ const run = (script) => {
   console.log(`\n>>> npm run ${script}`)
   execFileSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', script], { stdio: 'inherit', env: process.env, shell: true })
 }
-for (const script of ['check-routes','check-sql','check-sql-contracts','check-rpc-status-literals','check-error-sanitization','check-core-flow','check-production','check-hardening','typecheck','build']) run(script)
+const nodeMajor = Number(process.versions.node.split('.')[0])
+const gates = ['check-routes','check-sql','check-sql-contracts','check-rpc-status-literals','check-error-sanitization','check-core-flow','check-production','check-hardening','lint','typecheck']
+// Las pruebas ejecutan TypeScript directamente, y eso necesita Node 22 o mayor.
+if (nodeMajor >= 22) gates.push('test'); else console.log(`\n(i) Node ${process.versions.node}: se omiten las pruebas automaticas (requieren Node 22+)`)
+gates.push('build')
+for (const script of gates) run(script)
 pass('FULL RELEASE GATE')

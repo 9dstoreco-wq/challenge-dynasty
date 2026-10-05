@@ -10,9 +10,8 @@ type Sport = { id:string; slug:string; name:string; icon:string|null; color:stri
 
 export default function OnboardingPage(){
   const t=useTranslations('Onboarding')
-  const supabase=createClient()
   const [sports,setSports]=useState<Sport[]>([]); const [sport,setSport]=useState(''); const [message,setMessage]=useState(''); const [loading,setLoading]=useState(true); const [saving,setSaving]=useState(false)
-  useEffect(()=>{(async()=>{const {data,error}=await supabase.from('sports').select('id,slug,name,icon,color').order('name'); if(error)setMessage(toSafeMessage(error,'onboarding.loadSports')); else setSports(data??[]); setLoading(false)})()},[])
+  useEffect(()=>{(async()=>{const {data,error}=await createClient().from('sports').select('id,slug,name,icon,color').order('name'); if(error)setMessage(toSafeMessage(error,'onboarding.loadSports')); else setSports(data??[]); setLoading(false)})()},[])
   async function save(){const supabase=createClient();if(!sport){setMessage(t('selectSport'));return} setSaving(true); setMessage(''); const {data:{user}}=await supabase.auth.getUser(); if(!user){setMessage(t('loginFirst'));setSaving(false);return}
     const meta=(user.user_metadata||{}) as Record<string,unknown>
     const metaFullName=typeof meta.full_name==='string'?meta.full_name:null

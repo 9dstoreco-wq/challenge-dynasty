@@ -39,7 +39,7 @@ function parse(score: string): [number, number] | null {
   return m ? [Number(m[1]), Number(m[2])] : null
 }
 
-export default function MatchResultForm({ challengeId, matchId, resultId, creatorId, opponentId, creatorName, opponentName, currentUserId, winnerId, submittedBy, resultStatus, scoreSet1='', scoreSet2='', scoreSet3='', sportSlug }: Props) {
+export default function MatchResultForm({ matchId, resultId, creatorId, opponentId, creatorName, opponentName, currentUserId, winnerId, submittedBy, resultStatus, scoreSet1='', scoreSet2='', scoreSet3='', sportSlug }: Props) {
   const t = useTranslations('Challenge')
   const router = useRouter()
   const [winner, setWinner] = useState(winnerId ?? '')

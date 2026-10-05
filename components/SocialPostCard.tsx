@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Heart, MessageCircle, Share2, UserRound, Swords } from 'lucide-react'
+import { Heart, MessageCircle, Share2, Swords } from 'lucide-react'
 import { addComment, toggleLike, toggleFollow } from '@/app/actions/social'
 import { useTranslations } from 'next-intl'
 
