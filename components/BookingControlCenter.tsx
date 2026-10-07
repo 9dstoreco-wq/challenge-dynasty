@@ -14,7 +14,10 @@ export default function BookingControlCenter({bookables,bookings}:{bookables:Boo
  const t=useTranslations('Bookings')
  const supabase=createClient()
  const [bookableId,setBookableId]=useState(bookables[0]?.id||'')
- const [starts,setStarts]=useState(()=>new Date(Date.now()+60*60*1000).toISOString().slice(0,16))
+ // Mismo ajuste que en NewChallengeForm: toISOString() siempre da UTC, asi que sin restar el
+ // offset del huso horario el campo de fecha/hora salia precargado con la hora de Londres, no la
+ // de Colombia (ej. mostraba "14:32" cuando la hora local real era "09:32").
+ const [starts,setStarts]=useState(()=>{const d=new Date(Date.now()+60*60*1000); return new Date(d.getTime()-d.getTimezoneOffset()*60*1000).toISOString().slice(0,16)})
  const [quantity,setQuantity]=useState(1)
  const [busy,setBusy]=useState(false)
  const [message,setMessage]=useState<string|null>(null)

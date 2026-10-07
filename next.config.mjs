@@ -8,10 +8,12 @@ const securityHeaders = [
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
   { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-  // CSP en modo "solo reporte": no bloquea nada todavia, solo avisa en la consola del navegador de lo que
-  // bloquearia. Cuando se revise y no haya avisos legitimos, se cambia la clave a 'Content-Security-Policy'.
+  // CSP ya revisada y activa de verdad (antes estaba en modo "solo reporte"). Se verificaron todos
+  // los recursos externos que carga la app hoy: el script de checkout de ePayco (script-src,
+  // connect-src, frame-src), Supabase (connect-src, img-src), y nada mas -- no hay analitica,
+  // CDNs externos, iframes, ni fuentes externas (las fuentes van empaquetadas via @fontsource).
   {
-    key: 'Content-Security-Policy-Report-Only',
+    key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' https://checkout.epayco.co https://*.epayco.co",

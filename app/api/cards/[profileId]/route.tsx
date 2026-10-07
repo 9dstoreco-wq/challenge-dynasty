@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,11 +10,22 @@ const BG = '#0A0A0C'
 export async function GET(request: Request, { params }: { params: Promise<{ profileId: string }> }) {
   const { profileId } = await params
   const { searchParams } = new URL(request.url)
-  const matchResult = searchParams.get('result') // 'win' | 'loss' | null
-  const opponentName = searchParams.get('opponent') ?? ''
-  const xpParam = searchParams.get('xp')
+  // Antes esto confiaba en result/opponent/xp tal cual venian en la URL: cualquiera podia pedir
+  // /api/cards/<cualquier-id>?result=win&opponent=X&xp=99999 y fabricar una imagen "GANO vs X +99999 XP"
+  // de un partido que nunca existio. Ahora solo se acepta un matchId, y el resultado/rival/XP que se
+  // muestran se calculan del lado del servidor a partir de ese partido real, nunca de la URL.
+  const matchId = searchParams.get('match')
 
   const supabase = await createClient()
+
+  // Esta ruta es publica (sin sesion), asi que el limite es por IP: hasta 60 imagenes por minuto.
+  // Si la cabecera no trae IP (algunos entornos locales), se agrupa en un solo bucket generico en
+  // vez de fallar -- sigue siendo mejor que ningun limite.
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const allowed = await checkRateLimit(supabase, `card_image:${ip}`, 60, 60)
+  if (!allowed) {
+    return new Response('Too many requests', { status: 429 })
+  }
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -48,18 +60,52 @@ export async function GET(request: Request, { params }: { params: Promise<{ prof
 
   const streak = streakRows?.[0]?.current_win_streak ?? null
   const level = progression?.level ?? null
-  const totalXp = xpParam ? Number(xpParam) : progression?.total_xp ?? null
+  const totalXp = progression?.total_xp ?? null
 
   const name = profile?.display_name ?? 'Jugador Dynasty'
   const handle = profile?.username ? `@${profile.username}` : ''
 
-  const resultBanner =
-    matchResult === 'win'
-      ? `GANO vs ${opponentName || 'rival'}`
-      : matchResult === 'loss'
-        ? `PERDIO vs ${opponentName || 'rival'}`
-        : null
-  const resultXp = matchResult === 'win' ? '+100 XP' : matchResult === 'loss' ? '+50 XP' : null
+  // Todo el bloque del resultado (banner + XP) se reconstruye aqui desde datos reales de la base,
+  // nunca desde lo que mande la URL. Si el partido no existe, no esta confirmado, o este profileId
+  // no jugo ese partido, simplemente no se muestra ningun banner.
+  let resultBanner: string | null = null
+  let resultXp: string | null = null
+  if (matchId) {
+    const { data: matchRow } = await supabase
+      .from('matches')
+      .select('id,challenge_id')
+      .eq('id', matchId)
+      .maybeSingle()
+    if (matchRow) {
+      const { data: resultRow } = await supabase
+        .from('match_results')
+        .select('winner_profile_id,status')
+        .eq('match_id', matchRow.id)
+        .maybeSingle()
+      const { data: participants } = await supabase
+        .from('challenge_participants')
+        .select('profile_id,status,profile:profiles!challenge_participants_profile_id_fkey(display_name,username)')
+        .eq('challenge_id', matchRow.challenge_id)
+      const list = participants ?? []
+      const iPlayed = list.some((p) => p.profile_id === profileId && p.status !== 'declined' && p.status !== 'withdrawn')
+      const opponentRow = list.find((p) => p.profile_id !== profileId)
+      const opponentProfile = Array.isArray(opponentRow?.profile) ? opponentRow?.profile[0] : opponentRow?.profile
+      const opponentName = opponentProfile?.display_name || opponentProfile?.username || 'rival'
+      if (iPlayed && resultRow?.status === 'confirmed' && resultRow.winner_profile_id) {
+        const won = resultRow.winner_profile_id === profileId
+        resultBanner = won ? `GANO vs ${opponentName}` : `PERDIO vs ${opponentName}`
+        const { data: xpRow } = await supabase
+          .from('xp_events')
+          .select('amount')
+          .eq('source_type', 'MATCH_RESULT_CONFIRMED')
+          .eq('source_id', matchRow.id)
+          .eq('profile_id', profileId)
+          .maybeSingle()
+        const realXp = xpRow?.amount ?? (won ? 100 : 50)
+        resultXp = `+${realXp} XP`
+      }
+    }
+  }
 
   return new ImageResponse(
     (

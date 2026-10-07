@@ -7,23 +7,22 @@ export default function PlayerCard({
   profileId,
   playerName,
   username,
-  result,
-  opponent,
+  matchId,
 }: {
   profileId: string
   playerName?: string
   username?: string
-  result?: 'win' | 'loss'
-  opponent?: string
+  matchId?: string
 }) {
   const t = useTranslations('PlayerCard')
   const [busy, setBusy] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
+  // El banner de "GANO/PERDIO" y el XP los calcula el propio endpoint a partir del partido real
+  // (matchId); ya no se le puede pasar un resultado o un rival armado desde el cliente.
   const params = new URLSearchParams()
-  if (result) params.set('result', result)
-  if (opponent) params.set('opponent', opponent)
+  if (matchId) params.set('match', matchId)
   const query = params.toString()
   const imgSrc = `/api/cards/${profileId}${query ? `?${query}` : ''}`
 

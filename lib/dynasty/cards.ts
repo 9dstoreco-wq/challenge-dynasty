@@ -64,13 +64,33 @@ export function toCardView(row: Row, fallbackName: string): DynastyCardView {
   }
 }
 
-export async function getPlayerCards(supabase: SupabaseClient, ownerId: string, fallbackName: string): Promise<DynastyCardView[]> {
+// excludeLockedOutsideChallengeId: cuando se pasa, oculta cualquier carta que este bloqueada
+// (apostada y sin liquidar) en OTRO reto distinto a ese id. Sin este parametro no se filtra nada
+// (uso para "mis cartas" en /cards, donde queremos ver todas, incluso las bloqueadas).
+export async function getPlayerCards(
+  supabase: SupabaseClient,
+  ownerId: string,
+  fallbackName: string,
+  opts?: { excludeLockedOutsideChallengeId?: string },
+): Promise<DynastyCardView[]> {
   try {
     const { data, error } = await supabase.from('dynasty_cards').select(SELECT).eq('owner_profile_id', ownerId)
     if (error || !data) return []
-    return (data as unknown as Row[])
-      .map((r) => toCardView(r, fallbackName))
-      .sort((a, b) => RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity] || b.rating - a.rating)
+    let cards = (data as unknown as Row[]).map((r) => toCardView(r, fallbackName))
+    if (opts?.excludeLockedOutsideChallengeId !== undefined) {
+      const { data: locks } = await supabase
+        .from('challenge_card_stakes')
+        .select('card_id,challenge_id')
+        .eq('profile_id', ownerId)
+        .eq('status', 'locked')
+      const lockedElsewhere = new Set(
+        (locks ?? [])
+          .filter((l) => l.challenge_id !== opts.excludeLockedOutsideChallengeId)
+          .map((l) => l.card_id),
+      )
+      cards = cards.filter((c) => !lockedElsewhere.has(c.id))
+    }
+    return cards.sort((a, b) => RARITY_ORDER[a.rarity] - RARITY_ORDER[b.rarity] || b.rating - a.rating)
   } catch {
     return []
   }

@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { toSafeMessage } from '@/lib/safe-error'
 import { safeRun, type ActionResult } from '@/lib/action-result'
 import { getTranslations } from 'next-intl/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // Canonical partner action lives in partners.ts; re-export to preserve existing imports.
 import { respondToPartnerRequest as respondToPartnerRequestCore } from './partners'
@@ -19,6 +20,8 @@ export async function createPost(content: string, title?: string): Promise<Actio
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
+    // Hasta 20 publicaciones por hora por usuario.
+    if (!(await checkRateLimit(supabase, `create_post:${user.id}`, 20, 3600))) throw new Error(t('rateLimited'))
     const clean = content.trim()
     if (!clean || clean.length > 2000) throw new Error(t('postLength'))
     const { data, error } = await supabase.from('social_posts').insert({
@@ -52,6 +55,7 @@ export async function toggleFollow(followingId: string): Promise<ActionResult<bo
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(followingId)) throw new Error(t('invalidUser'))
     if (user.id === followingId) throw new Error(t('cannotFollowSelf'))
     const { data: blocked } = await supabase.from('user_blocks').select('blocker_profile_id').or(`and(blocker_profile_id.eq.${user.id},blocked_profile_id.eq.${followingId}),and(blocker_profile_id.eq.${followingId},blocked_profile_id.eq.${user.id})`).limit(1)
     if (blocked && blocked.length) throw new Error(t('cannotFollowBlocked'))

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { toSafeMessage } from '@/lib/safe-error'
 import { actionError, actionOk, safeRun, type ActionResult } from '@/lib/action-result'
 import { getTranslations } from 'next-intl/server'
+import { isAllowedVideoUrl } from '@/lib/validators'
 
 export async function createSkillChallenge(input: {
   sportId: string
@@ -43,6 +44,7 @@ export async function submitSkillChallenge(input: { challengeId: string; videoUr
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
+    if (!isAllowedVideoUrl(input.videoUrl)) throw new Error(t('invalidVideoUrl'))
     const { data, error } = await supabase.rpc('submit_skill_challenge', {
       p_challenge_id: input.challengeId,
       p_video_url: input.videoUrl,

@@ -5,6 +5,8 @@ import { revalidatePath } from 'next/cache'
 import { toSafeMessage } from '@/lib/safe-error'
 import { safeRun, type ActionResult } from '@/lib/action-result'
 import { getTranslations } from 'next-intl/server'
+import { isReservedUsername, isValidUsernameFormat } from '@/lib/validators'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function updateProfile(input: {
   fullName: string
@@ -20,6 +22,8 @@ export async function updateProfile(input: {
     const cleanName = input.fullName.trim()
     const cleanUsername = input.username.trim().toLowerCase()
     if (!cleanName || !cleanUsername) throw new Error(t('nameUsernameRequired'))
+    if (!isValidUsernameFormat(cleanUsername)) throw new Error(t('usernameInvalidFormat'))
+    if (isReservedUsername(cleanUsername)) throw new Error(t('usernameReserved'))
     const { error } = await supabase.from('profiles').update({
       display_name: cleanName,
       username: cleanUsername,
@@ -97,6 +101,8 @@ export async function reportContent(input: {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
+    // Hasta 10 reportes por hora por usuario.
+    if (!(await checkRateLimit(supabase, `report_content:${user.id}`, 10, 3600))) throw new Error(t('rateLimited'))
     const targetType = input.matchId ? 'match' : input.postId ? 'post' : input.targetUserId ? 'profile' : 'unknown'
     const targetId = input.matchId ?? input.postId ?? input.targetUserId
     if (!targetId) throw new Error(t('reportTargetRequired'))
