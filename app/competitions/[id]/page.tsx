@@ -6,8 +6,12 @@ import PageHero from '@/components/PageHero'
 import { getTranslations } from 'next-intl/server'
 import TournamentCategoryForm from '@/components/TournamentCategoryForm'
 import TournamentRegisterForm from '@/components/TournamentRegisterForm'
+import TournamentBracketPanel from '@/components/TournamentBracketPanel'
+import TournamentResultForm from '@/components/TournamentResultForm'
+import TournamentPendingPaymentsPanel from '@/components/TournamentPendingPaymentsPanel'
+import TournamentKnockoutPanel from '@/components/TournamentKnockoutPanel'
 
-type Fixture = { id: string; round_number: number | null; scheduled_at: string | null; status: string; side_a_entry_id: string | null; side_b_entry_id: string | null; winner_entry_id: string | null; metadata: { score_a?: number; score_b?: number } | null }
+type Fixture = { id: string; category_id: string; round_number: number | null; slot: number | null; next_fixture_id: string | null; scheduled_at: string | null; status: string; side_a_entry_id: string | null; side_b_entry_id: string | null; winner_entry_id: string | null; metadata: { score_a?: number; score_b?: number } | null }
 type Category = { id: string; name: string; participant_mode: string; capacity: number | null; entry_fee: number | null; status: string }
 
 export default async function CompetitionDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -16,25 +20,71 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
   const t = await getTranslations('Competitions')
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [{ data: tournament }, { data: catsData }, { data: fixturesData }] = await Promise.all([
-    supabase.from('tournaments').select('id,title,status,starts_at,ends_at,organization_id,organizer_profile_id').eq('id', id).maybeSingle(),
+  const [{ data: tournament }, { data: catsData }, { data: fixturesData }, { data: confirmedData }, { data: stagesData }] = await Promise.all([
+    supabase.from('tournaments').select('id,title,status,starts_at,ends_at,organization_id,organizer_profile_id,format_type').eq('id', id).maybeSingle(),
     supabase.from('tournament_categories').select('id,name,participant_mode,capacity,entry_fee,status').eq('tournament_id', id).order('name').returns<Category[]>(),
-    supabase.from('tournament_fixtures').select('id,round_number,scheduled_at,status,side_a_entry_id,side_b_entry_id,winner_entry_id,metadata').eq('tournament_id', id).order('scheduled_at', { ascending: true, nullsFirst: false }).limit(200).returns<Fixture[]>(),
+    supabase.from('tournament_fixtures').select('id,category_id,round_number,slot,next_fixture_id,scheduled_at,status,side_a_entry_id,side_b_entry_id,winner_entry_id,metadata').eq('tournament_id', id).order('scheduled_at', { ascending: true, nullsFirst: false }).limit(200).returns<Fixture[]>(),
+    supabase.from('tournament_entries').select('id,category_id').eq('tournament_id', id).eq('status', 'confirmed').returns<{ id: string; category_id: string }[]>(),
+    supabase.from('tournament_stages').select('category_id,stage_type').eq('tournament_id', id).returns<{ category_id: string; stage_type: string }[]>(),
   ])
   const cats = catsData ?? []
   const fixtures = fixturesData ?? []
   const isOrganizer = Boolean(user && tournament?.organizer_profile_id === user.id)
+
+  const categoriesWithFixtures = new Set(fixtures.map((f) => f.category_id))
+  const confirmedCountByCategory = new Map<string, number>()
+  for (const e of confirmedData ?? []) {
+    confirmedCountByCategory.set(e.category_id, (confirmedCountByCategory.get(e.category_id) ?? 0) + 1)
+  }
+
+  // Categorías de "grupos + eliminación" que ya tienen su fase de grupos armada pero todavía
+  // no tienen la fase final (cuadro de eliminación) generada — a esas les mostramos el botón.
+  const stages = stagesData ?? []
+  const categoriesWithGroupStage = new Set(stages.filter((s) => s.stage_type === 'group').map((s) => s.category_id))
+  const categoriesWithKnockoutStage = new Set(stages.filter((s) => s.stage_type === 'single_elimination').map((s) => s.category_id))
+  const categoriesNeedingKnockout = cats.filter(
+    (c) => tournament?.format_type === 'groups_then_knockout' && categoriesWithGroupStage.has(c.id) && !categoriesWithKnockoutStage.has(c.id)
+  )
 
   const entryIds = Array.from(new Set(fixtures.flatMap(f => [f.side_a_entry_id, f.side_b_entry_id]).filter((v): v is string => Boolean(v))))
   const { data: entriesData } = entryIds.length
     ? await supabase.from('tournament_entries').select('id,captain_profile_id,entry_type').in('id', entryIds)
     : { data: [] as { id: string; captain_profile_id: string | null; entry_type: string }[] }
   const entries = entriesData ?? []
-  const captainIds = Array.from(new Set(entries.map(e => e.captain_profile_id).filter((v): v is string => Boolean(v))))
+
+  // Para el organizador: inscripciones aún sin confirmar (por pago) de todo el torneo.
+  const { data: pendingEntriesData } = isOrganizer
+    ? await supabase.from('tournament_entries').select('id,category_id,captain_profile_id,entry_type').eq('tournament_id', id).eq('status', 'pending')
+    : { data: [] as { id: string; category_id: string; captain_profile_id: string | null; entry_type: string }[] }
+  const pendingEntries = pendingEntriesData ?? []
+  const pendingEntryIds = pendingEntries.map((e) => e.id)
+  const { data: pendingPaymentsData } = pendingEntryIds.length
+    ? await supabase.from('tournament_registration_payments').select('entry_id,amount_due,amount_paid').in('entry_id', pendingEntryIds)
+    : { data: [] as { entry_id: string; amount_due: number; amount_paid: number }[] }
+  const paymentByEntryId = new Map((pendingPaymentsData ?? []).map((p) => [p.entry_id, p]))
+
+  const captainIds = Array.from(new Set([...entries, ...pendingEntries].map(e => e.captain_profile_id).filter((v): v is string => Boolean(v))))
   const { data: captainsData } = captainIds.length
     ? await supabase.from('profiles').select('id,display_name,username').in('id', captainIds)
     : { data: [] as { id: string; display_name: string | null; username: string | null }[] }
   const captainById = new Map((captainsData ?? []).map(p => [p.id, p.display_name || p.username]))
+  const categoryNameById = new Map(cats.map((c) => [c.id, c.name]))
+
+  const pendingPaymentRows = pendingEntries
+    .map((e) => {
+      const payment = paymentByEntryId.get(e.id)
+      if (!payment) return null
+      const name = e.captain_profile_id ? captainById.get(e.captain_profile_id) : null
+      const playerLabel = (name ?? t('tbd')) + (e.entry_type === 'individual' ? '' : ` ${t('andTeam')}`)
+      return {
+        entryId: e.id,
+        categoryName: categoryNameById.get(e.category_id) ?? '',
+        playerLabel,
+        amountDue: payment.amount_due,
+        amountPaid: payment.amount_paid,
+      }
+    })
+    .filter((r): r is { entryId: string; categoryName: string; playerLabel: string; amountDue: number; amountPaid: number } => r !== null)
   const entryLabel = (entryId: string | null) => {
     if (!entryId) return t('tbd')
     const entry = entries.find(e => e.id === entryId)
@@ -89,6 +139,24 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
           </div>
 
           {isOrganizer && <TournamentCategoryForm tournamentId={tournament.id} />}
+          {isOrganizer && (
+            <TournamentBracketPanel
+              tournamentId={tournament.id}
+              formatType={tournament.format_type}
+              startsAt={tournament.starts_at}
+              categories={cats}
+              categoriesWithFixtures={categoriesWithFixtures}
+              confirmedCountByCategory={confirmedCountByCategory}
+            />
+          )}
+          {isOrganizer && <TournamentPendingPaymentsPanel rows={pendingPaymentRows} />}
+          {isOrganizer && (
+            <TournamentKnockoutPanel
+              tournamentId={tournament.id}
+              startsAt={tournament.starts_at}
+              categories={categoriesNeedingKnockout}
+            />
+          )}
 
           <section className="mt-7 card-fut-plain border border-white/10 bg-[#141416] p-6">
             <div className="flex justify-between items-center">
@@ -109,6 +177,17 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
                       <div className="text-sm">{entryLabel(f.side_a_entry_id)}</div>
                       <div className="text-sm">{entryLabel(f.side_b_entry_id)}</div>
                       <div className="text-right font-black">{hasScore ? `${scoreA} - ${scoreB}` : f.status}</div>
+                      {isOrganizer && f.status !== 'completed' && f.status !== 'cancelled' && (
+                        <div className="md:col-span-4">
+                          <TournamentResultForm
+                            fixtureId={f.id}
+                            entryAId={f.side_a_entry_id}
+                            entryBId={f.side_b_entry_id}
+                            labelA={entryLabel(f.side_a_entry_id)}
+                            labelB={entryLabel(f.side_b_entry_id)}
+                          />
+                        </div>
+                      )}
                     </div>
                   )
                 })}
