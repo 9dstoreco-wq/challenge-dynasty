@@ -314,7 +314,12 @@
     "markAllRead": "MARCAR TODO LEÍDO",
     "defaultTitle": "Notificación",
     "read": "LEÍDA",
-    "new": "NUEVA"
+    "new": "NUEVA",
+    "inviteAccept": "Aceptar",
+    "inviteReject": "Rechazar",
+    "inviteAccepted": "Aceptaste la invitación",
+    "inviteRejected": "Rechazaste la invitación",
+    "inviteActionFailed": "No se pudo registrar tu respuesta. Intenta de nuevo."
   },
   "NotificationPreferences": {
     "title": "Preferencias",
@@ -525,8 +530,36 @@
     "fixturesTitle": "Fixtures",
     "fixturesRegistered": "{count} registrados",
     "noFixtures": "Todavía no hay fixtures generados.",
-    "tbd": "TBD",
-    "organizeCta": "🏆 Organizar torneo"
+    "tbd": "Por confirmar",
+    "timeTBD": "Hora por confirmar",
+    "round": "Ronda {round}",
+    "andTeam": "y equipo",
+    "organizeCta": "🏆 Organizar torneo",
+    "noCategories": "Este torneo todavía no tiene categorías.",
+    "entryFee": "Inscripción: ${amount}",
+    "loginToRegister": "Inicia sesión para inscribirte.",
+    "categoryClosed": "Esta categoría ya no recibe inscripciones.",
+    "teamComingSoon": "Inscripción de equipos: próximamente.",
+    "selectPartner": "Elige tu pareja",
+    "registerCta": "Inscribirme",
+    "registerSuccess": "¡Listo! Ya quedaste inscrito.",
+    "registerFailed": "No se pudo completar la inscripción. Intenta de nuevo.",
+    "partnerMustAccept": "Tu pareja va a recibir un aviso y tiene que aceptar para que la inscripción quede confirmada.",
+    "submitting": "Enviando...",
+    "addCategoryTitle": "Agregar categoría",
+    "categoryNameLabel": "Nombre de la categoría",
+    "categoryNamePlaceholder": "Ej: Avanzado parejas mixtas",
+    "participantModeLabel": "Cómo se juega",
+    "capacityLabel": "Cupo (parejas/entradas)",
+    "entryFeeLabel": "Costo de inscripción",
+    "addCategoryCta": "Crear categoría",
+    "errCategoryNameRequired": "Ponle un nombre a la categoría.",
+    "categoryCreateFailed": "No se pudo crear la categoría. Intenta de nuevo.",
+    "mode": {
+      "individual": "Individual",
+      "pair": "Parejas",
+      "team": "Equipos"
+    }
   },
   "Onboarding": {
     "step": "PRIMER PASO",

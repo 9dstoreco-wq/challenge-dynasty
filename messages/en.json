@@ -314,7 +314,12 @@
     "markAllRead": "MARK ALL READ",
     "defaultTitle": "Notification",
     "read": "READ",
-    "new": "NEW"
+    "new": "NEW",
+    "inviteAccept": "Accept",
+    "inviteReject": "Reject",
+    "inviteAccepted": "You accepted the invite",
+    "inviteRejected": "You rejected the invite",
+    "inviteActionFailed": "Couldn't record your response. Try again."
   },
   "NotificationPreferences": {
     "title": "Preferences",
@@ -526,7 +531,35 @@
     "fixturesRegistered": "{count} registered",
     "noFixtures": "No fixtures generated yet.",
     "tbd": "TBD",
-    "organizeCta": "🏆 Organize a tournament"
+    "timeTBD": "Time TBD",
+    "round": "Round {round}",
+    "andTeam": "& team",
+    "organizeCta": "🏆 Organize a tournament",
+    "noCategories": "This tournament doesn't have any categories yet.",
+    "entryFee": "Entry fee: ${amount}",
+    "loginToRegister": "Sign in to register.",
+    "categoryClosed": "This category is no longer accepting entries.",
+    "teamComingSoon": "Team registration: coming soon.",
+    "selectPartner": "Choose your partner",
+    "registerCta": "Register",
+    "registerSuccess": "Done! You're registered.",
+    "registerFailed": "Couldn't complete the registration. Try again.",
+    "partnerMustAccept": "Your partner will get a notification and has to accept for the entry to be confirmed.",
+    "submitting": "Submitting...",
+    "addCategoryTitle": "Add category",
+    "categoryNameLabel": "Category name",
+    "categoryNamePlaceholder": "E.g. Advanced mixed pairs",
+    "participantModeLabel": "How it's played",
+    "capacityLabel": "Capacity (pairs/entries)",
+    "entryFeeLabel": "Entry fee",
+    "addCategoryCta": "Create category",
+    "errCategoryNameRequired": "Give the category a name.",
+    "categoryCreateFailed": "Couldn't create the category. Try again.",
+    "mode": {
+      "individual": "Individual",
+      "pair": "Pairs",
+      "team": "Teams"
+    }
   },
   "Onboarding": {
     "step": "FIRST STEP",
