@@ -1,8 +1,7 @@
 export const dynamic = 'force-dynamic'
 import Link from 'next/link'
-import Sidebar from '@/components/Sidebar'
-import BottomNav from '@/components/BottomNav'
-import PageHero from '@/components/PageHero'
+import BusinessShell from '@/components/business/BusinessShell'
+import BusinessHeader from '@/components/business/BusinessHeader'
 import ClubDashboard from '@/components/ClubDashboard'
 import ClubIncomePanel from '@/components/ClubIncomePanel'
 import { createClient } from '@/lib/supabase/server'
@@ -24,17 +23,13 @@ export default async function ClubManagePage({ params }: { params: Promise<{ id:
 
   if (!organization || !isOwner) {
     return (
-      <div className="min-h-screen arena-bg text-white ">
-        <Sidebar />
-        <main className="lg:pl-64 pb-20 lg:pb-0">
-          <div className="max-w-2xl mx-auto px-4 md:px-6 py-16 text-center">
-            <h1 className="text-3xl font-display font-black tracking-wide">{t('notOwnerTitle')}</h1>
-            <p className="text-white/50 mt-2">{t('notOwnerBody')}</p>
-            <Link href="/clubs" className="text-[#D4AF37] mt-6 inline-block">{t('backToClubs')}</Link>
-          </div>
-        </main>
-        <BottomNav />
-      </div>
+      <BusinessShell>
+        <div className="max-w-2xl mx-auto py-10 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">{t('notOwnerTitle')}</h1>
+          <p className="text-white/50 mt-2">{t('notOwnerBody')}</p>
+          <Link href="/clubs" className="text-[#6FA3D8] mt-6 inline-block">{t('backToClubs')}</Link>
+        </div>
+      </BusinessShell>
     )
   }
 
@@ -68,24 +63,16 @@ export default async function ClubManagePage({ params }: { params: Promise<{ id:
   })
 
   return (
-    <div className="min-h-screen arena-bg text-white ">
-      <Sidebar />
-      <main className="lg:pl-64 pb-20 lg:pb-0">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
-          <PageHero>
-            <div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">{t('tag')}</div>
-            <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{organization.name}</h1>
-            <p className="text-white/50 mt-2">{organization.city ?? ''} {organization.country_code ? `· ${organization.country_code}` : ''}</p>
-          </PageHero>
-          <div className="mt-7">
-            <ClubIncomePanel organizationId={organization.id} />
-          </div>
-          <div className="mt-7">
-            <ClubDashboard organizationId={organization.id} sports={sports ?? []} resources={resourceRows} />
-          </div>
-        </div>
-      </main>
-      <BottomNav />
-    </div>
+    <BusinessShell>
+      <BusinessHeader
+        eyebrow={t('tag')}
+        title={organization.name}
+        subtitle={[organization.city, organization.country_code].filter(Boolean).join(' · ') || undefined}
+      />
+      <div className="space-y-7">
+        <ClubIncomePanel organizationId={organization.id} />
+        <ClubDashboard organizationId={organization.id} sports={sports ?? []} resources={resourceRows} />
+      </div>
+    </BusinessShell>
   )
 }

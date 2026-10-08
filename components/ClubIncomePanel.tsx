@@ -51,8 +51,8 @@ export default async function ClubIncomePanel({ organizationId }: { organization
   }
 
   return (
-    <section className="card-fut-plain border border-white/10 bg-[#141416] p-6">
-      <div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">{t('tag')}</div>
+    <section className="rounded-2xl border border-white/10 bg-[#141416] p-6">
+      <div className="text-xs tracking-[.3em] text-[#3B6EA5] font-black">{t('tag')}</div>
       <h2 className="text-2xl font-black mt-1">{t('title')}</h2>
       <p className="text-white/45 text-sm mt-1">{t('subtitle')}</p>
 
@@ -88,7 +88,7 @@ export default async function ClubIncomePanel({ organizationId }: { organization
 function Metric({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-      <div className="text-[#D4AF37]">{icon}</div>
+      <div className="text-[#3B6EA5]">{icon}</div>
       <div className="text-[11px] text-white/40 uppercase tracking-widest mt-3">{label}</div>
       <div className="text-xl font-black mt-1">{value}</div>
     </div>
