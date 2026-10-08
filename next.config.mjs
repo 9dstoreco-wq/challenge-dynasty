@@ -10,8 +10,10 @@ const securityHeaders = [
   { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
   // CSP ya revisada y activa de verdad (antes estaba en modo "solo reporte"). Se verificaron todos
   // los recursos externos que carga la app hoy: el script de checkout de ePayco (script-src,
-  // connect-src, frame-src), Supabase (connect-src, img-src), y nada mas -- no hay analitica,
-  // CDNs externos, iframes, ni fuentes externas (las fuentes van empaquetadas via @fontsource).
+  // connect-src, frame-src), Supabase (connect-src, img-src), y nada mas -- no hay CDNs externos,
+  // iframes, ni fuentes externas (las fuentes van empaquetadas via @fontsource). La analitica de
+  // Vercel (@vercel/analytics) no necesita ninguna entrada aqui: su script y sus solicitudes
+  // salen de /_vercel/insights/... en el mismo dominio, ya cubierto por 'self'.
   {
     key: 'Content-Security-Policy',
     value: [

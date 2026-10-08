@@ -1168,5 +1168,17 @@
       "completed": "TERMINADO",
       "cancelled": "CANCELADO"
     }
+  },
+  "Health": {
+    "title": "Estado del sistema",
+    "allOk": "Todo funciona correctamente",
+    "someFail": "Hay un problema",
+    "database": "Base de datos",
+    "ok": "OK",
+    "fail": "FALLA",
+    "latency": "Responde en {ms} ms",
+    "checkedAt": "Revisado: {date}",
+    "environment": "Entorno: {env}",
+    "version": "Versión: {commit}"
   }
 }

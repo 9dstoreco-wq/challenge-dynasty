@@ -7,6 +7,7 @@ import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages, getTranslations } from 'next-intl/server'
+import { Analytics } from '@vercel/analytics/react'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Metadata')
@@ -30,5 +31,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages()
   return <html lang={locale}><body>
     <NextIntlClientProvider locale={locale} messages={messages}>{children}</NextIntlClientProvider>
+    <Analytics />
   </body></html>
 }
