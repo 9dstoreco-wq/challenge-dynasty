@@ -19,6 +19,10 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
   const supabase = await createClient()
   const t = await getTranslations('Competitions')
   const { data: { user } } = await supabase.auth.getUser()
+  const tournamentStatuses = ['draft', 'published', 'registration_open', 'registration_closed', 'in_progress', 'completed', 'cancelled']
+  const statusLabel = (s: string) => (tournamentStatuses.includes(s) ? t(`status.${s}` as 'status.draft') : s)
+  const fixtureStatuses = ['scheduled', 'ready', 'in_progress', 'completed', 'walkover', 'cancelled']
+  const fixtureStatusLabel = (s: string) => (fixtureStatuses.includes(s) ? t(`fixtureStatus.${s}` as 'fixtureStatus.scheduled') : s)
 
   const [{ data: tournament }, { data: catsData }, { data: fixturesData }, { data: confirmedData }, { data: stagesData }] = await Promise.all([
     supabase.from('tournaments').select('id,title,status,starts_at,ends_at,organization_id,organizer_profile_id,format_type').eq('id', id).maybeSingle(),
@@ -114,9 +118,12 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
               <div>
                 <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{tournament.title}</h1>
-                <p className="text-white/50 mt-2">{tournament.starts_at || t('dateTBD')}{tournament.ends_at ? ` → ${tournament.ends_at}` : ''}</p>
+                <p className="text-white/50 mt-2">
+                  {tournament.starts_at ? new Date(tournament.starts_at).toLocaleString('es-CO') : t('dateTBD')}
+                  {tournament.ends_at ? ` → ${new Date(tournament.ends_at).toLocaleString('es-CO')}` : ''}
+                </p>
               </div>
-              <div className="text-xs font-black uppercase tracking-widest text-[#D4AF37]">{tournament.status}</div>
+              <div className="text-xs font-black uppercase tracking-widest text-[#D4AF37]">{statusLabel(tournament.status)}</div>
             </div>
           </PageHero>
 
@@ -176,7 +183,7 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
                       <div className="text-xs text-white/40">{t('round', { round: f.round_number ?? '—' })}<br />{f.scheduled_at ? new Date(f.scheduled_at).toLocaleString('es-CO') : t('timeTBD')}</div>
                       <div className="text-sm">{entryLabel(f.side_a_entry_id)}</div>
                       <div className="text-sm">{entryLabel(f.side_b_entry_id)}</div>
-                      <div className="text-right font-black">{hasScore ? `${scoreA} - ${scoreB}` : f.status}</div>
+                      <div className="text-right font-black">{hasScore ? `${scoreA} - ${scoreB}` : fixtureStatusLabel(f.status)}</div>
                       {isOrganizer && f.status !== 'completed' && f.status !== 'cancelled' && (
                         <div className="md:col-span-4">
                           <TournamentResultForm

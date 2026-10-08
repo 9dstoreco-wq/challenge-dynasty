@@ -26,8 +26,12 @@ const supabase = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 )
 
+const LISTING_TYPE_VALUES = ['tournament', 'club', 'academy', 'coach', 'brand', 'event', 'other']
+
 export default function MarketplaceClient({ listings }: { listings: Listing[] }) {
   const t = useTranslations('Marketplace')
+  const tSeller = useTranslations('MarketplaceSeller')
+  const listingTypeLabel = (v: string) => (LISTING_TYPE_VALUES.includes(v) ? tSeller(`listingTypes.${v}` as 'listingTypes.other') : v)
   const locale = useLocale()
   const [selected, setSelected] = useState<Listing | null>(null)
   const [qty, setQty] = useState(1)
@@ -87,7 +91,7 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
         {filtered.map((x) => (
           <article key={x.id} className="card-fut-plain border border-white/10 bg-[#141416] p-6 flex flex-col">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-xs text-[#D4AF37] font-black uppercase tracking-widest">{x.listing_type}</div>
+              <div className="text-xs text-[#D4AF37] font-black uppercase tracking-widest">{listingTypeLabel(x.listing_type)}</div>
               {x.is_featured ? <span className="text-[10px] rounded-full border border-[#D4AF37]/30 px-2 py-1 text-[#D4AF37] font-black">{t('destacado')}</span> : null}
             </div>
             <h2 className="text-xl font-black mt-2">{x.title}</h2>

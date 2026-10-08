@@ -52,6 +52,11 @@ export default async function MasterPage() {
   const { data: overview, error } = await supabase.rpc("get_platform_overview");
   const data = (overview ?? null) as PlatformOverview | null;
 
+  const orgTypes = ["club", "academy", "fitness_center", "sports_center", "organizer", "business"];
+  const orgTypeLabel = (v: string | null) => (v && orgTypes.includes(v) ? t(`orgType.${v}` as "orgType.club") : v ?? "—");
+  const orgStatuses = ["draft", "active", "suspended", "archived"];
+  const orgStatusLabel = (v: string | null) => (v && orgStatuses.includes(v) ? t(`orgStatus.${v}` as "orgStatus.draft") : v ?? "—");
+
   return (
     <div className="min-h-screen arena-bg text-white ">
       <Sidebar />
@@ -102,9 +107,9 @@ export default async function MasterPage() {
                         {data.organizations.map((org) => (
                           <tr key={org.id} className="border-t border-white/5">
                             <td className="px-4 py-3 font-bold">{org.name}</td>
-                            <td className="px-4 py-3 text-white/60">{org.organization_type ?? "—"}</td>
+                            <td className="px-4 py-3 text-white/60">{orgTypeLabel(org.organization_type)}</td>
                             <td className="px-4 py-3 text-white/60">{org.city ?? "—"}</td>
-                            <td className="px-4 py-3 text-white/60">{org.status ?? "—"}</td>
+                            <td className="px-4 py-3 text-white/60">{orgStatusLabel(org.status)}</td>
                             <td className="px-4 py-3 text-white/40">
                               {new Date(org.created_at).toLocaleDateString("es-CO")}
                             </td>

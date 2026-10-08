@@ -12,6 +12,9 @@ type SellerOrder = { id: string; order_id: string | null; order_status: string |
 export default async function MarketplaceSellerPage() {
   const supabase = await createClient()
   const t = await getTranslations('MarketplaceSeller')
+  const tOrders = await getTranslations('MarketplaceOrders')
+  const orderStatuses = ['pending', 'reserved', 'paid', 'cancelled', 'fulfilled', 'refunded', 'partially_refunded']
+  const orderStatusLabel = (s: string | null) => (s && orderStatuses.includes(s) ? tOrders(`status.${s}` as 'status.pending') : s)
   const { data: userData } = await supabase.auth.getUser()
   const user = userData.user
   const { data: orders = [], error } = user
@@ -45,7 +48,7 @@ export default async function MarketplaceSellerPage() {
             )}
 
             <h2 className="font-black text-xl mt-10 mb-4">{t('pedidosRecibidos')}</h2>
-            {error ? <div className="rounded-3xl border border-red-400/20 bg-red-400/10 p-8">{t('errorPedidos')}</div> : !orders?.length ? <div className="rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-8">{t('sinPedidos')}</div> : <div className="space-y-4">{orders.map((o:SellerOrder)=><article key={o.id} className="card-fut-plain border border-white/10 bg-[#141416] p-6"><div className="flex flex-wrap items-start justify-between gap-4"><div><div className="text-xs text-[#D4AF37] uppercase tracking-widest font-black">{o.order_status || o.status || t('orden')}</div><h2 className="font-black text-xl mt-1">{t('ordenLabel')} {String(o.order_id || o.id).slice(0,8)}…</h2><div className="text-sm text-white/40 mt-2">{t('sku')}: {o.sku || '—'} · {t('cantidad')}: {o.quantity ?? '—'}</div></div><div className="text-right"><div className="font-black">{Number(o.line_total || o.total_amount || 0).toLocaleString('es-CO')} {o.currency_code || 'COP'}</div><div className="text-xs text-white/35 mt-1">{t('fee')}: {Number(o.seller_fee || 0).toLocaleString('es-CO')}</div></div></div></article>)}</div>}
+            {error ? <div className="rounded-3xl border border-red-400/20 bg-red-400/10 p-8">{t('errorPedidos')}</div> : !orders?.length ? <div className="rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-8">{t('sinPedidos')}</div> : <div className="space-y-4">{orders.map((o:SellerOrder)=><article key={o.id} className="card-fut-plain border border-white/10 bg-[#141416] p-6"><div className="flex flex-wrap items-start justify-between gap-4"><div><div className="text-xs text-[#D4AF37] uppercase tracking-widest font-black">{orderStatusLabel(o.order_status || o.status) || t('orden')}</div><h2 className="font-black text-xl mt-1">{t('ordenLabel')} {String(o.order_id || o.id).slice(0,8)}…</h2><div className="text-sm text-white/40 mt-2">{t('sku')}: {o.sku || '—'} · {t('cantidad')}: {o.quantity ?? '—'}</div></div><div className="text-right"><div className="font-black">{Number(o.line_total || o.total_amount || 0).toLocaleString('es-CO')} {o.currency_code || 'COP'}</div><div className="text-xs text-white/35 mt-1">{t('fee')}: {Number(o.seller_fee || 0).toLocaleString('es-CO')}</div></div></div></article>)}</div>}
           </>
         )}
       </section>

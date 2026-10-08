@@ -137,6 +137,13 @@
       "organization": "Organization",
       "brand": "Brand",
       "store": "Store"
+    },
+    "listingStatus": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "published": "Published",
+      "rejected": "Rejected",
+      "archived": "Archived"
     }
   },
   "Home": {
@@ -203,7 +210,15 @@
     "locationUnknown": "Location not set",
     "defaultDescription": "Dynasty Club",
     "empty": "No active organizations registered yet.",
-    "registerCta": "🏢 Register my club"
+    "registerCta": "🏢 Register my club",
+    "type": {
+      "club": "Club",
+      "academy": "Academy",
+      "fitness_center": "Fitness center",
+      "sports_center": "Sports center",
+      "organizer": "Organizer",
+      "business": "Business"
+    }
   },
   "Coaches": {
     "title": "Train. Manage. Grow.",
@@ -242,7 +257,24 @@
     "bookingCreated": "Booking created: {id}…",
     "bookingFailed": "Could not create the booking.",
     "bookingCancelled": "Booking cancelled. Reload to refresh the calendar.",
-    "cancelFailed": "Could not cancel."
+    "cancelFailed": "Could not cancel.",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "waitlisted": "Waitlisted",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "no_show": "No show",
+      "expired": "Expired"
+    },
+    "paymentStatus": {
+      "not_required": "Not required",
+      "pending": "Pending",
+      "paid": "Paid",
+      "refunded": "Refunded",
+      "partially_refunded": "Partially refunded",
+      "failed": "Failed"
+    }
   },
   "History": {
     "title": "Competitive history",
@@ -297,7 +329,14 @@
     "locationUnknown": "Location not specified",
     "viewProfile": "VIEW PROFILE",
     "challenge": "CHALLENGE",
-    "empty": "Not enough discoverable players yet."
+    "empty": "Not enough discoverable players yet.",
+    "skillLevel": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced",
+      "PRO": "Pro",
+      "ELITE": "Elite"
+    }
   },
   "Ranking": {
     "subtitle": "Standings calculated from Dynasty's real competitive ranking.",
@@ -357,7 +396,16 @@
     "title": "SEASONS",
     "subtitle": "The season layer is starting to consume real competitive activity from the backend.",
     "empty": "Not enough competitive activity yet to show seasons.",
-    "noDate": "No date"
+    "noDate": "No date",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "registration_open": "Registration open",
+      "registration_closed": "Registration closed",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
   },
   "Settings": {
     "loginRequired": "Sign in to open settings",
@@ -436,6 +484,13 @@
     "directChallengeBody": "You can turn any compatible profile into an official challenge.",
     "noFakeDataTitle": "No fake data",
     "noFakeDataBody": "This screen only shows real, discoverable profiles.",
+    "skillLevel": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced",
+      "PRO": "Pro",
+      "ELITE": "Elite"
+    },
     "inviting": "SENDING...",
     "invited": "✓ SENT",
     "invite": "INVITE",
@@ -504,7 +559,7 @@
     "set3Placeholder": "Set 3 · optional",
     "saving": "SAVING...",
     "saveResultBtn": "SAVE RESULT",
-    "resultRegistered": "Result recorded: {id}",
+    "resultRegistered": "Result recorded: {id}…",
     "status": {
       "open": "OPEN",
       "scheduled": "SCHEDULED",
@@ -600,7 +655,24 @@
     "generateKnockout": "Generate final stage",
     "knockoutGenerated": "Done: final stage created with {count} matches.",
     "groupsNotFinished": "Some group matches still don't have a result.",
-    "knockoutGenerateFailed": "Could not generate the final stage. Please try again."
+    "knockoutGenerateFailed": "Could not generate the final stage. Please try again.",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "registration_open": "Registration open",
+      "registration_closed": "Registration closed",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "fixtureStatus": {
+      "scheduled": "Scheduled",
+      "ready": "Ready",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "walkover": "Walkover",
+      "cancelled": "Cancelled"
+    }
   },
   "Onboarding": {
     "step": "FIRST STEP",
@@ -655,7 +727,14 @@
     "targetVotesPlaceholder": "Target votes",
     "errCreateFailed": "Couldn't create",
     "publishing": "PUBLISHING...",
-    "publishBtn": "PUBLISH CHALLENGE"
+    "publishBtn": "PUBLISH CHALLENGE",
+    "difficulty": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced",
+      "PRO": "Pro",
+      "ELITE": "Elite"
+    }
   },
   "Profile": {
     "errGeneric": "Couldn't complete the action. Please try again.",
@@ -699,7 +778,19 @@
     "statusExpired": "EXPIRED",
     "statusGrace": "GRACE",
     "statusRestricted": "RESTRICTED",
-    "statusSuspended": "SUSPENDED"
+    "statusSuspended": "SUSPENDED",
+    "audienceType": {
+      "player": "Player",
+      "provider": "Provider",
+      "organization": "Organization",
+      "seller": "Seller",
+      "all": "All"
+    },
+    "billingInterval": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "one_time": "One time"
+    }
   },
   "Finance": {
     "tag": "Dynasty Finance OS",
@@ -725,7 +816,46 @@
     "ledgerTitle": "Latest transactions",
     "recordsCount": "{count} records",
     "emptyLedger": "No financial transactions visible yet.",
-    "manual": "manual"
+    "manual": "manual",
+    "paymentStatus": {
+      "pending": "Pending",
+      "authorized": "Authorized",
+      "paid": "Paid",
+      "failed": "Failed",
+      "refunded": "Refunded",
+      "partially_refunded": "Partially refunded",
+      "cancelled": "Cancelled"
+    },
+    "accountType": {
+      "cash": "Cash",
+      "bank": "Bank",
+      "digital_wallet": "Digital wallet",
+      "accounts_receivable": "Accounts receivable",
+      "accounts_payable": "Accounts payable",
+      "revenue": "Revenue",
+      "expense": "Expense",
+      "equity": "Equity",
+      "other": "Other"
+    },
+    "invoiceStatus": {
+      "draft": "Draft",
+      "open": "Open",
+      "partial": "Partially paid",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
+    },
+    "transactionStatus": {
+      "pending": "Pending",
+      "posted": "Posted",
+      "void": "Void"
+    },
+    "transactionType": {
+      "income": "Income",
+      "expense": "Expense",
+      "transfer": "Transfer",
+      "adjustment": "Adjustment"
+    }
   },
   "MarketplaceOrders": {
     "tag": "Marketplace",
@@ -753,7 +883,16 @@
     "orderCancelled": "Order cancelled.",
     "cancelFailed": "The order couldn't be cancelled.",
     "returnReasonPrompt": "Reason for the return",
-    "returnCreated": "Return request created: {id}…"
+    "returnCreated": "Return request created: {id}…",
+    "status": {
+      "pending": "Pending",
+      "reserved": "Reserved",
+      "paid": "Paid",
+      "cancelled": "Cancelled",
+      "fulfilled": "Fulfilled",
+      "refunded": "Refunded",
+      "partially_refunded": "Partially refunded"
+    }
   },
   "Master": {
     "tag": "PLATFORM MASTER",
@@ -776,7 +915,21 @@
     "colType": "Type",
     "colCity": "City",
     "colStatus": "Status",
-    "colCreated": "Created"
+    "colCreated": "Created",
+    "orgType": {
+      "club": "Club",
+      "academy": "Academy",
+      "fitness_center": "Fitness center",
+      "sports_center": "Sports center",
+      "organizer": "Organizer",
+      "business": "Business"
+    },
+    "orgStatus": {
+      "draft": "Draft",
+      "active": "Active",
+      "suspended": "Suspended",
+      "archived": "Archived"
+    }
   },
   "CoachDashboard": {
     "tag": "COACH OS · MY PANEL",
@@ -823,7 +976,24 @@
     "bookingsSubtitle": "Latest bookings for your services.",
     "emptyBookings": "You don't have any bookings yet.",
     "defaultService": "Service",
-    "markCompletedBtn": "Mark completed"
+    "markCompletedBtn": "Mark completed",
+    "bookingStatus": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "waitlisted": "Waitlisted",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "no_show": "No show",
+      "expired": "Expired"
+    },
+    "bookingPaymentStatus": {
+      "not_required": "Not required",
+      "pending": "Pending",
+      "paid": "Paid",
+      "refunded": "Refunded",
+      "partially_refunded": "Partially refunded",
+      "failed": "Failed"
+    }
   },
   "Errors": {
     "authRequired": "You must be signed in",
@@ -1017,7 +1187,16 @@
     "tcPreview": "Preview",
     "tcValidate": "Validate",
     "tcPublish": "Publish schedule",
-    "tcEngineResult": "Engine result"
+    "tcEngineResult": "Engine result",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "registration_open": "Registration open",
+      "registration_closed": "Registration closed",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
   },
   "TournamentCreate": {
     "title": "Create tournament",
@@ -1060,7 +1239,16 @@
     "empty": "You haven't created any tournaments yet.",
     "dateTBD": "Date TBD",
     "authRequiredTitle": "You must sign in",
-    "loginLink": "Go to sign in"
+    "loginLink": "Go to sign in",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "registration_open": "Registration open",
+      "registration_closed": "Registration closed",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
   },
   "Cards": {
     "showcaseTitle": "My collection",

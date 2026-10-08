@@ -43,6 +43,8 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
   const t = useTranslations('CoachDashboard')
   const MODE_LABELS: Record<string, string> = { in_person: t('modeInPerson'), online: t('modeOnline'), hybrid: t('modeHybrid') }
   const STATUS_LABELS: Record<string, string> = { draft: t('statusDraft'), active: t('statusActive'), paused: t('statusPaused'), archived: t('statusArchived') }
+  const BOOKING_STATUS_LABELS: Record<string, string> = { pending: t('bookingStatus.pending'), confirmed: t('bookingStatus.confirmed'), waitlisted: t('bookingStatus.waitlisted'), cancelled: t('bookingStatus.cancelled'), completed: t('bookingStatus.completed'), no_show: t('bookingStatus.no_show'), expired: t('bookingStatus.expired') }
+  const BOOKING_PAYMENT_STATUS_LABELS: Record<string, string> = { not_required: t('bookingPaymentStatus.not_required'), pending: t('bookingPaymentStatus.pending'), paid: t('bookingPaymentStatus.paid'), refunded: t('bookingPaymentStatus.refunded'), partially_refunded: t('bookingPaymentStatus.partially_refunded'), failed: t('bookingPaymentStatus.failed') }
   function friendlyError(message: string): string {
     const map: Record<string, string> = {
       AUTH_REQUIRED: t('errAuthRequired'),
@@ -234,7 +236,7 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
                 <div key={b.id} className="flex items-center justify-between rounded-xl bg-white/[.03] p-3 text-sm gap-2">
                   <div className="truncate">
                     <div className="font-bold truncate">{b.bookable_title || t('defaultService')}</div>
-                    <div className="text-white/40 text-xs">{new Date(b.starts_at).toLocaleString('es-CO')} · {b.status} · {b.payment_status} · {Number(b.amount).toLocaleString('es-CO')} {b.currency_code}</div>
+                    <div className="text-white/40 text-xs">{new Date(b.starts_at).toLocaleString('es-CO')} · {BOOKING_STATUS_LABELS[b.status] || b.status} · {BOOKING_PAYMENT_STATUS_LABELS[b.payment_status] || b.payment_status} · {Number(b.amount).toLocaleString('es-CO')} {b.currency_code}</div>
                   </div>
                   {b.status === 'confirmed' && (
                     <button onClick={() => completeBooking(b.id)} disabled={busy} className="text-xs text-[#D4AF37] hover:text-white shrink-0">{t('markCompletedBtn')}</button>

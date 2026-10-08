@@ -137,6 +137,13 @@
       "organization": "Organización",
       "brand": "Marca",
       "store": "Tienda"
+    },
+    "listingStatus": {
+      "draft": "Borrador",
+      "pending": "Pendiente",
+      "published": "Publicado",
+      "rejected": "Rechazado",
+      "archived": "Archivado"
     }
   },
   "Home": {
@@ -203,7 +210,15 @@
     "locationUnknown": "Ubicación no definida",
     "defaultDescription": "Club Dynasty",
     "empty": "Todavía no hay organizaciones activas registradas en Supabase.",
-    "registerCta": "🏢 Registrar mi club"
+    "registerCta": "🏢 Registrar mi club",
+    "type": {
+      "club": "Club",
+      "academy": "Academia",
+      "fitness_center": "Centro de acondicionamiento",
+      "sports_center": "Centro deportivo",
+      "organizer": "Organizador",
+      "business": "Negocio"
+    }
   },
   "Coaches": {
     "title": "Entrena. Gestiona. Crece.",
@@ -242,7 +257,24 @@
     "bookingCreated": "Reserva creada: {id}…",
     "bookingFailed": "No se pudo crear la reserva.",
     "bookingCancelled": "Reserva cancelada. Recarga para actualizar el calendario.",
-    "cancelFailed": "No se pudo cancelar."
+    "cancelFailed": "No se pudo cancelar.",
+    "status": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmada",
+      "waitlisted": "En lista de espera",
+      "cancelled": "Cancelada",
+      "completed": "Completada",
+      "no_show": "No se presentó",
+      "expired": "Vencida"
+    },
+    "paymentStatus": {
+      "not_required": "No requerido",
+      "pending": "Pendiente",
+      "paid": "Pagado",
+      "refunded": "Reembolsado",
+      "partially_refunded": "Reembolso parcial",
+      "failed": "Fallido"
+    }
   },
   "History": {
     "title": "Historial competitivo",
@@ -297,7 +329,14 @@
     "locationUnknown": "Ubicación no indicada",
     "viewProfile": "VER PERFIL",
     "challenge": "RETAR",
-    "empty": "No hay suficientes jugadores descubribles todavía."
+    "empty": "No hay suficientes jugadores descubribles todavía.",
+    "skillLevel": {
+      "BEGINNER": "Principiante",
+      "INTERMEDIATE": "Intermedio",
+      "ADVANCED": "Avanzado",
+      "PRO": "Pro",
+      "ELITE": "Elite"
+    }
   },
   "Ranking": {
     "subtitle": "Posiciones calculadas desde el ranking competitivo real de Dynasty.",
@@ -357,7 +396,16 @@
     "title": "TEMPORADAS",
     "subtitle": "La capa de temporada empieza a consumir la actividad competitiva real del backend.",
     "empty": "Todavía no hay actividad competitiva suficiente para mostrar temporadas.",
-    "noDate": "Sin fecha"
+    "noDate": "Sin fecha",
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicado",
+      "registration_open": "Inscripciones abiertas",
+      "registration_closed": "Inscripciones cerradas",
+      "in_progress": "En curso",
+      "completed": "Terminado",
+      "cancelled": "Cancelado"
+    }
   },
   "Settings": {
     "loginRequired": "Inicia sesión para abrir configuración",
@@ -436,6 +484,13 @@
     "directChallengeBody": "Puedes convertir cualquier perfil compatible en un reto oficial.",
     "noFakeDataTitle": "Sin datos ficticios",
     "noFakeDataBody": "La pantalla solo muestra perfiles existentes y descubribles.",
+    "skillLevel": {
+      "BEGINNER": "Principiante",
+      "INTERMEDIATE": "Intermedio",
+      "ADVANCED": "Avanzado",
+      "PRO": "Pro",
+      "ELITE": "Elite"
+    },
     "inviting": "ENVIANDO...",
     "invited": "✓ ENVIADA",
     "invite": "INVITAR",
@@ -504,7 +559,7 @@
     "set3Placeholder": "Set 3 · opcional",
     "saving": "GUARDANDO...",
     "saveResultBtn": "GUARDAR RESULTADO",
-    "resultRegistered": "Resultado registrado: {id}",
+    "resultRegistered": "Resultado registrado: {id}…",
     "status": {
       "open": "ABIERTO",
       "scheduled": "PROGRAMADO",
@@ -600,7 +655,24 @@
     "generateKnockout": "Generar fase final",
     "knockoutGenerated": "Listo: se creó la fase final con {count} partidos.",
     "groupsNotFinished": "Todavía hay partidos de grupo sin resultado.",
-    "knockoutGenerateFailed": "No se pudo armar la fase final. Intenta de nuevo."
+    "knockoutGenerateFailed": "No se pudo armar la fase final. Intenta de nuevo.",
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicado",
+      "registration_open": "Inscripciones abiertas",
+      "registration_closed": "Inscripciones cerradas",
+      "in_progress": "En curso",
+      "completed": "Terminado",
+      "cancelled": "Cancelado"
+    },
+    "fixtureStatus": {
+      "scheduled": "Programado",
+      "ready": "Listo",
+      "in_progress": "En curso",
+      "completed": "Terminado",
+      "walkover": "Por abandono",
+      "cancelled": "Cancelado"
+    }
   },
   "Onboarding": {
     "step": "PRIMER PASO",
@@ -655,7 +727,14 @@
     "targetVotesPlaceholder": "Votos objetivo",
     "errCreateFailed": "No se pudo crear",
     "publishing": "PUBLICANDO...",
-    "publishBtn": "PUBLICAR CHALLENGE"
+    "publishBtn": "PUBLICAR CHALLENGE",
+    "difficulty": {
+      "BEGINNER": "Principiante",
+      "INTERMEDIATE": "Intermedio",
+      "ADVANCED": "Avanzado",
+      "PRO": "Pro",
+      "ELITE": "Elite"
+    }
   },
   "Profile": {
     "errGeneric": "No se pudo completar la acción. Intenta de nuevo.",
@@ -699,7 +778,19 @@
     "statusExpired": "VENCIDO",
     "statusGrace": "GRACIA",
     "statusRestricted": "RESTRINGIDO",
-    "statusSuspended": "SUSPENDIDO"
+    "statusSuspended": "SUSPENDIDO",
+    "audienceType": {
+      "player": "Jugador",
+      "provider": "Prestador",
+      "organization": "Organización",
+      "seller": "Vendedor",
+      "all": "Todos"
+    },
+    "billingInterval": {
+      "monthly": "Mensual",
+      "yearly": "Anual",
+      "one_time": "Pago único"
+    }
   },
   "Finance": {
     "tag": "Dynasty Finance OS",
@@ -725,7 +816,46 @@
     "ledgerTitle": "Últimos movimientos",
     "recordsCount": "{count} registros",
     "emptyLedger": "No hay movimientos financieros visibles todavía.",
-    "manual": "manual"
+    "manual": "manual",
+    "paymentStatus": {
+      "pending": "Pendiente",
+      "authorized": "Autorizado",
+      "paid": "Pagado",
+      "failed": "Fallido",
+      "refunded": "Reembolsado",
+      "partially_refunded": "Reembolso parcial",
+      "cancelled": "Cancelado"
+    },
+    "accountType": {
+      "cash": "Efectivo",
+      "bank": "Banco",
+      "digital_wallet": "Billetera digital",
+      "accounts_receivable": "Cuentas por cobrar",
+      "accounts_payable": "Cuentas por pagar",
+      "revenue": "Ingresos",
+      "expense": "Gastos",
+      "equity": "Patrimonio",
+      "other": "Otro"
+    },
+    "invoiceStatus": {
+      "draft": "Borrador",
+      "open": "Abierta",
+      "partial": "Pago parcial",
+      "paid": "Pagada",
+      "overdue": "Vencida",
+      "cancelled": "Cancelada"
+    },
+    "transactionStatus": {
+      "pending": "Pendiente",
+      "posted": "Contabilizado",
+      "void": "Anulado"
+    },
+    "transactionType": {
+      "income": "Ingreso",
+      "expense": "Gasto",
+      "transfer": "Transferencia",
+      "adjustment": "Ajuste"
+    }
   },
   "MarketplaceOrders": {
     "tag": "Marketplace",
@@ -753,7 +883,16 @@
     "orderCancelled": "Orden cancelada.",
     "cancelFailed": "No fue posible cancelar la orden.",
     "returnReasonPrompt": "Motivo de la devolución",
-    "returnCreated": "Solicitud de devolución creada: {id}…"
+    "returnCreated": "Solicitud de devolución creada: {id}…",
+    "status": {
+      "pending": "Pendiente",
+      "reserved": "Reservada",
+      "paid": "Pagada",
+      "cancelled": "Cancelada",
+      "fulfilled": "Entregada",
+      "refunded": "Reembolsada",
+      "partially_refunded": "Reembolso parcial"
+    }
   },
   "Master": {
     "tag": "PLATFORM MASTER",
@@ -776,7 +915,21 @@
     "colType": "Tipo",
     "colCity": "Ciudad",
     "colStatus": "Estado",
-    "colCreated": "Creada"
+    "colCreated": "Creada",
+    "orgType": {
+      "club": "Club",
+      "academy": "Academia",
+      "fitness_center": "Centro de acondicionamiento",
+      "sports_center": "Centro deportivo",
+      "organizer": "Organizador",
+      "business": "Negocio"
+    },
+    "orgStatus": {
+      "draft": "Borrador",
+      "active": "Activo",
+      "suspended": "Suspendido",
+      "archived": "Archivado"
+    }
   },
   "CoachDashboard": {
     "tag": "COACH OS · MI PANEL",
@@ -823,7 +976,24 @@
     "bookingsSubtitle": "Últimas reservas de tus servicios.",
     "emptyBookings": "Todavía no tienes reservas.",
     "defaultService": "Servicio",
-    "markCompletedBtn": "Marcar completada"
+    "markCompletedBtn": "Marcar completada",
+    "bookingStatus": {
+      "pending": "Pendiente",
+      "confirmed": "Confirmada",
+      "waitlisted": "En lista de espera",
+      "cancelled": "Cancelada",
+      "completed": "Completada",
+      "no_show": "No se presentó",
+      "expired": "Vencida"
+    },
+    "bookingPaymentStatus": {
+      "not_required": "No requerido",
+      "pending": "Pendiente",
+      "paid": "Pagado",
+      "refunded": "Reembolsado",
+      "partially_refunded": "Reembolso parcial",
+      "failed": "Fallido"
+    }
   },
   "Errors": {
     "authRequired": "Debes iniciar sesión",
@@ -1017,7 +1187,16 @@
     "tcPreview": "Previsualizar",
     "tcValidate": "Validar",
     "tcPublish": "Publicar calendario",
-    "tcEngineResult": "Resultado del motor"
+    "tcEngineResult": "Resultado del motor",
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicado",
+      "registration_open": "Inscripciones abiertas",
+      "registration_closed": "Inscripciones cerradas",
+      "in_progress": "En curso",
+      "completed": "Terminado",
+      "cancelled": "Cancelado"
+    }
   },
   "TournamentCreate": {
     "title": "Crear torneo",
@@ -1060,7 +1239,16 @@
     "empty": "Todavia no has creado ningun torneo.",
     "dateTBD": "Fecha por definir",
     "authRequiredTitle": "Debes iniciar sesion",
-    "loginLink": "Ir a iniciar sesion"
+    "loginLink": "Ir a iniciar sesion",
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicado",
+      "registration_open": "Inscripciones abiertas",
+      "registration_closed": "Inscripciones cerradas",
+      "in_progress": "En curso",
+      "completed": "Terminado",
+      "cancelled": "Cancelado"
+    }
   },
   "Cards": {
     "showcaseTitle": "Mi colección",

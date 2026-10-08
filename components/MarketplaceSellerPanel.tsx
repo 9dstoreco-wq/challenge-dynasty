@@ -34,6 +34,7 @@ export type MyListing = {
 
 const LISTING_TYPE_VALUES = ['tournament', 'club', 'academy', 'coach', 'brand', 'event', 'other'] as const
 const SELLER_TYPE_VALUES = ['individual', 'coach', 'club', 'organization', 'brand', 'store'] as const
+const LISTING_STATUS_VALUES = ['draft', 'pending', 'published', 'rejected', 'archived'] as const
 
 export function MarketplaceCreateSellerProfile({ userId }: { userId: string }) {
   const t = useTranslations('MarketplaceSeller')
@@ -119,6 +120,9 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
 
   const listingTypeLabels: Record<string, string> = Object.fromEntries(
     LISTING_TYPE_VALUES.map((v) => [v, t(`listingTypes.${v}`)])
+  )
+  const listingStatusLabels: Record<string, string> = Object.fromEntries(
+    LISTING_STATUS_VALUES.map((v) => [v, t(`listingStatus.${v}`)])
   )
 
   async function publish() {
@@ -209,7 +213,7 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
           <div key={l.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[.02] p-4">
             <div>
               <div className="font-black">{l.title}</div>
-              <div className="text-xs text-white/40 mt-1">{listingTypeLabels[l.listing_type] || l.listing_type} · {l.city || t('sinCiudad')} · {l.status}</div>
+              <div className="text-xs text-white/40 mt-1">{listingTypeLabels[l.listing_type] || l.listing_type} · {l.city || t('sinCiudad')} · {listingStatusLabels[l.status] || l.status}</div>
             </div>
             <button disabled={statusBusyId === l.id} onClick={() => toggleStatus(l)} className="rounded-xl border border-white/10 px-4 py-2 text-sm font-black disabled:opacity-60">
               {statusBusyId === l.id ? '...' : l.status === 'published' ? t('pausar') : t('reactivar')}
