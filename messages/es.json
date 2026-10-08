@@ -849,7 +849,8 @@
     "rateLimited": "Demasiados intentos. Espera un momento y vuelve a intentarlo.",
     "invalidVideoUrl": "El enlace debe ser de YouTube, TikTok, Instagram, Facebook o Vimeo",
     "usernameInvalidFormat": "El username debe tener entre 3 y 20 caracteres, empezar con una letra y usar solo letras, números y guión bajo",
-    "usernameReserved": "Ese username no está disponible"
+    "usernameReserved": "Ese username no está disponible",
+    "winnerScoreMismatch": "El ganador que marcaste no coincide con el marcador que escribiste"
   },
   "AppError": {
     "title": "Algo salió mal.",

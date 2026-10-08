@@ -5,6 +5,7 @@ import { toSafeMessage } from '@/lib/safe-error'
 import { actionError, actionOk, type ActionResult } from '@/lib/action-result'
 import { getTranslations } from 'next-intl/server'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { modeForSlug, computeWinnerSide } from '@/lib/sport-scoring'
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
@@ -106,6 +107,29 @@ export async function submitMatchResult(input: {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
+
+    // La funcion submit_challenge_result en la base de datos valida que el ganador sea un
+    // participante del reto, pero NO compara el ganador declarado contra los marcadores -- un
+    // cliente que la llame directo podria mandar un marcador que dice una cosa y un ganador que
+    // dice otra. Esta verificacion recalcula el ganador a partir de los marcadores (igual que hace
+    // el formulario) y rechaza cualquier desacuerdo antes de llegar a la base de datos.
+    const { data: matchRow } = await supabase.from('matches').select('challenge_id').eq('id', input.matchId).maybeSingle()
+    if (!matchRow?.challenge_id) throw new Error(invalidField(t('fieldMatch')))
+    const { data: challengeRow } = await supabase.from('challenges').select('creator_id,sport_id').eq('id', matchRow.challenge_id).maybeSingle()
+    if (!challengeRow) throw new Error(invalidField(t('fieldMatch')))
+    const { data: participants } = await supabase
+      .from('challenge_participants')
+      .select('profile_id,status')
+      .eq('challenge_id', matchRow.challenge_id)
+    const opponent = (participants ?? []).find((p) => p.profile_id !== challengeRow.creator_id && p.status !== 'declined' && p.status !== 'withdrawn')
+    const validWinnerIds = new Set([challengeRow.creator_id, opponent?.profile_id].filter((id): id is string => Boolean(id)))
+    if (!validWinnerIds.has(input.winnerId)) throw new Error(invalidField(t('fieldWinner')))
+    const { data: sportRow } = await supabase.from('sports').select('slug').eq('id', challengeRow.sport_id).maybeSingle()
+    const mode = modeForSlug(sportRow?.slug)
+    const declaredSide = input.winnerId === challengeRow.creator_id ? 0 : 1
+    const computedSide = computeWinnerSide(mode, input.scoreSet1 ?? '', input.scoreSet2, input.scoreSet3)
+    if (computedSide !== null && computedSide !== declaredSide) throw new Error(t('winnerScoreMismatch'))
+
     const { data, error } = await supabase.rpc('submit_challenge_result', {
       p_match_id: input.matchId,
       p_winner_profile_id: input.winnerId,

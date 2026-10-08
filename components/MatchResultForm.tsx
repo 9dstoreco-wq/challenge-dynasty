@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { confirmMatch, submitMatchResult } from '@/app/actions/challenges'
 import { useTranslations } from 'next-intl'
+import { modeForSlug, computeWinnerSide } from '@/lib/sport-scoring'
 
 type Props = {
   challengeId: string
@@ -26,19 +27,6 @@ type Props = {
 const scorePattern = /^\d{1,2}[-:]\d{1,2}$/
 const pointsPattern = /^\d{1,3}[-:]\d{1,3}$/
 
-// Como se registra el marcador segun el deporte: por sets (padel, tenis), un solo marcador
-// (futbol, basquet) o solo el ganador (carrera y deportes sin marcador).
-type ScoreMode = 'sets' | 'points' | 'winner'
-function modeFor(slug?: string | null): ScoreMode {
-  if (slug === 'football' || slug === 'basketball') return 'points'
-  if (slug === 'padel' || slug === 'tennis' || !slug) return 'sets'
-  return 'winner'
-}
-function parse(score: string): [number, number] | null {
-  const m = score.trim().match(/^(\d+)[-:](\d+)$/)
-  return m ? [Number(m[1]), Number(m[2])] : null
-}
-
 export default function MatchResultForm({ matchId, resultId, creatorId, opponentId, creatorName, opponentName, currentUserId, winnerId, submittedBy, resultStatus, scoreSet1='', scoreSet2='', scoreSet3='', sportSlug }: Props) {
   const t = useTranslations('Challenge')
   const router = useRouter()
@@ -53,7 +41,7 @@ export default function MatchResultForm({ matchId, resultId, creatorId, opponent
   const isPendingReview = resultStatus === 'pending'
   const submittedByMe = submittedBy === currentUserId
 
-  const mode = modeFor(sportSlug)
+  const mode = modeForSlug(sportSlug)
 
   function validateForm() {
     if (!winner) return t('selectWinner')
@@ -62,17 +50,13 @@ export default function MatchResultForm({ matchId, resultId, creatorId, opponent
     const side = winner === creatorId ? 0 : 1
     if (mode === 'points') {
       if (!pointsPattern.test(set1.trim())) return t('scoreFormatPoints')
-      const [x, y] = parse(set1)!
-      if (x === y) return t('drawNotAllowed')
-      if ((x > y ? 0 : 1) !== side) return t('winnerMismatch')
-      return ''
+    } else {
+      if (!scorePattern.test(set1.trim()) || !scorePattern.test(set2.trim())) return t('setsFormat12')
+      if (set3.trim() && !scorePattern.test(set3.trim())) return t('set3Format')
     }
-    if (!scorePattern.test(set1.trim()) || !scorePattern.test(set2.trim())) return t('setsFormat12')
-    if (set3.trim() && !scorePattern.test(set3.trim())) return t('set3Format')
-    const wins = [0, 0]
-    for (const sc of [set1, set2, set3]) { const p = parse(sc); if (p && p[0] !== p[1]) wins[p[0] > p[1] ? 0 : 1] += 1 }
-    if (wins[0] === wins[1]) return t('setsNeedWinner')
-    if ((wins[0] > wins[1] ? 0 : 1) !== side) return t('winnerMismatch')
+    const computedSide = computeWinnerSide(mode, set1, set2, set3)
+    if (computedSide === null) return mode === 'points' ? t('drawNotAllowed') : t('setsNeedWinner')
+    if (computedSide !== side) return t('winnerMismatch')
     return ''
   }
 
