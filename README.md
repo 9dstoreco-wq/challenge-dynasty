@@ -8,6 +8,11 @@ Solo 4 cosas:
 
 1. Crear una cuenta/proyecto gratuito en Supabase.
 2. En Supabase → SQL Editor, pegar y ejecutar **una sola vez**: `supabase/schema_master.sql`.
+   Este archivo es una foto exacta de la base de datos en vivo tomada el **2026-10-08**
+   (generada por introspección directa de producción, no escrita a mano) — verificado
+   corriéndolo completo contra un Postgres limpio antes de entregarlo. Si en
+   `supabase/migrations/` hay archivos con fecha **posterior** a esa, hay que correrlos
+   también, uno por uno y en orden de fecha, después de `schema_master.sql`.
 3. Copiar `.env.example` como `.env.local` y pegar las 2 claves de Supabase.
 4. Ejecutar:
 
@@ -47,7 +52,10 @@ En Supabase: **Project Settings → API**.
 
 No ejecutes ninguna migración antigua de V7, V8, V9 o V9.1.
 
-Usa únicamente `supabase/schema_master.sql`.
+Para un proyecto nuevo, usa `supabase/schema_master.sql` como punto de partida (ver el
+encabezado del archivo para el detalle de qué incluye y qué no). Los archivos en
+`supabase/migrations/` de ahí en adelante son el historial de cambios *nuevos* — no una forma
+alternativa de montar el proyecto desde cero.
 
 ## Producción
 
@@ -56,7 +64,7 @@ Primero prueba localmente. Cuando ya funcione, puedes desplegar este mismo proye
 El auto-confirmado de resultados de 12 horas queda preparado en SQL como:
 
 ```sql
-select public.auto_confirm_due_matches();
+select public.auto_confirm_due_match_results();
 ```
 
 Para producción se programa en Supabase cuando ya estemos usando resultados reales.
