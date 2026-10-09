@@ -19,6 +19,8 @@ export async function updateProfile(input: {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
+    // Hasta 15 actualizaciones de perfil por hora por usuario.
+    if (!(await checkRateLimit(supabase, `update_profile:${user.id}`, 15, 3600))) throw new Error(t('rateLimited'))
     const cleanName = input.fullName.trim()
     const cleanUsername = input.username.trim().toLowerCase()
     if (!cleanName || !cleanUsername) throw new Error(t('nameUsernameRequired'))
@@ -69,6 +71,8 @@ export async function blockProfile(profileId: string): Promise<ActionResult<bool
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user || user.id === profileId) throw new Error(t('invalidUser'))
+    // Hasta 50 bloqueos por hora por usuario.
+    if (!(await checkRateLimit(supabase, `block_profile:${user.id}`, 50, 3600))) throw new Error(t('rateLimited'))
     const { error } = await supabase.from('user_blocks').upsert({ blocker_profile_id: user.id, blocked_profile_id: profileId }, { onConflict: 'blocker_profile_id,blocked_profile_id' })
     if (error) throw new Error(toSafeMessage(error, 'profile.blockProfile'))
     revalidatePath('/players')

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { toSafeMessage } from '@/lib/safe-error'
 import { safeRun, type ActionResult } from '@/lib/action-result'
 import { getTranslations } from 'next-intl/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function requestPartner({ sportId, recipientId }: { sportId: string; recipientId: string }): Promise<ActionResult<string>> {
   return safeRun('partners.requestPartner', async () => {
@@ -12,6 +13,8 @@ export async function requestPartner({ sportId, recipientId }: { sportId: string
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     if (user.id === recipientId) throw new Error(t('cannotInviteSelf'))
+    // Hasta 30 invitaciones de pareja por hora por usuario.
+    if (!(await checkRateLimit(supabase, `request_partner:${user.id}`, 30, 3600))) throw new Error(t('rateLimited'))
     const { data, error } = await supabase.rpc('request_partner', {
       p_sport_id: sportId,
       p_recipient_id: recipientId,
@@ -27,6 +30,8 @@ export async function respondToPartnerRequest(requestId: string, response: 'ACCE
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
+    // Hasta 40 respuestas a invitaciones de pareja por hora por usuario.
+    if (!(await checkRateLimit(supabase, `respond_partner:${user.id}`, 40, 3600))) throw new Error(t('rateLimited'))
     const { error } = await supabase.rpc('respond_to_partner_request', {
       p_request_id: requestId,
       p_response: response,

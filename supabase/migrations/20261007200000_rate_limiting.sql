@@ -1,7 +1,9 @@
 -- Challenge Dynasty -- limite de intentos (rate limiting) basico para las acciones mas sensibles
 -- a abuso: crear retos, publicaciones, reportes, e imagen de carta.
--- ESTADO: ESCRITA, NO APLICADA. El sistema de permisos bloqueo aplicarla desde Claude porque es
--- un deploy a produccion sin revision humana; la corre Luis en el editor SQL de Supabase.
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-09: public.check_rate_limit y
+-- public.rate_limit_hits existen en la base en vivo -- select proname from pg_proc where
+-- proname='check_rate_limit'). Se deja este archivo en el historial de migraciones como registro
+-- de lo que se aplico y por que.
 --
 -- QUE PASABA: no habia ningun limite de cuantas veces se podia crear un reto, publicar, reportar
 -- contenido o pedir la imagen de una carta -- solo el endpoint de la IA tenia un limite (20 por

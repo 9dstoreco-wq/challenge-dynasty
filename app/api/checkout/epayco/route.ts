@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { toSafeMessage } from "@/lib/safe-error";
 import { buildEpaycoCheckout, type EpaycoDomain } from "@/lib/dynasty/epayco";
 import { ALLOWED_CHECKOUT_DOMAINS, CHECKOUT_RESOLVERS, CheckoutError } from "@/lib/dynasty/checkout-resolvers";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,12 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
   if (authError || !user) {
     return NextResponse.json({ error: "AUTH_REQUIRED" }, { status: 401 });
+  }
+
+  // Hasta 20 intentos de iniciar un pago por hora por usuario.
+  const allowed = await checkRateLimit(supabase, `checkout_epayco:${user.id}`, 20, 3600);
+  if (!allowed) {
+    return NextResponse.json({ error: "RATE_LIMITED" }, { status: 429 });
   }
 
   // NEXT_PUBLIC_EPAYCO_PUBLIC_KEY is what the client actually needs to open the widget, but

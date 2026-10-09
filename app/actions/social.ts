@@ -41,6 +41,8 @@ export async function addComment(postId: string, content: string): Promise<Actio
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
+    // Hasta 60 comentarios por hora por usuario.
+    if (!(await checkRateLimit(supabase, `add_comment:${user.id}`, 60, 3600))) throw new Error(t('rateLimited'))
     const clean = content.trim()
     if (!clean || clean.length > 600) throw new Error(t('commentLength'))
     const { error } = await supabase.from('social_comments').insert({ post_id: postId, author_profile_id: user.id, body: clean, status: 'visible' })
@@ -57,6 +59,8 @@ export async function toggleFollow(followingId: string): Promise<ActionResult<bo
     if (!user) throw new Error(t('authRequired'))
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(followingId)) throw new Error(t('invalidUser'))
     if (user.id === followingId) throw new Error(t('cannotFollowSelf'))
+    // Hasta 100 seguir/dejar de seguir por hora por usuario.
+    if (!(await checkRateLimit(supabase, `toggle_follow:${user.id}`, 100, 3600))) throw new Error(t('rateLimited'))
     const { data: blocked } = await supabase.from('user_blocks').select('blocker_profile_id').or(`and(blocker_profile_id.eq.${user.id},blocked_profile_id.eq.${followingId}),and(blocker_profile_id.eq.${followingId},blocked_profile_id.eq.${user.id})`).limit(1)
     if (blocked && blocked.length) throw new Error(t('cannotFollowBlocked'))
     const { data: existing } = await supabase.from('social_follows').select('id').eq('follower_profile_id', user.id).eq('followed_profile_id', followingId).maybeSingle()
@@ -77,6 +81,8 @@ export async function toggleLike(postId: string): Promise<ActionResult<boolean>>
   return safeRun('social.toggleLike', async () => {
     const t = await getTranslations('Errors')
     const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) throw new Error(t('authRequired'))
+    // Hasta 300 likes/quitar-like por hora por usuario.
+    if (!(await checkRateLimit(supabase, `toggle_like:${user.id}`, 300, 3600))) throw new Error(t('rateLimited'))
     const {data:existing}=await supabase.from('social_reactions').select('id').eq('post_id',postId).eq('profile_id',user.id).eq('reaction_type','like').maybeSingle()
     if(existing){ const {error}=await supabase.from('social_reactions').delete().eq('post_id',postId).eq('profile_id',user.id).eq('reaction_type','like'); if(error) throw new Error(toSafeMessage(error, 'social.toggleLike.unlike')); revalidatePath('/'); return false }
     const {error}=await supabase.from('social_reactions').insert({post_id:postId,profile_id:user.id,reaction_type:'like'}); if(error) throw new Error(toSafeMessage(error, 'social.toggleLike.like')); revalidatePath('/'); return true
