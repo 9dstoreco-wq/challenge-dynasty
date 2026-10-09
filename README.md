@@ -61,13 +61,14 @@ alternativa de montar el proyecto desde cero.
 
 Primero prueba localmente. Cuando ya funcione, puedes desplegar este mismo proyecto en Vercel y añadir las mismas 2 variables de entorno.
 
-El auto-confirmado de resultados de 12 horas queda preparado en SQL como:
-
-```sql
-select public.auto_confirm_due_match_results();
-```
-
-Para producción se programa en Supabase cuando ya estemos usando resultados reales.
+El auto-confirmado de resultados ya corre en producción: `public.expire_stale_challenge_disputes()`
+(definida en `supabase/migrations/20261007210000_dispute_timeout_and_card_caps.sql`) auto-confirma
+con la última versión registrada cualquier resultado `pending` o `disputed` sin movimiento por más
+de 48 horas, y está programada en Supabase como cron job cada 15 minutos (confirmado en vivo:
+`select jobname,schedule,active from cron.job`). La función más vieja
+`public.auto_confirm_due_match_results()` (ventana de 12 horas, solo cubre `pending`) sigue
+existiendo en el esquema pero no está programada — quedó superada por la de arriba, que además
+cubre el caso `disputed` (el ciclo de disputa que antes podía quedar atascado para siempre).
 
 ## CORE FUNCTIONAL 5
 Esta iteración agrega settings/pasaporte, búsqueda, historial competitivo, Skill Challenges completos, cancelación de retos, rating ELO con historial, bloqueos, reportes y límites básicos de abuso. Ejecuta `npm run check-routes`, `npm run check-sql`, `npm run check-core-flow` y `node scripts/check-hardening.mjs` antes de desplegar.

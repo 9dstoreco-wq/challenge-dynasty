@@ -4,8 +4,10 @@
 -- (b) un tope GLOBAL (no solo por rival) de cartas trofeo por semana;
 -- (c) que un fallo al entregar una carta avise a los jugadores y se reintente solo, en vez de
 --     quedar como una simple advertencia en el log que nadie ve.
--- ESTADO: ESCRITA, NO APLICADA. El sistema de permisos bloqueo aplicarla desde Claude porque es
--- un deploy a produccion sin revision humana; la corre Luis en el editor SQL de Supabase.
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-08: public.expire_stale_challenge_disputes
+-- y public.retry_failed_card_deliveries existen en la base en vivo y ambos cron jobs estan
+-- activos cada 15 minutos -- select jobname,schedule,active from cron.job). Se deja este archivo
+-- en el historial de migraciones como registro de lo que se aplico y por que.
 
 -- =====================================================================================
 -- (a) Vencimiento automatico del ciclo de disputa
