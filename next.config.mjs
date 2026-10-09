@@ -22,6 +22,12 @@ const securityHeaders = [
   // el codigo la pinta todavia), asi que esto no cambia nada visible, pero cierra el hueco por
   // adelantado para cuando se agregue una funcion de foto de perfil o de club.
   //
+  // 2026-10-09: se agrego Wompi (*.wompi.co) a script-src/connect-src/frame-src -- el widget
+  // de Wompi carga su propio script desde checkout.wompi.co, hace llamadas a su API
+  // (production.wompi.co / sandbox.wompi.co) y puede abrir metodos de pago (PSE, Nequi) en un
+  // iframe de un subdominio suyo. Se uso el comodin *.wompi.co en vez de listar cada subdominio
+  // porque Wompi no documenta una lista cerrada de los que usa.
+  //
   // Pendiente (no resuelto en esta pasada, documentado aqui para no perderlo): script-src y
   // style-src siguen con 'unsafe-inline'. style-src lo necesita el propio JSX de la app (atributos
   // style={{...}} inline en varios componentes) -- quitarlo implicaria sacar esos estilos a clases.
@@ -34,12 +40,12 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://checkout.epayco.co https://*.epayco.co",
+      "script-src 'self' 'unsafe-inline' https://checkout.epayco.co https://*.epayco.co https://*.wompi.co",
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       "img-src 'self' data: blob: https://*.supabase.co",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.epayco.co",
-      "frame-src https://*.epayco.co",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.epayco.co https://*.wompi.co",
+      "frame-src https://*.epayco.co https://*.wompi.co",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
