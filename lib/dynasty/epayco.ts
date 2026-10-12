@@ -19,13 +19,12 @@
 //   dyn:<domain>:<row_id>
 //
 //   domain      row_id matches...
-//   shop        shop_orders.id            (shop_order_payments.order_id)
 //   booking     bookings.id               (payment_records.booking_id, via apply_payment_result)
 //   tournament  tournament_entries.id     (tournament_registration_payments.entry_id)
 //   marketplace marketplace_orders.id     (marketplace_order_payments.order_id)
 //   billing     billing_invoices.id       (billing_invoices.id directly)
 
-export type EpaycoDomain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
+export type EpaycoDomain = "booking" | "tournament" | "marketplace" | "billing";
 
 export interface EpaycoCheckoutConfig {
   amount: number;
@@ -36,7 +35,6 @@ export interface EpaycoCheckoutConfig {
 }
 
 const DOMAIN_TITLES: Record<EpaycoDomain, string> = {
-  shop: "Dynasty Shop - Pedido",
   booking: "Challenge Dynasty - Reserva de cancha",
   tournament: "Challenge Dynasty - Inscripcion a torneo",
   marketplace: "Dynasty Marketplace - Pedido",

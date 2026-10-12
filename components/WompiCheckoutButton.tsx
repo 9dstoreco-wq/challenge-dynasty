@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CreditCard, Loader2 } from "lucide-react";
 
-export type WompiCheckoutDomain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
+export type WompiCheckoutDomain = "booking" | "tournament" | "marketplace" | "billing";
 
 interface WompiCheckoutConfig {
   amountInCents: number;

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CreditCard, Loader2 } from "lucide-react";
 
-export type EpaycoCheckoutDomain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
+export type EpaycoCheckoutDomain = "booking" | "tournament" | "marketplace" | "billing";
 
 interface EpaycoCheckoutConfig {
   amount: number;

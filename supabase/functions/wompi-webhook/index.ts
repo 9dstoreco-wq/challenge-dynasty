@@ -60,7 +60,7 @@ function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-type Domain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
+type Domain = "booking" | "tournament" | "marketplace" | "billing";
 
 // Wompi's four terminal/non-terminal transaction states -> this platform's payment_records
 // status vocabulary (same vocabulary apply_payment_result enforces for every provider).
@@ -230,20 +230,6 @@ Deno.serve(async (req) => {
           p_amount: amount,
           p_currency_code: currencyCode,
           p_status: status,
-          p_raw_payload: rawPayload,
-        });
-        if (error) throw error;
-        break;
-      }
-      case "shop": {
-        if (status !== "paid") break; // confirm_shop_order_payment is success-only.
-        const { error } = await supabase.rpc("confirm_shop_order_payment", {
-          p_order_id: rowId,
-          p_provider: "wompi",
-          p_provider_payment_id: providerPaymentId,
-          p_provider_event_id: providerEventId,
-          p_amount: amount,
-          p_currency_code: currencyCode,
           p_raw_payload: rawPayload,
         });
         if (error) throw error;

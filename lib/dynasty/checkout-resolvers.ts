@@ -24,10 +24,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 
-export type CheckoutDomain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
+export type CheckoutDomain = "booking" | "tournament" | "marketplace" | "billing";
 
 export const ALLOWED_CHECKOUT_DOMAINS = new Set<CheckoutDomain>([
-  "shop",
   "booking",
   "tournament",
   "marketplace",
@@ -45,18 +44,6 @@ export class CheckoutError extends Error {
 }
 
 export type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
-
-async function resolveShop(supabase: SupabaseServerClient, userId: string, rowId: string): Promise<ResolvedCheckoutRow> {
-  const { data, error } = await supabase
-    .from("shop_orders")
-    .select("total_amount, currency_code, profile_id, payment_status")
-    .eq("id", rowId)
-    .maybeSingle();
-  if (error || !data) throw new CheckoutError("ORDER_NOT_FOUND", 404);
-  if (data.profile_id !== userId) throw new CheckoutError("FORBIDDEN", 403);
-  if (data.payment_status === "paid") throw new CheckoutError("ALREADY_PAID", 409);
-  return { amount: Number(data.total_amount), currencyCode: data.currency_code ?? "COP", redirectPath: `/shop/orders/${rowId}` };
-}
 
 async function resolveBooking(supabase: SupabaseServerClient, userId: string, rowId: string): Promise<ResolvedCheckoutRow> {
   const { data: booking, error: bookingError } = await supabase
@@ -150,7 +137,6 @@ export const CHECKOUT_RESOLVERS: Record<
   CheckoutDomain,
   (supabase: SupabaseServerClient, userId: string, rowId: string) => Promise<ResolvedCheckoutRow>
 > = {
-  shop: resolveShop,
   booking: resolveBooking,
   tournament: resolveTournament,
   marketplace: resolveMarketplace,

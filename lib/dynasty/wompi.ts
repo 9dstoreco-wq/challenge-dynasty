@@ -20,7 +20,7 @@
 
 import { createHash } from "node:crypto";
 
-export type WompiDomain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
+export type WompiDomain = "booking" | "tournament" | "marketplace" | "billing";
 
 export interface WompiCheckoutConfig {
   amountInCents: number;

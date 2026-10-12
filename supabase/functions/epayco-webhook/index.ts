@@ -59,7 +59,7 @@ function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-type Domain = "shop" | "booking" | "tournament" | "marketplace" | "billing";
+type Domain = "booking" | "tournament" | "marketplace" | "billing";
 
 // ePayco sends both a numeric `x_cod_response` (1 Aceptada / 2 Rechazada / 3 Pendiente /
 // 4 Fallida) and a localized `x_response` text -- prefer the numeric code, fall back to
@@ -221,20 +221,6 @@ Deno.serve(async (req) => {
           p_amount: amount,
           p_currency_code: currencyCode,
           p_status: status,
-          p_raw_payload: rawPayload,
-        });
-        if (error) throw error;
-        break;
-      }
-      case "shop": {
-        if (status !== "paid") break; // confirm_shop_order_payment is success-only.
-        const { error } = await supabase.rpc("confirm_shop_order_payment", {
-          p_order_id: rowId,
-          p_provider: "epayco",
-          p_provider_payment_id: providerPaymentId,
-          p_provider_event_id: providerEventId,
-          p_amount: amount,
-          p_currency_code: currencyCode,
           p_raw_payload: rawPayload,
         });
         if (error) throw error;
