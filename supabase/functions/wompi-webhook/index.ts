@@ -4,10 +4,26 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // CHALLENGE DYNASTY -- Wompi payment webhook (platform-wide).
 //
 // Receives the event Wompi posts after a transaction changes state and routes by the
-// `dyn:<domain>:<row_id>` reference convention set by lib/dynasty/wompi.ts when the widget
-// is opened (see components/WompiCheckoutButton.tsx). Mirrors
-// supabase/functions/epayco-webhook in shape and hardening -- same reference convention,
-// same per-domain RPC routing -- just re-pointed at Wompi's own event/field names.
+// `dyn:<domain>:<row_id>:<nonce>` reference convention set by lib/dynasty/wompi.ts when the
+// widget is opened (see app/api/checkout/wompi/route.ts). Mirrors supabase/functions/epayco-webhook
+// in shape and hardening -- same per-domain RPC routing -- just re-pointed at Wompi's own
+// event/field names. The trailing nonce exists only so every checkout attempt gets a
+// reference Wompi has never seen before (their docs: a reference "will not be possible to
+// use again" once used for a payment) -- it is parsed off and discarded, never matched
+// against anything here.
+//
+// 2026-10-13 reconciliation note: this file previously used a per-STATUS provider_event_id
+// (`<txId>:<status>`). apply_payment_result keys existing rows by (provider,
+// provider_payment_id) and then REJECTS the update outright (PAYMENT_EVENT_ID_MISMATCH) if
+// the incoming provider_event_id differs from the one already stored -- so a transaction
+// that went pending -> approved would get its pending row created fine, then the approved
+// event would be rejected forever, because "<txId>:PENDING" != "<txId>:APPROVED". The event
+// id must be STABLE per Wompi transaction (`verified.id` alone) so a later status event for
+// the same transaction updates the same row instead of being permanently rejected; retried
+// deliveries of the SAME status remain idempotent via the same stable id. Also restored the
+// ACTIVE-deployed version's PERMANENT_RPC_ERRORS -> 200 behavior below, so Wompi stops
+// retrying something that provably will never succeed (e.g. a late VOIDED after the booking
+// is already paid).
 //
 // Needs two Supabase Edge Function secrets, both from the Wompi merchant dashboard
 // (comercios.wompi.co) under "Desarrolladores" / "Secretos para integracion tecnica" --
@@ -35,8 +51,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // For the `booking` domain this calls `apply_payment_result` (p_provider: "wompi"), the
 // same hardened SECURITY DEFINER RPC the ePayco webhook uses, which validates the amount
 // against `bookings` directly. Other domains call their own hardened confirm_* RPC where
-// one exists (shop, marketplace, tournament); `billing` has no dedicated RPC yet, so it
-// keeps a direct table update for that domain -- identical to epayco-webhook.
+// one exists (marketplace, tournament -- shop was retired platform-wide in commit 0c53c40,
+// 2026-10-12); `billing` has no dedicated RPC yet, so it keeps a direct table update for
+// that domain -- identical to epayco-webhook.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -139,6 +156,26 @@ async function fetchVerifiedTransaction(transactionId: string, publicKey: string
 
 const SAME_AMOUNT = (a: number, b: number) => a === b && Number.isFinite(a) && Number.isFinite(b);
 
+// RPC errors that can never succeed on retry (e.g. a late VOIDED arriving after the booking
+// is already paid, or a genuinely duplicate/mismatched event). Answering 200 for these stops
+// Wompi from retrying something that is permanently rejected (30 min, 3 h, 24 h) while still
+// answering 5xx for anything that might be a transient DB/RPC problem worth retrying.
+const PERMANENT_RPC_ERRORS = [
+  "PAYMENT_STATE_REGRESSION",
+  "PAYMENT_TERMINAL_STATE",
+  "PAYMENT_AMOUNT_OR_CURRENCY_MISMATCH",
+  "PAYMENT_IDENTITY_MISMATCH",
+  "PAYMENT_EVENT_ID_MISMATCH",
+  "PAYMENT_EVENT_ALREADY_USED",
+  "BOOKING_NOT_FOUND",
+  "payment_identity_mismatch",
+  "payment_event_identity_mismatch",
+  "payment_event_already_used",
+  "order_not_payable",
+  "amount_mismatch",
+  "currency_mismatch",
+];
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "METHOD_NOT_ALLOWED" }, 405);
@@ -195,8 +232,11 @@ Deno.serve(async (req) => {
   }
 
   const reference = verified.reference;
+  // dyn:<domain>:<rowId>:<nonce> -- the nonce (lib/dynasty/wompi.ts's checkoutNonce()) only
+  // exists to make each checkout attempt's reference unique for Wompi; it is parsed off and
+  // never used for routing or matching.
   const refParts = reference.split(":");
-  if (refParts.length !== 3 || refParts[0] !== "dyn") {
+  if (refParts.length !== 4 || refParts[0] !== "dyn") {
     console.error("wompi-webhook: unrecognized reference format", reference);
     return json({ ok: true, unrouted: reference });
   }
@@ -207,10 +247,13 @@ Deno.serve(async (req) => {
   const currencyCode = "COP";
   const status = normalizeStatus(verified.status);
   const providerPaymentId = verified.id;
-  // Wompi doesn't hand out a separate per-delivery notification id -- derive a
-  // stable-per-status event id (same approach as epayco-webhook) so identical retries of
-  // the same status are idempotent while a genuine status change still registers as new.
-  const providerEventId = `${verified.id}:${verified.status}`;
+  // STABLE per Wompi transaction, not per status (see the reconciliation note at the top of
+  // this file): apply_payment_result keys the existing row by (provider, provider_payment_id)
+  // and rejects the update if provider_event_id ever changes for that same payment id, so a
+  // legitimate status change (pending -> approved -> voided) must keep reusing the same id.
+  // Retried deliveries of an unchanged status are naturally idempotent too, since both
+  // provider_payment_id and provider_event_id stay identical across retries.
+  const providerEventId = verified.id;
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -274,10 +317,16 @@ Deno.serve(async (req) => {
             return json({ error: "AMOUNT_MISMATCH" }, 422);
           }
         }
+        // billing_invoices_status_check only allows draft/open/paid/void/uncollectible/
+        // refunded -- there is no "failed" status (F03: writing one here raised a raw
+        // Postgres CHECK-constraint error the catch block below didn't recognize, so Wompi
+        // kept retrying forever). A payment attempt that did not succeed (declined, voided,
+        // still pending) simply leaves the invoice open/unpaid for a retry; only a confirmed
+        // paid event changes its status.
         const { error } = await supabase
           .from("billing_invoices")
           .update({
-            status: status === "paid" ? "paid" : status === "failed" ? "failed" : "open",
+            status: status === "paid" ? "paid" : "open",
             amount_paid: status === "paid" ? amount : 0,
             provider_name: "wompi",
             provider_invoice_reference: providerPaymentId,
@@ -293,7 +342,12 @@ Deno.serve(async (req) => {
         return json({ ok: true, unrouted: reference });
     }
   } catch (err) {
-    console.error("wompi-webhook: RPC/DB update failed", domain, rowId, err instanceof Error ? err.message : err);
+    const message = err instanceof Error ? err.message : String(err);
+    if (PERMANENT_RPC_ERRORS.some((code) => message.includes(code))) {
+      console.error("wompi-webhook: permanent RPC rejection", domain, rowId, message);
+      return json({ ok: true, ignored: message });
+    }
+    console.error("wompi-webhook: RPC/DB update failed", domain, rowId, message);
     return json({ error: "DB_UPDATE_FAILED" }, 500);
   }
 
