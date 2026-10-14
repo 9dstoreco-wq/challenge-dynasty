@@ -19,7 +19,7 @@
 //   NEXT_PUBLIC_EPAYCO_PUBLIC_KEY is not set anywhere, so app/api/checkout/epayco/route.ts always
 //   returns 503 PAYMENT_PROVIDER_NOT_CONFIGURED if ever called. supabase/functions/epayco-webhook
 //   exists in the repo but was never deployed (not in the live Edge Functions list). The old
-//   mercadopago-webhook Edge Function is still deployed (ACTIVE) with service_role access, but
+//   mercadopago-webhook Edge Function is still deployed (ACTIVE) with elevated (service-role-level) database access, but
 //   nothing in the current app can build the dyn:mercadopago:... reference it expects --
 //   orphaned infrastructure from the 2026-09-29 swap, not cleaned up when Mercado Pago was
 //   replaced. See Challenge_Dynasty_F11_entrega.md for the full inventory and recommendation.
@@ -96,15 +96,23 @@ async function resolveTournament(supabase: SupabaseServerClient, userId: string,
 
   const { data: payment, error: paymentError } = await supabase
     .from("tournament_registration_payments")
-    .select("amount_due, currency_code, status")
+    .select("amount_due, amount_paid, currency_code, status")
     .eq("entry_id", rowId)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
   if (paymentError || !payment) throw new CheckoutError("ENTRY_PAYMENT_NOT_FOUND", 404);
   if (payment.status === "paid") throw new CheckoutError("ALREADY_PAID", 409);
+  // F12: quote the remaining balance, not the full amount_due. confirm_tournament_registration_
+  // payment (the RPC the payment webhooks call) now sums distinct provider events into
+  // amount_paid instead of replacing it, but that fix is useless if checkout keeps asking the
+  // player to pay the FULL amount_due on every attempt -- a player who already paid a partial
+  // $50.000 of a $100.000 entry and tries to pay again from the app would be charged $100.000
+  // again instead of the $50.000 actually owed, overpaying by the amount already settled.
+  const remaining = Number(payment.amount_due) - Number(payment.amount_paid ?? 0);
+  if (remaining <= 0) throw new CheckoutError("ALREADY_PAID", 409);
   return {
-    amount: Number(payment.amount_due),
+    amount: remaining,
     currencyCode: payment.currency_code ?? "COP",
     redirectPath: `/competitions/${entry.tournament_id}`,
   };

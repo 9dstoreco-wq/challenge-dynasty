@@ -154,7 +154,6 @@ async function fetchVerifiedTransaction(transactionId: string, publicKey: string
   }
 }
 
-const SAME_AMOUNT = (a: number, b: number) => a === b && Number.isFinite(a) && Number.isFinite(b);
 
 // RPC errors that can never succeed on retry (e.g. a late VOIDED arriving after the booking
 // is already paid, or a genuinely duplicate/mismatched event). Answering 200 for these stops
@@ -292,49 +291,51 @@ Deno.serve(async (req) => {
         break;
       }
       case "tournament": {
-        if (status !== "paid") break; // confirm_tournament_registration_payment is success-only.
+        // F12: confirm_tournament_registration_payment now takes full payment identity and
+        // sums distinct provider events into amount_paid (it used to just overwrite amount_paid
+        // with the latest event's amount, which silently dropped a second real partial payment
+        // whenever it happened to equal the first -- see the migration header for the exact
+        // failure scenario). It is success-only like before: a failed/pending event is not a
+        // "payment", there is nothing to record on the registration side for it.
+        if (status !== "paid") break;
         const { error } = await supabase.rpc("confirm_tournament_registration_payment", {
           p_entry_id: rowId,
-          p_amount_paid: amount,
+          p_provider: "wompi",
+          p_provider_payment_id: providerPaymentId,
+          p_provider_event_id: providerEventId,
+          p_amount: amount,
+          p_currency_code: currencyCode,
         });
         if (error) throw error;
         break;
       }
       case "billing": {
-        // No dedicated confirm_* RPC exists yet for billing invoices (same as epayco-webhook):
-        // compare the amount with the invoice and never overwrite an already-paid invoice.
-        const { data: invoice, error: invErr } = await supabase
-          .from("billing_invoices")
-          .select("id, status, amount_due, currency_code")
-          .eq("id", rowId)
-          .maybeSingle();
-        if (invErr) throw invErr;
-        if (!invoice) return json({ ok: true, unrouted: reference });
-        if (invoice.status === "paid") break; // late/duplicate events never change a paid invoice.
-        if (status === "paid") {
-          if (!SAME_AMOUNT(Number(invoice.amount_due), amount) || (invoice.currency_code ?? "COP").toUpperCase() !== "COP") {
-            console.error("wompi-webhook: billing amount mismatch", rowId, invoice.amount_due, amount);
+        // F12: billing invoices are now confirmed through confirm_billing_invoice_payment
+        // (a ledger-backed RPC, same pattern as confirm_marketplace_payment) instead of a raw
+        // client-side UPDATE. The old UPDATE had no record of individual payment events at
+        // all -- no uniqueness per provider/transaction, no trace of a duplicate or failed
+        // attempt to reconcile against later. Only a "paid" event ever changes the invoice;
+        // billing_invoices_status_check has no "failed" status (see F03), so a failed/declined
+        // event is only recorded in the ledger, never written to the invoice itself.
+        const { error } = await supabase.rpc("confirm_billing_invoice_payment", {
+          p_invoice_id: rowId,
+          p_provider: "wompi",
+          p_provider_payment_id: providerPaymentId,
+          p_provider_event_id: providerEventId,
+          p_amount: amount,
+          p_currency_code: currencyCode,
+          p_status: status === "paid" ? "paid" : "failed",
+        });
+        if (error) {
+          if (String(error.message ?? "").includes("AMOUNT_OR_CURRENCY_MISMATCH")) {
+            console.error("wompi-webhook: billing amount mismatch", rowId, amount, currencyCode);
             return json({ error: "AMOUNT_MISMATCH" }, 422);
           }
+          if (String(error.message ?? "").includes("INVOICE_NOT_FOUND")) {
+            return json({ ok: true, unrouted: reference });
+          }
+          throw error;
         }
-        // billing_invoices_status_check only allows draft/open/paid/void/uncollectible/
-        // refunded -- there is no "failed" status (F03: writing one here raised a raw
-        // Postgres CHECK-constraint error the catch block below didn't recognize, so Wompi
-        // kept retrying forever). A payment attempt that did not succeed (declined, voided,
-        // still pending) simply leaves the invoice open/unpaid for a retry; only a confirmed
-        // paid event changes its status.
-        const { error } = await supabase
-          .from("billing_invoices")
-          .update({
-            status: status === "paid" ? "paid" : "open",
-            amount_paid: status === "paid" ? amount : 0,
-            provider_name: "wompi",
-            provider_invoice_reference: providerPaymentId,
-            paid_at: status === "paid" ? new Date().toISOString() : null,
-          })
-          .eq("id", rowId)
-          .neq("status", "paid");
-        if (error) throw error;
         break;
       }
       default:
