@@ -45,8 +45,16 @@ qué estado (prueba/producción).
     del checkout, se usa como Bearer token para confirmar la transacción contra la API de
     Wompi)
   - Código: `supabase/functions/wompi-webhook/index.ts`
-- **Dominios cubiertos por este webhook:** shop, booking, tournament, marketplace, billing
-  (convención de referencia `dyn:<domain>:<row_id>`)
+- **Dominios cubiertos por este webhook:** booking, tournament, marketplace, billing
+  (convención de referencia `dyn:<domain>:<row_id>`). **"shop" ya NO esta cubierto.**
+  Corregido 2026-10-14 (hallazgo P2 #11): esta linea listaba "shop" desde que se creo este
+  archivo, pero el mismo commit que lo creo (`0c53c406`, "remove orphaned 'shop' payment
+  checkout domain, add payment accounts registry") ya habia quitado "shop" del codigo --
+  quedo una contradiccion interna sin corregir. Verificado contra el codigo en vivo:
+  `CheckoutDomain` en `lib/dynasty/checkout-resolvers.ts` es
+  `"booking" | "tournament" | "marketplace" | "billing"` (sin "shop"), y el `switch` de
+  `supabase/functions/wompi-webhook/index.ts` solo tiene casos para esos mismos cuatro
+  dominios.
 - **Estado actual (verificado 2026-10-12):** SANDBOX/PRUEBA -- `NEXT_PUBLIC_WOMPI_PUBLIC_KEY`
   en Vercel está anotada explícitamente como "sandbox/test... swap to pub_prod_... once
   tested and Luis approves going live". NINGÚN cobro real se procesa todavía en Challenge
@@ -61,6 +69,40 @@ qué estado (prueba/producción).
   2026-10-09) es un comercio nuevo. El código de ePayco (proveedor anterior) se dejó en el
   repo sin usar, como respaldo (`lib/dynasty/epayco.ts`,
   `app/api/checkout/epayco/route.ts`, `supabase/functions/epayco-webhook`).
+
+## 2.1 Riesgo operativo: dos proyectos Vercel "production" simultaneos (hallazgo P2 #11, 2026-10-14)
+
+Verificado en vivo contra la API de Vercel (no solo citando la auditoria), equipo
+`team_s4NK9uMkpAxrap5uMOUqYl6L`:
+
+- Existen **5 proyectos Vercel**, no 2: `challenge-dynasty`, `challenge-dynasty-v10`,
+  `challenge-dynasty-launch`, `challenge-dynasty-launch-final`, `challenge-dynasty-final-2026`.
+- **Ninguno de los 5 tiene dominio propio configurado** -- los 5 solo responden en su
+  subdominio `*.vercel.app` por defecto.
+- `challenge-dynasty-v10` nunca tuvo un deploy (abandonado). `challenge-dynasty-launch` y
+  `challenge-dynasty-launch-final` tienen un unico deploy viejo del 28 de agosto de 2026,
+  no conectado a git, sin actividad desde entonces.
+- **`challenge-dynasty-final-2026` (el canonico, el que tiene las llaves de Wompi de
+  sandbox) y `challenge-dynasty` (el que SOLO tiene variables de Supabase, ninguna
+  variable de pasarela de pago) estan AMBOS desplegando en paralelo desde la misma rama
+  `main` del mismo repo, hoy, al mismo commit exacto** (`0c53c406545a097244110fa99c1349c087210cf8`,
+  verificado en ambos proyectos, timestamps casi identicos). Es decir: cada push a `main`
+  produce dos "production deployments" distintos, con configuracion de pago distinta,
+  bajo dos URLs `*.vercel.app` distintas.
+- Riesgo concreto: si alguien (Luis, un colaborador, un enlace viejo guardado) usa la URL
+  de `challenge-dynasty` en vez de `challenge-dynasty-final-2026`, el checkout de Wompi
+  devuelve 503 (sin llaves configuradas) en el mejor caso -- no hay riesgo de cobro
+  duplicado o cruzado porque faltan las llaves, pero si hay riesgo de confusion
+  operativa/soporte ("el pago no funciona" sin saber por que) y de que alguien active
+  variables de pago ahi por error, duplicando el comercio #2 sin querer.
+- **Esto no se corrigio en este pase** -- es una decision de Luis, no algo que deba
+  resolverse en automatico (igual que F10/F11). Opciones a elegir: (a) desconectar la
+  integracion de git de `challenge-dynasty` en el dashboard de Vercel para que deje de
+  autodesplegar; (b) dejarlo desplegando pero documentado como "no usar, sin pasarela de
+  pago"; (c) borrar el proyecto `challenge-dynasty` si ya no tiene ningun uso. Los otros 3
+  proyectos abandonados (`v10`, `launch`, `launch-final`) no autodesplegan (sin deploys
+  recientes o no conectados a git), asi que no tienen este mismo riesgo activo -- pero
+  tampoco tienen ninguna razon conocida para seguir existiendo.
 
 ## Regla general (para cualquier cuenta de pago futura)
 
