@@ -54,6 +54,15 @@ async function resolveBooking(supabase: SupabaseServerClient, userId: string, ro
   if (bookingError || !booking) throw new CheckoutError("BOOKING_NOT_FOUND", 404);
   if (booking.booked_by !== userId) throw new CheckoutError("FORBIDDEN", 403);
   if (booking.status === "cancelled") throw new CheckoutError("BOOKING_CANCELLED", 409);
+  // F05 (Auditoria_Challenge_Dynasty_2026-10-12.md): this used to only reject "cancelled" --
+  // "expired" (expire_pending_booking_offers, 15 min hold by default), "completed",
+  // "no_show" and "waitlisted" fell through and could still have a brand-new checkout
+  // initiated against them, even though none of them should ever accept a new payment.
+  // "pending" (awaiting its first payment) and "confirmed" (already holding its slot,
+  // possibly still awaiting payment after an admin override) are the only payable states.
+  if (booking.status !== "pending" && booking.status !== "confirmed") {
+    throw new CheckoutError("BOOKING_NOT_PAYABLE", 409);
+  }
   if (booking.payment_status === "paid") throw new CheckoutError("ALREADY_PAID", 409);
   if (booking.payment_status === "not_required" || Number(booking.amount) <= 0) {
     throw new CheckoutError("PAYMENT_NOT_REQUIRED", 409);

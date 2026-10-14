@@ -1044,6 +1044,7 @@
     "notConfigured": "Payments not available yet.",
     "invalidAmount": "Invalid amount to charge.",
     "bookingCancelled": "This booking was cancelled.",
+    "bookingNotPayable": "This booking no longer accepts payment.",
     "paymentNotRequired": "This booking doesn't require payment.",
     "genericError": "Could not start the payment. Try again.",
     "preparing": "Preparing payment…",

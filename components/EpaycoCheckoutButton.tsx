@@ -68,6 +68,7 @@ export function EpaycoCheckoutButton({ domain, rowId, className }: EpaycoCheckou
     ALREADY_PAID: t("alreadyPaid"),
     FORBIDDEN: t("forbidden"),
     BOOKING_CANCELLED: t("bookingCancelled"),
+    BOOKING_NOT_PAYABLE: t("bookingNotPayable"),
     PAYMENT_NOT_REQUIRED: t("paymentNotRequired"),
     PAYMENT_PROVIDER_NOT_CONFIGURED: t("notConfigured"),
     INVALID_AMOUNT: t("invalidAmount"),
