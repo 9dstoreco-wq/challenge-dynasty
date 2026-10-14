@@ -18,7 +18,7 @@ export async function stakeCard(challengeId: string, cardId: string): Promise<Ac
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 30 cartas puestas en juego por hora por usuario.
-    if (!(await checkRateLimit(supabase, `stake_card:${user.id}`, 30, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'stake_card', 30, 3600))) throw new Error(t('rateLimited'))
     const { error } = await supabase.rpc('stake_card_on_challenge', { p_challenge_id: challengeId, p_card_id: cardId })
     if (error) throw error
     return actionOk(true as const)

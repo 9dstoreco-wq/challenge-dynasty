@@ -22,7 +22,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ prof
   // Si la cabecera no trae IP (algunos entornos locales), se agrupa en un solo bucket generico en
   // vez de fallar -- sigue siendo mejor que ningun limite.
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-  const allowed = await checkRateLimit(supabase, `card_image:${ip}`, 60, 60)
+  const allowed = await checkRateLimit(supabase, 'card_image', 60, 60, ip)
   if (!allowed) {
     return new Response('Too many requests', { status: 429 })
   }
