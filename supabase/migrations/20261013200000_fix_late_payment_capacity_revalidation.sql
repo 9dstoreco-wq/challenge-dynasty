@@ -1,3 +1,11 @@
+-- CORRECCION 2026-10-14 (encontrada al aplicar esta migracion, antes de que llegara a
+-- produccion): esta migracion reescribe apply_payment_result() completa y, al hacerlo,
+-- revertia sin querer el fix de F03 (ver 20261013061500_fix_wompi_payment_status_check_violations.sql)
+-- -- volvia a escribir bookings.payment_status = p_status verbatim para 'cancelled', que
+-- bookings_payment_status_check no admite. Corregido antes de aplicar: ver el bloque
+-- failed/cancelled mas abajo, ahora mapea ambos a 'failed' igual que F03. Nunca se aplico
+-- a produccion con el bug -- se detecto en la revision previa a aplicar.
+
 -- F05 (Auditoria_Challenge_Dynasty_2026-10-12.md): "Alta: un pago puede quedar
 -- pagado sin reserva confirmada". apply_payment_result() inserta/actualiza
 -- payment_records a 'paid' siempre, pero solo confirmaba la reserva
@@ -254,8 +262,12 @@ begin
       end if;
     end if;
   elsif p_status in ('failed','cancelled') then
+    -- F03 fix (must be preserved here too, this function was re-created whole by F05):
+    -- bookings_payment_status_check has no 'cancelled' value -- both a declined and a
+    -- voided provider attempt map to the booking-level 'failed'. Writing p_status verbatim
+    -- here would silently reintroduce the exact CHECK-constraint violation F03 fixed.
     update public.bookings
-    set payment_status = p_status, updated_at = now()
+    set payment_status = 'failed', updated_at = now()
     where id = p_booking_id
       and payment_status not in ('paid','refunded','partially_refunded');
   elsif p_status in ('refunded','partially_refunded') then
