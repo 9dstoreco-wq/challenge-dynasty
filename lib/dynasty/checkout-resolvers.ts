@@ -1,13 +1,28 @@
-// Shared row-resolution logic for every "pay for X" checkout entrypoint (ePayco, and any
-// future provider). Each provider's own route handler (e.g.
-// app/api/checkout/epayco/route.ts) imports this so the "which row is this payment for,
-// how much is owed, does this user own it" logic is written exactly once and can't drift
-// between providers.
+// Shared row-resolution logic for every "pay for X" checkout entrypoint (Wompi, ePayco, and
+// any future provider). Each provider's own route handler (e.g. app/api/checkout/wompi/route.ts,
+// app/api/checkout/epayco/route.ts) imports this so the "which row is this payment for, how
+// much is owed, does this user own it" logic is written exactly once and can't drift between
+// providers.
 //
-// 2026-09-29: Wompi was removed from the platform (merchant account blocked on Camara de
-// Comercio renewal, decided not worth chasing), replaced by Mercado Pago -- and the same
-// day, Mercado Pago was itself replaced by ePayco (product decision). ePayco is the only
-// payment provider now. See lib/dynasty/epayco.ts and supabase/functions/epayco-webhook.
+// Provider history (F11, Auditoria_Challenge_Dynasty_2026-10-12.md -- this comment block was
+// stale and said ePayco was "the only provider now"; corrected 2026-10-14 after confirming
+// against the live code, not just this comment):
+//   2026-09-29: Wompi was removed from the platform (merchant account blocked on Camara de
+//   Comercio renewal, decided not worth chasing), replaced by Mercado Pago -- and the same day,
+//   Mercado Pago was itself replaced by ePayco (product decision).
+//   2026-10-09: Luis activated a new Wompi merchant account and Wompi came BACK, replacing
+//   ePayco (see /areas/payment accounts notes). This is the current state: WompiCheckoutButton
+//   is the one actually rendered (components/BookingControlCenter.tsx), and
+//   NEXT_PUBLIC_WOMPI_PUBLIC_KEY/WOMPI_INTEGRITY_SECRET are the only payment-provider env vars
+//   set in Vercel. EpaycoCheckoutButton (components/EpaycoCheckoutButton.tsx) is fully built but
+//   never rendered anywhere -- confirmed via repo-wide search, zero JSX usages -- and
+//   NEXT_PUBLIC_EPAYCO_PUBLIC_KEY is not set anywhere, so app/api/checkout/epayco/route.ts always
+//   returns 503 PAYMENT_PROVIDER_NOT_CONFIGURED if ever called. supabase/functions/epayco-webhook
+//   exists in the repo but was never deployed (not in the live Edge Functions list). The old
+//   mercadopago-webhook Edge Function is still deployed (ACTIVE) with service_role access, but
+//   nothing in the current app can build the dyn:mercadopago:... reference it expects --
+//   orphaned infrastructure from the 2026-09-29 swap, not cleaned up when Mercado Pago was
+//   replaced. See Challenge_Dynasty_F11_entrega.md for the full inventory and recommendation.
 //
 // IMPORTANT (2026-09-29 audit): `resolveBooking` reads amount/currency/payment_status
 // directly off `bookings`, NOT `booking_payment_records`. `create_atomic_booking` (the only
