@@ -1,6 +1,11 @@
 -- F08 (Auditoria_Challenge_Dynasty_2026-10-12.md): check_rate_limit() es manipulable por cualquier
 -- llamador, directo via la Data API de Supabase, sin pasar por el codigo de Next.js.
 --
+-- ESTADO: ESCRITA, NO APLICADA. Verificada en vivo dentro de BEGIN...ROLLBACK (ver
+-- supabase/tests/f08_rate_limit_dryrun.test.sql, 9/9 checks OK); nunca confirmada. La aplica Luis en el
+-- editor SQL de Supabase cuando decida activarla, o se aplica junto con el resto de la rama
+-- fix/wompi-webhook-reconciliation.
+--
 -- ============================================================================
 -- EL BUG (confirmado contra la base real, no asumido)
 -- ============================================================================

@@ -1,6 +1,8 @@
 -- Challenge Dynasty -- evita retos duplicados en el servidor.
--- ESTADO: ESCRITA, NO APLICADA. El sistema de permisos bloqueo aplicarla desde Claude; la corre el dueno
--- en el editor SQL de Supabase (usa "create or replace", sin drops).
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-14, F10: public.create_challenge existe en vivo con
+-- exactamente esta firma -- p_challenged_id, p_sport_id, p_match_date, p_club_id, p_match_type, p_points).
+-- Esta nota decia 'NO APLICADA' pero nunca se actualizo despues de que Luis la corriera a mano en el editor
+-- SQL -- ver Challenge_Dynasty_F10_entrega.md.
 --
 -- Regla: mismo creador + mismo rival + mismo deporte + misma fecha mientras el reto siga abierto => 'Ya enviaste este reto'.
 -- Es identica a la funcion en produccion salvo por el bloque marcado.
