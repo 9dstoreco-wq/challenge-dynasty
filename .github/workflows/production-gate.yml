@@ -1,9 +1,18 @@
 name: Dynasty Production Gate
+
+# F09 (Auditoria_Challenge_Dynasty_2026-10-12.md): mismo ajuste que challenge-dynasty-ci.yml
+# -- Node 24 (en vez de 20) para que las pruebas automaticas de tests/*.test.mjs puedan
+# correr aqui tambien si se agregan a este gate en el futuro, y acciones fijadas por SHA con
+# permisos minimos explicitos.
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   gate:
@@ -12,10 +21,10 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://ggkthvewxmsmtupjzfnk.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_g6H3tifZdc0ucoxIrwUayg_xazuUb1l
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 24
       - run: npm ci --no-audit --no-fund
       - run: npm run check-routes
       - run: npm run check-sql
