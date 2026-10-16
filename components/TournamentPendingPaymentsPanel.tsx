@@ -16,25 +16,12 @@ export default function TournamentPendingPaymentsPanel({ rows }: { rows: Row[] }
   const pending = rows.filter((r) => r.amountPaid < r.amountDue)
   if (pending.length === 0) return null
 
-  async function markPaid(entryId: string, amountDue: number, amountPaid: number) {
+  async function markPaid(entryId: string, amountDue: number) {
     setBusyId(entryId)
     setErrorId(null)
-    // F12: confirm_tournament_registration_payment now takes full payment identity
-    // (provider/provider_payment_id/provider_event_id) and SUMS events instead of
-    // replacing amount_paid -- see Challenge_Dynasty_SQL_F04_F12_para_pegar.sql.
-    // This manual "mark as paid" action has no real provider transaction, so it uses
-    // provider: 'manual' with a fresh, unique id per click (the UI already disables
-    // the button while busy, so no duplicate-click risk). Pass only the REMAINING
-    // balance as the amount for this event, not the full amountDue -- the RPC adds it
-    // to whatever was already paid, it no longer overwrites.
-    const remaining = amountDue - amountPaid
-    const eventId = crypto.randomUUID()
     const { error } = await supabase.rpc('confirm_tournament_registration_payment', {
       p_entry_id: entryId,
-      p_provider: 'manual',
-      p_provider_payment_id: eventId,
-      p_provider_event_id: eventId,
-      p_amount: remaining,
+      p_amount_paid: amountDue,
     })
     setBusyId(null)
     if (error) { setErrorId(entryId); return }
@@ -52,7 +39,7 @@ export default function TournamentPendingPaymentsPanel({ rows }: { rows: Row[] }
             {errorId === r.entryId && <div className="text-xs text-red-400 mt-1">{t('markPaidFailed')}</div>}
           </div>
           <button
-            onClick={() => markPaid(r.entryId, r.amountDue, r.amountPaid)}
+            onClick={() => markPaid(r.entryId, r.amountDue)}
             disabled={busyId === r.entryId}
             className="rounded-xl bg-[#D4AF37] text-black font-black py-2 px-4 text-xs disabled:opacity-40 whitespace-nowrap"
           >
