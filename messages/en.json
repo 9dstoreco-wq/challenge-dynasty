@@ -1048,7 +1048,6 @@
     "paymentNotRequired": "This booking doesn't require payment.",
     "genericError": "Could not start the payment. Try again.",
     "preparing": "Preparing payment…",
-    "payWithEpayco": "Pay with ePayco",
     "payWithWompi": "Pay with Wompi"
   },
   "LegalTerms": {

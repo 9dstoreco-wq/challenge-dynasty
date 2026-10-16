@@ -1,11 +1,12 @@
 // Server-only helpers for the Wompi checkout entrypoint (Web Checkout widget / widget.js).
 // Only ever import this from a server file (a Route Handler, a Server Action).
 //
-// Uses the same `dyn:<domain>:<row_id>:<nonce>` reference convention as the previous ePayco
-// integration (see lib/dynasty/checkout-resolvers.ts and supabase/functions/wompi-webhook),
-// so the same server-side resolvers and confirm_*/apply_payment_result RPCs work unchanged
-// for either provider -- only the `p_provider` value passed to them differs ("wompi" vs
-// "epayco").
+// Uses the `dyn:<domain>:<row_id>:<nonce>` reference convention (see
+// lib/dynasty/checkout-resolvers.ts and supabase/functions/wompi-webhook) so the same
+// server-side resolvers and confirm_*/apply_payment_result RPCs stay provider-agnostic -- the
+// `p_provider` value passed to them is "wompi". (The previous ePayco provider used the same
+// convention with p_provider "epayco"; its code was deleted 2026-10-16, see the history note
+// in checkout-resolvers.ts.)
 //
 // Unlike ePayco's classic handler.open({...}), Wompi's Web Checkout widget needs a signed
 // "signature:integrity" computed from reference + amount + currency + a secret the browser
@@ -16,7 +17,8 @@
 // 2026-10-09: Wompi (re)introduced as the platform's payment provider, with a new merchant
 // account. (A previous Wompi integration existed and was removed 2026-09-29 over a Camara
 // de Comercio renewal problem with the old account -- see the history note at the top of
-// checkout-resolvers.ts. ePayco's code is left in place, unused, as a fallback.)
+// checkout-resolvers.ts. ePayco's code was left in place, unused, as a fallback, until it
+// was deleted 2026-10-16.)
 //
 // 2026-10-13: Wompi's own docs are explicit that a reference "will not be possible to use
 // again" once it has been used for a payment on the merchant account
@@ -64,8 +66,9 @@ export interface BuildWompiCheckoutParams {
 
 /**
  * Computes the checkout config the client needs to open Wompi's Web Checkout widget,
- * including the server-computed integrity signature. Mirrors buildEpaycoCheckout's shape
- * and validation (lib/dynasty/epayco.ts), plus the signature step ePayco doesn't need.
+ * including the server-computed integrity signature. (Previously mirrored
+ * buildEpaycoCheckout's shape and validation in lib/dynasty/epayco.ts, plus the signature
+ * step ePayco didn't need -- that file was deleted 2026-10-16.)
  */
 export function buildWompiCheckout(params: BuildWompiCheckoutParams): WompiCheckoutConfig {
   const currency = (params.currencyCode || "COP").toUpperCase();

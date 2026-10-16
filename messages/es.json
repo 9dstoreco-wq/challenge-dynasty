@@ -1048,7 +1048,6 @@
     "paymentNotRequired": "Esta reserva no requiere pago.",
     "genericError": "No se pudo iniciar el pago. Intenta de nuevo.",
     "preparing": "Preparando pago…",
-    "payWithEpayco": "Pagar con ePayco",
     "payWithWompi": "Pagar con Wompi"
   },
   "LegalTerms": {

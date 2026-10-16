@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "AUTH_REQUIRED" }, { status: 401 });
   }
 
-  // Hasta 20 intentos de iniciar un pago por hora por usuario (mismo limite que ePayco).
+  // Hasta 20 intentos de iniciar un pago por hora por usuario.
   const allowed = await checkRateLimit(supabase, 'checkout_wompi', 20, 3600);
   if (!allowed) {
     return NextResponse.json({ error: "RATE_LIMITED" }, { status: 429 });

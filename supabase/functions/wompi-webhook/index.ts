@@ -5,9 +5,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //
 // Receives the event Wompi posts after a transaction changes state and routes by the
 // `dyn:<domain>:<row_id>:<nonce>` reference convention set by lib/dynasty/wompi.ts when the
-// widget is opened (see app/api/checkout/wompi/route.ts). Mirrors supabase/functions/epayco-webhook
-// in shape and hardening -- same per-domain RPC routing -- just re-pointed at Wompi's own
-// event/field names. The trailing nonce exists only so every checkout attempt gets a
+// widget is opened (see app/api/checkout/wompi/route.ts). (Previously mirrored
+// supabase/functions/epayco-webhook in shape and hardening -- same per-domain RPC routing --
+// just re-pointed at Wompi's own event/field names; that function was deleted 2026-10-16,
+// never having been deployed.) The trailing nonce exists only so every checkout attempt gets a
 // reference Wompi has never seen before (their docs: a reference "will not be possible to
 // use again" once used for a payment) -- it is parsed off and discarded, never matched
 // against anything here.
@@ -34,14 +35,14 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //                           Wompi's own API for the transaction's real state.
 // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 //
-// HARDENING (matches epayco-webhook's approach):
+// HARDENING (ported from the now-deleted epayco-webhook's approach):
 //   * Checksum verification (X-Event-Checksum / signature.checksum): per Wompi's docs the
 //     checksum is sha256(concat of the values at signature.properties, in order) + timestamp
 //     + Events secret). The property list is read from the event itself, never hardcoded,
 //     because Wompi says it can change.
 //   * SERVER-SIDE VERIFICATION: after the checksum passes, this still asks Wompi's own API
 //     (GET /v1/transactions/{id}) for the transaction and acts on ITS status/amount/
-//     reference/currency -- never the ones in the posted body -- exactly like
+//     reference/currency -- never the ones in the posted body -- exactly like the deleted
 //     epayco-webhook's fetchVerifiedTransaction step. Fails closed: if Wompi's API can't
 //     confirm the transaction, nothing is marked paid and Wompi is asked to retry later.
 //   * Only COP is accepted.
@@ -49,11 +50,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 //     marked paid is never overwritten by a later/duplicate event.
 //
 // For the `booking` domain this calls `apply_payment_result` (p_provider: "wompi"), the
-// same hardened SECURITY DEFINER RPC the ePayco webhook uses, which validates the amount
+// same hardened SECURITY DEFINER RPC the (now-deleted) ePayco webhook used, which validates
+// the amount
 // against `bookings` directly. Other domains call their own hardened confirm_* RPC where
 // one exists (marketplace, tournament -- shop was retired platform-wide in commit 0c53c40,
 // 2026-10-12); `billing` has no dedicated RPC yet, so it keeps a direct table update for
-// that domain -- identical to epayco-webhook.
+// that domain, same as the deleted epayco-webhook did.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
