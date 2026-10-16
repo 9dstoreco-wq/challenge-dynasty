@@ -66,9 +66,10 @@ qué estado (prueba/producción).
   sandbox por las de producción (`pub_prod_...` etc.), nunca antes.
 - **Nota histórica:** hubo una integración Wompi anterior, retirada el 2026-09-29 por un
   problema de renovación de Cámara de Comercio con esa cuenta vieja. La actual (desde
-  2026-10-09) es un comercio nuevo. El código de ePayco (proveedor anterior) se dejó en el
-  repo sin usar, como respaldo (`lib/dynasty/epayco.ts`,
-  `app/api/checkout/epayco/route.ts`, `supabase/functions/epayco-webhook`).
+  2026-10-09) es un comercio nuevo. El código de ePayco (proveedor anterior), que se había
+  dejado sin usar como respaldo (`lib/dynasty/epayco.ts`, `app/api/checkout/epayco/route.ts`,
+  `supabase/functions/epayco-webhook`), se borró del repo el 2026-10-16 a pedido de Luis
+  (F11) -- nunca estuvo desplegado ni configurado, así que no afectaba nada en vivo.
 
 ## 2.1 Riesgo operativo: dos proyectos Vercel "production" simultaneos (hallazgo P2 #11, 2026-10-14)
 

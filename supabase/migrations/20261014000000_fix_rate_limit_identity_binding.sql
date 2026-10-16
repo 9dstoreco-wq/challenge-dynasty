@@ -40,7 +40,9 @@
 --
 -- Los 11 sitios de llamada en la app (lib/rate-limit.ts, usado desde
 -- app/actions/{challenges,cards,profile,partners,skills,social}.ts y
--- app/api/{cards/[profileId],checkout/epayco,checkout/wompi}/route.ts) construyen el
+-- app/api/{cards/[profileId],checkout/epayco,checkout/wompi}/route.ts -- nota 2026-10-16: la
+-- ruta checkout/epayco se borro junto con el resto del codigo muerto de ePayco, ver F11; el
+-- conteo de 11 sitios es historico, al momento de escribir este comentario) construyen el
 -- bucket como `<accion>:${user.id}` -- es decir, la propia app ya veia a `user.id` como
 -- la fuente de verdad de identidad. El problema nunca fue la logica de la app: fue que
 -- la funcion de base de datos confiaba en un string que el cliente podia reemplazar.
