@@ -37,7 +37,7 @@ export async function createChallenge(input: {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 20 retos creados por hora por usuario.
-    if (!(await checkRateLimit(supabase, `create_challenge:${user.id}`, 20, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'create_challenge', 20, 3600))) throw new Error(t('rateLimited'))
 
     const { data, error } = await supabase.rpc('create_challenge', {
       p_challenged_id: input.challengedId,
@@ -62,7 +62,7 @@ export async function respondToChallenge(invitationId: string, accept: boolean):
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 40 respuestas a retos por hora por usuario.
-    if (!(await checkRateLimit(supabase, `respond_challenge:${user.id}`, 40, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'respond_challenge', 40, 3600))) throw new Error(t('rateLimited'))
     const { error } = await supabase.rpc('respond_to_challenge_invitation', {
       p_invitation_id: invitationId,
       p_accept: accept,
@@ -83,7 +83,7 @@ export async function cancelChallenge(challengeId: string): Promise<ActionResult
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 20 cancelaciones por hora por usuario.
-    if (!(await checkRateLimit(supabase, `cancel_challenge:${user.id}`, 20, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'cancel_challenge', 20, 3600))) throw new Error(t('rateLimited'))
     const { error } = await supabase.rpc('cancel_challenge', { p_challenge_id: challengeId })
     if (error) throw error
     return actionOk(true as const)
@@ -112,7 +112,7 @@ export async function submitMatchResult(input: {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 30 envios de resultado por hora por usuario.
-    if (!(await checkRateLimit(supabase, `submit_result:${user.id}`, 30, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'submit_result', 30, 3600))) throw new Error(t('rateLimited'))
 
     // La funcion submit_challenge_result en la base de datos valida que el ganador sea un
     // participante del reto, pero NO compara el ganador declarado contra los marcadores -- un
@@ -162,7 +162,7 @@ export async function confirmMatch(resultId: string, confirm: boolean): Promise<
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 30 confirmaciones/disputas por hora por usuario.
-    if (!(await checkRateLimit(supabase, `review_result:${user.id}`, 30, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'review_result', 30, 3600))) throw new Error(t('rateLimited'))
     const { error } = await supabase.rpc('review_challenge_result', { p_result_id: resultId, p_confirm: confirm })
     if (error) throw error
     return actionOk(true as const)

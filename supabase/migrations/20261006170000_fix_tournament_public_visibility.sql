@@ -1,6 +1,7 @@
 -- Challenge Dynasty -- deja ver el cuadro de partidos (rivales) de un torneo publico.
--- ESTADO: ESCRITA, NO APLICADA. El sistema de permisos bloqueo aplicarla desde Claude
--- porque es un deploy a produccion sin revision humana; la corre Luis en el editor SQL de Supabase.
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-14, F10: las policies 'tournament entries public read' y
+-- 'tournament entry members public read' ya existen en vivo). Esta nota decia 'NO APLICADA' pero nunca se
+-- actualizo despues de que Luis la corriera a mano en el editor SQL -- ver Challenge_Dynasty_F10_entrega.md.
 --
 -- QUE PASABA: encontrado durante la auditoria completa de torneos que pidio Luis. Hoy, aunque
 -- un torneo sea publico, nadie puede ver quien esta inscrito ni quien juega contra quien --

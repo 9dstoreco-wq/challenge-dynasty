@@ -1,10 +1,21 @@
 name: Challenge Dynasty CI
 
+# F09 (Auditoria_Challenge_Dynasty_2026-10-12.md): este workflow fijaba Node 20, y
+# release-doctor.mjs omite el gate `npm test` en Node<22 (las pruebas en tests/*.test.mjs
+# importan .ts directo, lo que necesita el soporte nativo de TypeScript de Node 22+). Es
+# decir: CI nunca corrio las pruebas automaticas, aunque el job terminara en verde. Se fija
+# Node 24 para que `npm run verify:release` (release-doctor) incluya el gate de tests, y se
+# fijan las acciones por SHA (no por tag mutable) con permisos minimos, por la misma
+# recomendacion del hallazgo ("acciones fijadas por SHA, permisos minimos").
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   verify:
@@ -13,10 +24,10 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://ggkthvewxmsmtupjzfnk.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_g6H3tifZdc0ucoxIrwUayg_xazuUb1l
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 24
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
       - name: Verify release

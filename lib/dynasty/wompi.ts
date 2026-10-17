@@ -1,11 +1,12 @@
 // Server-only helpers for the Wompi checkout entrypoint (Web Checkout widget / widget.js).
 // Only ever import this from a server file (a Route Handler, a Server Action).
 //
-// Uses the same `dyn:<domain>:<row_id>` reference convention as the previous ePayco
-// integration (see lib/dynasty/checkout-resolvers.ts and supabase/functions/wompi-webhook),
-// so the same server-side resolvers and confirm_*/apply_payment_result RPCs work unchanged
-// for either provider -- only the `p_provider` value passed to them differs ("wompi" vs
-// "epayco").
+// Uses the `dyn:<domain>:<row_id>:<nonce>` reference convention (see
+// lib/dynasty/checkout-resolvers.ts and supabase/functions/wompi-webhook) so the same
+// server-side resolvers and confirm_*/apply_payment_result RPCs stay provider-agnostic -- the
+// `p_provider` value passed to them is "wompi". (The previous ePayco provider used the same
+// convention with p_provider "epayco"; its code was deleted 2026-10-16, see the history note
+// in checkout-resolvers.ts.)
 //
 // Unlike ePayco's classic handler.open({...}), Wompi's Web Checkout widget needs a signed
 // "signature:integrity" computed from reference + amount + currency + a secret the browser
@@ -16,9 +17,20 @@
 // 2026-10-09: Wompi (re)introduced as the platform's payment provider, with a new merchant
 // account. (A previous Wompi integration existed and was removed 2026-09-29 over a Camara
 // de Comercio renewal problem with the old account -- see the history note at the top of
-// checkout-resolvers.ts. ePayco's code is left in place, unused, as a fallback.)
+// checkout-resolvers.ts. ePayco's code was left in place, unused, as a fallback, until it
+// was deleted 2026-10-16.)
+//
+// 2026-10-13: Wompi's own docs are explicit that a reference "will not be possible to use
+// again" once it has been used for a payment on the merchant account
+// (docs.wompi.co/en/docs/colombia/widget-checkout-web, step 2). buildWompiReference used to
+// return the exact same string (`dyn:<domain>:<rowId>`) for every checkout attempt on the
+// same row, so a user whose card was declined (or who just closed the widget) would get an
+// already-used reference on retry. Each call now appends a short random nonce so the
+// reference is unique per attempt while the domain/rowId routing stays unchanged. The
+// webhook (supabase/functions/wompi-webhook/index.ts) parses and discards that 4th segment --
+// it is never looked up against anything, it only keeps Wompi happy.
 
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 
 export type WompiDomain = "booking" | "tournament" | "marketplace" | "billing";
 
@@ -31,8 +43,14 @@ export interface WompiCheckoutConfig {
   signature: string;
 }
 
+/** Random per-attempt suffix: short enough to keep the reference readable, long enough
+ *  (36 bits) that two concurrent checkout attempts on the same row never collide. */
+function checkoutNonce(): string {
+  return randomBytes(5).toString("hex");
+}
+
 export function buildWompiReference(domain: WompiDomain, rowId: string): string {
-  return `dyn:${domain}:${rowId}`;
+  return `dyn:${domain}:${rowId}:${checkoutNonce()}`;
 }
 
 export interface BuildWompiCheckoutParams {
@@ -48,8 +66,9 @@ export interface BuildWompiCheckoutParams {
 
 /**
  * Computes the checkout config the client needs to open Wompi's Web Checkout widget,
- * including the server-computed integrity signature. Mirrors buildEpaycoCheckout's shape
- * and validation (lib/dynasty/epayco.ts), plus the signature step ePayco doesn't need.
+ * including the server-computed integrity signature. (Previously mirrored
+ * buildEpaycoCheckout's shape and validation in lib/dynasty/epayco.ts, plus the signature
+ * step ePayco didn't need -- that file was deleted 2026-10-16.)
  */
 export function buildWompiCheckout(params: BuildWompiCheckoutParams): WompiCheckoutConfig {
   const currency = (params.currencyCode || "COP").toUpperCase();

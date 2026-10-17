@@ -61,9 +61,11 @@ function loadWompiScript(): Promise<void> {
  * Renders a "Pagar con Wompi" button. On mount it asks our own server
  * (/api/checkout/wompi) to look up the real amount owed for `domain`/`rowId` -- always
  * computed server-side from lib/dynasty/checkout-resolvers.ts -- and to compute the
- * integrity signature Wompi's widget requires (lib/dynasty/wompi.ts). Unlike the previous
- * ePayco button (components/EpaycoCheckoutButton.tsx), the amount can't be tampered with
- * client-side here: without a valid server-issued signature the widget itself won't open.
+ * integrity signature Wompi's widget requires (lib/dynasty/wompi.ts). The amount can't be
+ * tampered with client-side here: without a valid server-issued signature the widget itself
+ * won't open. (The previous ePayco button, components/EpaycoCheckoutButton.tsx, had the same
+ * property; its code was deleted 2026-10-16 -- see the provider-history note at the top of
+ * checkout-resolvers.ts.)
  * Clicking the button loads Wompi's widget.js (once per page) and opens its hosted Web
  * Checkout. The final source of truth is still the signed event Wompi sends to
  * supabase/functions/wompi-webhook, which re-verifies the transaction against Wompi's own
@@ -76,6 +78,7 @@ export function WompiCheckoutButton({ domain, rowId, className }: WompiCheckoutB
     ALREADY_PAID: t("alreadyPaid"),
     FORBIDDEN: t("forbidden"),
     BOOKING_CANCELLED: t("bookingCancelled"),
+    BOOKING_NOT_PAYABLE: t("bookingNotPayable"),
     PAYMENT_NOT_REQUIRED: t("paymentNotRequired"),
     PAYMENT_PROVIDER_NOT_CONFIGURED: t("notConfigured"),
     INVALID_AMOUNT: t("invalidAmount"),

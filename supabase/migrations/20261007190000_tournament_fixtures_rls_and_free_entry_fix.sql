@@ -1,8 +1,10 @@
 -- Challenge Dynasty -- deja que el organizador arme el cuadro de partidos, deja que el
 -- organizador vea quien ya pago su inscripcion, y corrige que una categoria SIN costo de
 -- inscripcion se quedaba "pendiente" para siempre.
--- ESTADO: ESCRITA, NO APLICADA. El sistema de permisos bloqueo aplicarla desde Claude
--- porque es un deploy a produccion sin revision humana; la corre Luis en el editor SQL de Supabase.
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-14, F10: el cuerpo en vivo de public.register_tournament_entry
+-- -- obtenido via pg_get_functiondef -- ya incluye el bloque 'si v_amount_due=0 confirmar directo' que
+-- describe este archivo). Esta nota decia 'NO APLICADA' pero nunca se actualizo despues de que Luis la
+-- corriera a mano en el editor SQL -- ver Challenge_Dynasty_F10_entrega.md.
 --
 -- QUE PASABA (encontrado en el repaso de hoy, construyendo "armar el cuadro automatico"):
 -- 1) "tournament_fixtures" (los partidos de un torneo) solo tenia permiso de LECTURA. No habia

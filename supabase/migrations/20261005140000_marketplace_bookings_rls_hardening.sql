@@ -1,5 +1,9 @@
 -- Challenge Dynasty — endurecimiento de seguridad (revision en vivo 2026-10-05)
--- ESTADO: ESCRITA, NO APLICADA. Se aplica solo con autorizacion explicita del dueno.
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-14, F10 -- Auditoria_Challenge_Dynasty_2026-10-12.md:
+-- los 3 triggers y las 2 policies nuevas de este archivo ya existen en vivo: trg_protect_seller_profile_privileged,
+-- trg_protect_listing_privileged, trg_enforce_bookable_resource_ownership, 'billing invoices owner read',
+-- 'billing subscriptions owner read'. Esta nota decia 'NO APLICADA' pero nunca se actualizo despues de que
+-- Luis la corriera a mano en el editor SQL -- ver Challenge_Dynasty_F10_entrega.md.
 -- Todo es idempotente (drop if exists / create or replace).
 --
 -- Contexto: las politicas RLS de estas tablas solo comparan owner_id = auth.uid(), pero no limitan

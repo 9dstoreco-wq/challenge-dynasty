@@ -1,6 +1,9 @@
 -- Challenge Dynasty -- cierra el hueco de consentimiento al inscribir pareja/equipo en torneos.
--- ESTADO: ESCRITA, NO APLICADA. El sistema de permisos bloqueo aplicarla desde Claude
--- porque es un deploy a produccion sin revision humana; la corre Luis en el editor SQL de Supabase.
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-14, F10: public.register_tournament_entry y
+-- public.respond_tournament_entry_invite existen en vivo con exactamente estas firmas; el cuerpo en vivo de
+-- register_tournament_entry ya refleja ademas el fix posterior de 20261007190000, ver esa nota). Esta nota
+-- decia 'NO APLICADA' pero nunca se actualizo despues de que Luis la corriera a mano -- ver
+-- Challenge_Dynasty_F10_entrega.md.
 --
 -- QUE PASABA: cuando alguien se inscribe en un torneo con pareja/equipo, el sistema metia a los
 -- demas jugadores como "invited" sin preguntarles nada, y no existia ninguna forma (ni boton, ni

@@ -1,6 +1,7 @@
 -- Challenge Dynasty -- arregla una compra del marketplace que esta rota en produccion.
--- ESTADO: ESCRITA, NO APLICADA. El sistema de permisos bloqueo aplicarla desde Claude
--- porque es un deploy a produccion sin revision humana; la corre Luis en el editor SQL de Supabase.
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-14, F10: public.create_marketplace_order existe en vivo
+-- con exactamente esta firma -- p_items jsonb, p_delivery_amount numeric). Esta nota decia 'NO APLICADA' pero
+-- nunca se actualizo despues de que Luis la corriera a mano en el editor SQL -- ver Challenge_Dynasty_F10_entrega.md.
 --
 -- QUE PASA: create_marketplace_order metia un valor a mano en marketplace_order_items.line_total,
 -- pero esa columna es "generada" (Postgres la calcula solo con cantidad*precio+envio) y no se le

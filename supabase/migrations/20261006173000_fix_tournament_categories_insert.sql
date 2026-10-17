@@ -1,6 +1,7 @@
 -- Challenge Dynasty -- deja que el organizador cree categorias dentro de su torneo.
--- ESTADO: ESCRITA, NO APLICADA. El sistema de permisos bloqueo aplicarla desde Claude
--- porque es un deploy a produccion sin revision humana; la corre Luis en el editor SQL de Supabase.
+-- ESTADO: APLICADA EN PRODUCCION (confirmado 2026-10-14, F10: la policy 'tournament categories organizer
+-- write' ya existe en vivo). Esta nota decia 'NO APLICADA' pero nunca se actualizo despues de que Luis la
+-- corriera a mano en el editor SQL -- ver Challenge_Dynasty_F10_entrega.md.
 --
 -- QUE PASABA: encontrado en la auditoria completa de torneos. La tabla "tournament_categories"
 -- (individual/parejas/equipos, cupo, costo de inscripcion) solo tenia permiso de LECTURA. No

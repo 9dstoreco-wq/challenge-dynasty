@@ -23,7 +23,7 @@ export async function createSkillChallenge(input: {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 15 retos de trucos creados por hora por usuario.
-    if (!(await checkRateLimit(supabase, `create_skill_challenge:${user.id}`, 15, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'create_skill_challenge', 15, 3600))) throw new Error(t('rateLimited'))
     const { data, error } = await supabase.rpc('create_skill_challenge', {
       p_sport_id: input.sportId,
       p_title: input.title,
@@ -48,7 +48,7 @@ export async function submitSkillChallenge(input: { challengeId: string; videoUr
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 20 envios de trucos por hora por usuario.
-    if (!(await checkRateLimit(supabase, `submit_skill_challenge:${user.id}`, 20, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'submit_skill_challenge', 20, 3600))) throw new Error(t('rateLimited'))
     if (!isAllowedVideoUrl(input.videoUrl)) throw new Error(t('invalidVideoUrl'))
     const { data, error } = await supabase.rpc('submit_skill_challenge', {
       p_challenge_id: input.challengeId,
@@ -67,7 +67,7 @@ export async function voteSkillSubmission(submissionId: string, score: number): 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error(t('authRequired'))
     // Hasta 200 votos por hora por usuario.
-    if (!(await checkRateLimit(supabase, `vote_skill:${user.id}`, 200, 3600))) throw new Error(t('rateLimited'))
+    if (!(await checkRateLimit(supabase, 'vote_skill', 200, 3600))) throw new Error(t('rateLimited'))
     const { error } = await supabase.rpc('vote_skill_submission', {
       p_submission_id: submissionId,
       p_value: score,
