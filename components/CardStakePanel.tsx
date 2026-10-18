@@ -66,7 +66,7 @@ export default function CardStakePanel({
       </div>
 
       <div className="mt-4 text-center text-sm font-bold">
-        {settled ? <span className="text-[#00E676]">{t('stake.settled')}</span> : bothIn ? <span className="text-[#00E676]"><Swords className="mr-1 inline" size={14} />{t('stake.locked')}</span> : <span className="text-white/45">{t('stake.needBoth')}</span>}
+        {settled ? <span className="text-[#00E676]">{t('stake.settled')}</span> : bothIn ? <span className="text-[#00E676]"><Swords className="mr-1 inline" size={14} aria-hidden="true" />{t('stake.locked')}</span> : <span className="text-white/45">{t('stake.needBoth')}</span>}
       </div>
 
       {canEdit && !bothIn && !settled && (
@@ -96,7 +96,7 @@ export default function CardStakePanel({
           )}
         </div>
       )}
-      {error && <p className="mt-3 text-center text-sm text-red-300">{error}</p>}
+      {error && <p role="alert" className="mt-3 text-center text-sm text-red-300">{error}</p>}
     </section>
   )
 }

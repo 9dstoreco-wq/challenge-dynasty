@@ -67,7 +67,7 @@ export default async function MyChallengesPage() {
   )
 
   return <div className="min-h-screen arena-bg text-white"><Sidebar /><main className="lg:pl-64 pb-24 lg:pb-0 p-6 md:p-10"><div className="max-w-3xl">
-    <PageHero wide badge={false} className="p-6 md:p-8"><div className="flex items-center justify-between gap-4"><div><h1 className="text-3xl font-display font-black tracking-wide">{t('title')}</h1><p className="text-white/45 mt-2">{t('subtitle')}</p></div><Link href="/challenge/new" className="btn-gold px-4 py-2.5 text-sm shrink-0">{t('newBtn')}</Link></div></PageHero>
+    <PageHero wide badge={false} className="p-6 md:p-8"><div className="flex items-center justify-between gap-4"><div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide leading-[.92]">{t('title')}</h1><p className="text-white/45 mt-2">{t('subtitle')}</p></div><Link href="/challenge/new" className="btn-gold px-4 py-2.5 text-sm shrink-0">{t('newBtn')}</Link></div></PageHero>
     {renderSection(t('toAnswer'), toAnswer, true)}
     {renderSection(t('playing'), playing)}
     {renderSection(t('closed'), closed)}

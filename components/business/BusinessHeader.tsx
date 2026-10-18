@@ -10,9 +10,9 @@ export default function BusinessHeader({
   subtitle?: string
 }) {
   return (
-    <div className="mb-8 pb-6 border-b border-white/10">
-      {eyebrow && <div className="text-[11px] font-semibold uppercase tracking-wider text-[#6FA3D8]">{eyebrow}</div>}
-      <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mt-1.5">{title}</h1>
+    <div className="mb-8 border-b border-white/10 border-l-4 border-l-[#6FA3D8]/50 pb-6 pl-5">
+      {eyebrow && <div className="text-[11px] font-semibold uppercase tracking-[.2em] text-[#6FA3D8]">{eyebrow}</div>}
+      <h1 className="mt-2 text-4xl font-black leading-[0.98] tracking-tight md:text-5xl">{title}</h1>
       {subtitle && <p className="text-white/50 text-sm mt-2 max-w-2xl">{subtitle}</p>}
     </div>
   )

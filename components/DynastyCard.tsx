@@ -34,19 +34,19 @@ export default function DynastyCard({ card, selected = false, onClick }: { card:
     <Tag
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`block w-full max-w-[260px] text-left ${selected ? 'ring-2 ring-[#00E676] ring-offset-2 ring-offset-[#0A0A0C]' : ''}`}
+      className={`block w-full max-w-[260px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0C] ${selected ? 'ring-2 ring-[#00E676] ring-offset-2 ring-offset-[#0A0A0C]' : ''}`}
       aria-pressed={onClick ? selected : undefined}
     >
       <div ref={ref} className={`dcard r-${card.rarity}`} onPointerMove={move} onPointerLeave={leave}>
         <div className="dcard-body">
           <div className="dcard-in">
             <div className="absolute left-3 top-3 z-10">
-              <div className="font-display text-5xl leading-none" style={{ color: 'var(--r)' }}>{card.rating}</div>
+              <div className="font-display text-5xl leading-none tabular-nums" style={{ color: 'var(--r)' }}>{card.rating}</div>
               <div className="mt-1 text-[10px] font-black uppercase tracking-[.2em] text-white/60">{t('ratingShort')}</div>
-              <div className="mt-2 text-xl leading-none">{card.sportIcon ?? '🏅'}</div>
+              <div className="mt-2 text-xl leading-none" aria-hidden="true">{card.sportIcon ?? '🏅'}</div>
             </div>
             <div className="absolute right-3 top-3 z-10">
-              <div className="hex grid h-11 w-11 place-items-center font-display text-xl" style={{ background: 'linear-gradient(160deg,#fff9,var(--r))' }}>{card.level}</div>
+              <div className="hex grid h-11 w-11 place-items-center font-display text-xl tabular-nums" style={{ background: 'linear-gradient(160deg,#fff9,var(--r))' }}>{card.level}</div>
               <div className="mt-1 text-center text-[9px] font-black uppercase tracking-widest text-white/50">{t('levelShort')}</div>
             </div>
             <div className="absolute inset-x-0 top-[22%] grid place-items-center">
@@ -57,7 +57,7 @@ export default function DynastyCard({ card, selected = false, onClick }: { card:
               <div className="mt-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-[.16em]">
                 <span style={{ color: 'var(--r)' }}>{t(`rarity.${card.rarity}`)}</span>
                 <span className="inline-flex items-center gap-1 text-white/55">
-                  {card.isProtected ? <ShieldCheck size={11} /> : <Trophy size={11} />}
+                  {card.isProtected ? <ShieldCheck size={11} aria-hidden="true" /> : <Trophy size={11} aria-hidden="true" />}
                   {card.isProtected ? t('baseTag') : t('trophyTag')}
                 </span>
               </div>

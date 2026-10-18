@@ -19,9 +19,11 @@ export default async function RankingPage(){
   const rest = rankings.slice(3)
 
   return <div className="min-h-screen arena-bg text-white"><Sidebar/><main className="lg:pl-64 pb-20 lg:pb-0"><div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
-    <PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">CHALLENGE DYNASTY · RANKING</div>
-    <h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">RANKING</h1>
-    <p className="text-white/50 mt-2">{t('subtitle')}</p></PageHero>
+    <PageHero>
+    {podium[0] && <div aria-hidden="true" className="pointer-events-none absolute right-6 -top-6 select-none font-display text-[160px] leading-none text-[#D4AF37]/[0.07] md:text-[240px]">{Number(podium[0].rating).toFixed(0)}</div>}
+    <div className="relative text-xs tracking-[.3em] text-[#D4AF37] font-black">CHALLENGE DYNASTY · RANKING</div>
+    <h1 className="relative text-5xl md:text-8xl font-display font-black tracking-wide leading-[.92] mt-2">RANKING</h1>
+    <p className="relative text-white/50 mt-2">{t('subtitle')}</p></PageHero>
     {error ? <div className="mt-7 rounded-3xl border border-red-400/20 bg-red-400/5 p-8 text-center text-red-200">{t('loadError')}</div> : rankings.length === 0 ? <div className="mt-7 rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-10 text-center text-white/45">{t('empty')}</div> : <>
       {podium.length>0 && <div className="mt-7 grid grid-cols-3 gap-3 md:gap-5 items-end">{[podium[1],podium[0],podium[2]].map((r,k)=>{
         if(!r) return <div key={`empty-${k}`}/>
