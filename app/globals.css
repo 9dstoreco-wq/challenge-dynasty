@@ -120,13 +120,44 @@ article.rounded-3xl, .rounded-3xl{transition:border-color .2s ease,transform .2s
 select option,select optgroup{background-color:#141416;color:#fff}
 
 /* ===== Portada estilo Lando (LandoHero + MarqueeTicker) ===== */
-.lando-hero{--gx:75%;--gy:35%}
-.lando-glow{position:absolute;z-index:0;left:var(--gx);top:var(--gy);width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:9999px;pointer-events:none;
-  background:radial-gradient(circle,rgba(212,175,55,.5) 0%,rgba(212,175,55,.16) 38%,transparent 70%);filter:blur(30px);transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1)}
+@property --lens{syntax:'<length>';inherits:true;initial-value:0px}
+.lando-hero{--pf:1;--sx:0;--sy:0;--sp:0;--lx:50%;--ly:50%;--lens:0px;transition:--lens .5s cubic-bezier(.2,.8,.2,1)}
+.lando-hero[data-hover="1"]{--lens:clamp(70px,11vw,150px)}
+.lando-hero[data-swing="1"]{--lens:clamp(110px,16vw,230px)}
+.lando-glow{position:absolute;z-index:0;left:calc(50% + var(--sx)*35%);top:calc(45% + var(--sy)*30%);width:620px;height:620px;margin:-310px 0 0 -310px;border-radius:9999px;pointer-events:none;
+  background:radial-gradient(circle,rgba(212,175,55,.45) 0%,rgba(212,175,55,.14) 38%,transparent 70%);filter:blur(34px)}
 .lando-outline{color:transparent;-webkit-text-stroke:2px #D4AF37}
+/* Letras con paralaje a distinta profundidad */
+.lando-l1{transform:translate3d(calc(var(--sx)*-22px*var(--pf)),calc(var(--sy)*-8px*var(--pf)),0)}
+.lando-l2{transform:translate3d(calc(var(--sx)*34px*var(--pf)),calc(var(--sy)*6px*var(--pf)),0)}
+.lando-l3{transform:translate3d(calc(var(--sx)*-12px*var(--pf)),calc(var(--sy)*10px*var(--pf)),0)}
+/* Lupa: misma tipografia invertida, recortada en un circulo que sigue el cursor */
+.lando-lens{position:absolute;inset:-120px;padding:120px;z-index:3;pointer-events:none;background:#D4AF37;color:#0A0A0C;
+  clip-path:circle(var(--lens) at calc(var(--lx) + 120px) calc(var(--ly) + 120px))}
+.lando-lens .lando-outline{-webkit-text-stroke:2px #0A0A0C}
+.lando-lens .lando-l3{color:#F5F2EA;-webkit-text-stroke:2px #0A0A0C}
+/* Pala 3D: se inclina hacia el cursor y gira con el scroll */
+.lando-stage{perspective:1100px}
+.lando-paddle-3d{transform-style:preserve-3d;will-change:transform;
+  transform:translate3d(calc(var(--sx)*30px),calc(var(--sy)*22px + var(--sp)*-160px),0) rotateY(calc(var(--sx)*28deg)) rotateX(calc(var(--sy)*-20deg)) rotateZ(calc(var(--sp)*80deg))}
+.lando-swing{transform-origin:50% 92%}
+.lando-hero[data-swing="1"] .lando-swing{animation:lando-swing .65s cubic-bezier(.2,.8,.2,1)}
+@keyframes lando-swing{0%{transform:rotate(0)}30%{transform:rotate(-38deg) scale(1.04)}65%{transform:rotate(22deg)}100%{transform:rotate(0)}}
 .lando-paddle{transform-origin:200px 300px;animation:lando-float 6s ease-in-out infinite}
 @keyframes lando-float{0%,100%{transform:rotate(16deg) translateY(0)}50%{transform:rotate(16deg) translateY(-14px)}}
+.lando-trail{opacity:.5;transition:opacity .2s}
+.lando-hero[data-swing="1"] .lando-trail{opacity:1}
+.lando-bolt{animation:lando-bolt 3.2s steps(1) infinite}
+@keyframes lando-bolt{0%,90%,100%{opacity:1}92%{opacity:.35}95%{opacity:1}97%{opacity:.6}}
+/* Pelota: orbita en reposo, sale disparada con el smash */
+.lando-ball{position:absolute;left:4%;top:12%;width:17%;aspect-ratio:1;border-radius:9999px;
+  background:radial-gradient(circle at 35% 35%,#FFF6CF,#E8C752 50%,#8A6B16);box-shadow:0 0 40px rgba(212,175,55,.55);
+  transform:translate3d(calc(var(--sx)*60px),calc(var(--sy)*44px),0);animation:lando-orbit 5s ease-in-out infinite}
+@keyframes lando-orbit{0%,100%{margin-top:0}50%{margin-top:-18px}}
+.lando-hero[data-swing="1"] .lando-ball{animation:lando-shot .9s cubic-bezier(.15,.7,.2,1)}
+@keyframes lando-shot{0%{translate:0 0;scale:1;opacity:1}55%{translate:-260% -170%;scale:.45;opacity:1}56%{opacity:0}80%{translate:0 40%;scale:.6;opacity:0}100%{translate:0 0;scale:1;opacity:1}}
 .lando-ticker{transform:rotate(-1.5deg)}
 .lando-track{animation:lando-marquee 28s linear infinite}
 @keyframes lando-marquee{to{transform:translateX(-50%)}}
-@media (prefers-reduced-motion:reduce){.lando-paddle,.lando-track{animation:none}.lando-glow{transition:none}}
+@media (max-width:767px){.lando-hero{--pf:.25}.lando-hero[data-hover="1"]{--lens:58px}.lando-outline,.lando-lens .lando-outline,.lando-lens .lando-l3{-webkit-text-stroke-width:1.5px}}
+@media (prefers-reduced-motion:reduce){.lando-paddle,.lando-track,.lando-bolt,.lando-ball{animation:none!important}.lando-hero{transition:none}}
