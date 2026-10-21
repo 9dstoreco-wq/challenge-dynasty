@@ -5,7 +5,7 @@ import FollowButton from '@/components/FollowButton'
 import PlayerCard from '@/components/PlayerCard'
 import CardShowcase from '@/components/CardShowcase'
 import { getPlayerCards } from '@/lib/dynasty/cards'
-import { getTranslations } from 'next-intl/server'
+import { getTranslations, getLocale } from 'next-intl/server'
 import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 
@@ -31,6 +31,8 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
   const t = await getTranslations('Profile')
+  const locale = await getLocale()
+  const dateLocale = locale === 'en' ? 'en-US' : 'es-CO'
   const tCards = await getTranslations('Cards')
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -101,70 +103,95 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
     [t('rank'), bestRank !== null ? `#${bestRank}` : '—'],
   ]
 
+  const nameWords = (p.display_name || p.username || '').trim().split(/\s+/)
+  const firstName = nameWords[0] ?? ''
+  const restName = nameWords.slice(1).join(' ')
+
   return (
-    <main className="min-h-screen arena-bg p-4 md:p-10 text-white">
-      <div className="max-w-5xl mx-auto">
-        <Link href="/" className="text-sm text-white/50">{t('backLink')}</Link>
-        <section className="hud-corners mt-6 border border-[#D4AF37]/30 bg-gradient-to-br from-[#221F0F] via-[#141416] to-[#0A0A0C] p-6 md:p-8 relative overflow-hidden [clip-path:polygon(28px_0,100%_0,100%_calc(100%-28px),calc(100%-28px)_100%,0_100%,0_28px)]">
-          <div className="flex flex-col md:flex-row gap-6 items-start">
-            <div className="hex grid h-24 w-24 place-items-center font-display text-5xl">{(p.display_name || p.username || '?').trim()[0]?.toUpperCase()}</div>
-            <div className="flex-1">
-              <div className="text-xs tracking-[.25em] text-[#D4AF37] font-bold">{t('tag')}</div>
-              <h1 className="text-4xl font-display font-black tracking-wide mt-2">{p.display_name}</h1>
-              <div className="text-white/50 mt-1">@{p.username} · {p.city || t('locationUnknown')}</div>
+    <main className="min-h-screen arena-bg overflow-x-clip px-4 py-6 text-white md:px-10 md:py-10">
+      <div className="mx-auto max-w-6xl">
+        <Link href="/" className="text-sm text-white/60 hover:text-[#D4AF37]">{t('backLink')}</Link>
+
+        {/* Portada estilo ficha de piloto */}
+        <section className="relative isolate mt-6 grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_auto]">
+          {bestRating !== null && (
+            <div aria-hidden="true" className="pointer-events-none absolute -top-8 right-0 -z-10 select-none font-display leading-none tabular-nums text-[#D4AF37]/[0.06] text-[38vw] md:text-[360px]">
+              {Math.round(Number(bestRating))}
+            </div>
+          )}
+          <div className="min-w-0">
+            <div className="reveal text-xs font-black tracking-[.3em] text-[#D4AF37]">{t('tag')}</div>
+            <h1 className="mt-3 break-words font-display font-normal leading-[.86] tracking-tight text-[clamp(64px,11vw,170px)]">
+              <span className="reveal block" style={{ ['--i' as string]: 1 }}>{firstName}</span>
+              {restName && <span className="reveal lando-outline block pl-[6%]" style={{ ['--i' as string]: 2 }}>{restName}</span>}
+            </h1>
+            <div className="reveal mt-4 flex flex-wrap items-center gap-3 text-white/70" style={{ ['--i' as string]: 3 }}>
+              <span>@{p.username} · {p.city || t('locationUnknown')}</span>
               {progression?.level != null && (
-                <div className="inline-flex items-center gap-2 mt-3 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/30 px-3 py-1">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/15 px-3 py-1">
                   <span className="text-xs font-black text-[#D4AF37]">{t('level')} {progression.level}</span>
-                  {progression.total_xp != null && <span className="text-xs text-white/50">· {progression.total_xp} {t('xp')}</span>}
-                </div>
+                  {progression.total_xp != null && <span className="text-xs text-white/60 tabular-nums">· {progression.total_xp} {t('xp')}</span>}
+                </span>
               )}
-              <div className="flex gap-2 mt-4">
-                <Link href={`/challenge/new?player=${p.id}`} className="btn-gold">{t('challengeBtn')}</Link>
-                {user && !isOwnProfile && <FollowButton targetId={p.id} initialFollowing={Boolean(follow)} />}
-              </div>
             </div>
-            <div className="text-right">
-              <div className="text-xs text-white/40">{t('globalRanking')}</div>
-              <div className="text-sm font-black text-[#D4AF37]">{bestRank !== null ? `#${bestRank}` : t('rankingLabel')}</div>
-              <div className="text-xs text-white/40">{t('rankingHint')}</div>
+            <div className="reveal mt-6 flex flex-wrap gap-3" style={{ ['--i' as string]: 4 }}>
+              <Link href={`/challenge/new?player=${p.id}`} className="btn-gold shine">{t('challengeBtn')}</Link>
+              {user && !isOwnProfile && <FollowButton targetId={p.id} initialFollowing={Boolean(follow)} />}
             </div>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mt-8">
-            {statBlocks.map(([label, value]) => (
-              <div key={label} className="card-fut-plain bg-white/5 p-4">
-                <div className="text-xs text-white/40">{label}</div>
-                <div className="font-display text-4xl leading-none mt-1">{value}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8">
-            <div className="font-black mb-3">{isOwnProfile ? t('myCardTitle') : t('tag')}</div>
-            <PlayerCard profileId={p.id} playerName={p.display_name} username={p.username} />
-          </div>
-
-          <div className="mt-8">
-            <CardShowcase cards={collection} title={isOwnProfile ? undefined : tCards('collectionOf', { name: p.display_name })} />
-          </div>
-
-          <div className="mt-8">
-            <div className="font-black">{t('rivalriesTitle')}</div>
-            <div className="mt-4 space-y-3">
-              {(rivals ?? []).map((r) => (
-                <Link key={r.opponent_id} href={`/u/${r.opponent_username}`} className="flex items-center gap-4 rounded-2xl bg-white/5 p-4 hover:bg-white/10">
-                  <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-white/20 to-white/5" />
-                  <div className="flex-1">
-                    <div className="font-black">{r.opponent_name}</div>
-                    <div className="text-xs text-white/40">{t('matchesPlayed', { count: r.played, wins: r.wins, losses: r.losses })}</div>
-                  </div>
-                  <div className="text-xs text-white/40">{new Date(r.last_played).toLocaleDateString('es-CO')}</div>
-                </Link>
-              ))}
-              {(rivals ?? []).length === 0 && <div className="rounded-2xl bg-white/5 p-4 text-white/45">{t('emptyRivalries')}</div>}
+          <div className="reveal relative mx-auto" style={{ ['--i' as string]: 2 }}>
+            <div aria-hidden="true" className="spot-rays" />
+            <div className="hex grid h-40 w-40 place-items-center font-display text-8xl md:h-56 md:w-56 md:text-9xl" aria-hidden="true">{(p.display_name || p.username || '?').trim()[0]?.toUpperCase()}</div>
+            <div className="mt-4 text-center">
+              <div className="text-[10px] font-black uppercase tracking-[.3em] text-white/50">{t('globalRanking')}</div>
+              <div className="font-display text-5xl leading-none tabular-nums text-[#D4AF37]">{bestRank !== null ? `#${bestRank}` : '—'}</div>
             </div>
           </div>
         </section>
+
+        {/* Estadisticas en grande */}
+        <dl className="mt-12 grid grid-cols-2 border-t border-white/10 md:grid-cols-6">
+          {statBlocks.map(([label, value], i) => (
+            <div key={label} className="reveal border-b border-white/10 py-5 pr-4 md:border-b-0 md:py-6" style={{ ['--i' as string]: Math.min(i, 8) }}>
+              <dt className="text-[11px] font-black uppercase tracking-[.2em] text-white/50">{label}</dt>
+              <dd className="mt-1 font-display text-5xl leading-none tabular-nums md:text-6xl">{value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <section className="mt-14 grid items-start gap-10 md:grid-cols-[auto_minmax(0,1fr)]">
+          <div>
+            <h2 className="mb-4 font-display text-4xl leading-none tracking-wide">{isOwnProfile ? t('myCardTitle') : t('tag')}</h2>
+            <PlayerCard profileId={p.id} playerName={p.display_name} username={p.username} />
+          </div>
+          <div>
+            <h2 className="mb-4 font-display text-4xl leading-none tracking-wide">{t('rivalriesTitle')}</h2>
+            <div className="space-y-2">
+              {(rivals ?? []).map((r) => {
+                const g = (r.wins ?? 0) + (r.losses ?? 0)
+                const pct = g ? Math.round(((r.wins ?? 0) / g) * 100) : 0
+                return (
+                  <Link key={r.opponent_id} href={`/u/${r.opponent_username}`} className="standings-row flex items-center gap-4 border-t border-white/10 px-2 py-4">
+                    <div className="hex grid h-11 w-11 shrink-0 place-items-center font-display text-xl" aria-hidden="true">{(r.opponent_name || '?').trim()[0]?.toUpperCase()}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-display text-2xl tracking-wide">{r.opponent_name}</div>
+                      <div className="mt-1 flex items-center gap-3">
+                        <div className="h-1.5 w-28 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-[#D4AF37]" style={{ width: `${pct}%` }} /></div>
+                        <span className="text-xs text-white/60 tabular-nums">{t('matchesPlayed', { count: r.played, wins: r.wins, losses: r.losses })}</span>
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-xs text-white/50">{new Date(r.last_played).toLocaleDateString(dateLocale)}</div>
+                  </Link>
+                )
+              })}
+              {(rivals ?? []).length === 0 && <div className="border border-dashed border-white/15 bg-white/[.02] p-5 text-white/55">{t('emptyRivalries')}</div>}
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-14">
+          <CardShowcase cards={collection} title={isOwnProfile ? undefined : tCards('collectionOf', { name: p.display_name })} />
+        </div>
       </div>
     </main>
   )
