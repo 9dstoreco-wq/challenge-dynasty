@@ -202,7 +202,17 @@
     "ticker2": "WIN",
     "ticker3": "TAKE THEIR CARD",
     "ticker4": "LEVEL UP",
-    "ticker5": "RULE"
+    "ticker5": "RULE",
+    "worldOnTag": "01 / Compete",
+    "worldOnMeta": "Challenges · Ranking · Tournaments",
+    "worldOnTitle": "ON THE\nCOURT",
+    "worldOnBody": "Challenge, play and log the score. Every win adds XP and upgrades your card's rarity.",
+    "worldOnCta": "Go to the arena",
+    "worldOffTag": "02 / Live",
+    "worldOffMeta": "Community · Cards · Shop",
+    "worldOffTitle": "OFF THE\nCOURT",
+    "worldOffBody": "Collect, trade and show off. Your card showcase and your people, all in one place.",
+    "worldOffCta": "See my cards"
   },
   "Arena": {
     "title": "Live competition",

@@ -202,7 +202,17 @@
     "ticker2": "GANA",
     "ticker3": "QUÍTALE LA CARTA",
     "ticker4": "SUBE DE NIVEL",
-    "ticker5": "REINA"
+    "ticker5": "REINA",
+    "worldOnTag": "01 / Competir",
+    "worldOnMeta": "Retos · Ranking · Torneos",
+    "worldOnTitle": "EN LA\nCANCHA",
+    "worldOnBody": "Reta, juega y registra el marcador. Cada victoria suma XP y sube tu carta de rareza.",
+    "worldOnCta": "Ir a la arena",
+    "worldOffTag": "02 / Vivir",
+    "worldOffMeta": "Comunidad · Cartas · Shop",
+    "worldOffTitle": "FUERA DE\nLA CANCHA",
+    "worldOffBody": "Colecciona, intercambia y presume. Tu vitrina de cartas y tu gente, en un solo lugar.",
+    "worldOffCta": "Ver mis cartas"
   },
   "Arena": {
     "title": "Competencia en vivo",

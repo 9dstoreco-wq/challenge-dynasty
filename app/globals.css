@@ -142,7 +142,7 @@ select option,select optgroup{background-color:#141416;color:#fff}
   transform:translate3d(calc(var(--sx)*30px),calc(var(--sy)*22px + var(--sp)*-160px),0) rotateY(calc(var(--sx)*28deg)) rotateX(calc(var(--sy)*-20deg)) rotateZ(calc(var(--sp)*80deg))}
 .lando-swing{transform-origin:50% 92%}
 .lando-hero[data-swing="1"] .lando-swing{animation:lando-swing .65s cubic-bezier(.2,.8,.2,1)}
-@keyframes lando-swing{0%{transform:rotate(0)}30%{transform:rotate(-38deg) scale(1.04)}65%{transform:rotate(22deg)}100%{transform:rotate(0)}}
+@keyframes lando-swing{0%{transform:rotate(0)}30%{transform:rotate(-26deg) scale(1.04)}65%{transform:rotate(12deg)}100%{transform:rotate(0)}}
 .lando-paddle{transform-origin:200px 300px;animation:lando-float 6s ease-in-out infinite}
 @keyframes lando-float{0%,100%{transform:rotate(16deg) translateY(0)}50%{transform:rotate(16deg) translateY(-14px)}}
 .lando-trail{opacity:.5;transition:opacity .2s}
@@ -156,8 +156,52 @@ select option,select optgroup{background-color:#141416;color:#fff}
 @keyframes lando-orbit{0%,100%{margin-top:0}50%{margin-top:-18px}}
 .lando-hero[data-swing="1"] .lando-ball{animation:lando-shot .9s cubic-bezier(.15,.7,.2,1)}
 @keyframes lando-shot{0%{translate:0 0;scale:1;opacity:1}55%{translate:-260% -170%;scale:.45;opacity:1}56%{opacity:0}80%{translate:0 40%;scale:.6;opacity:0}100%{translate:0 0;scale:1;opacity:1}}
+/* --- Capa extra de efectos --- */
+.lando-edge{transform:translate(calc(var(--sx)*-9px + 7px),calc(var(--sy)*-7px + 9px))}
+.lando-sheen{transform:translateX(calc(var(--sx)*170px - 40px)) skewX(-12deg);transition:none}
+.lando-hero[data-swing="1"] .lando-sheen{animation:lando-sheen-hit .65s ease-out}
+@keyframes lando-sheen-hit{from{transform:translateX(-320px) skewX(-12deg)}to{transform:translateX(320px) skewX(-12deg)}}
+.lando-halo{position:absolute;inset:6% 4% 30% 4%;border-radius:9999px;background:radial-gradient(circle,rgba(212,175,55,.35),transparent 65%);filter:blur(20px);animation:lando-halo 4s ease-in-out infinite;
+  transform:translate(calc(var(--sx)*20px),calc(var(--sy)*16px))}
+@keyframes lando-halo{0%,100%{opacity:.55;scale:1}50%{opacity:1;scale:1.08}}
+.lando-shadow{position:absolute;left:22%;right:22%;bottom:-4%;height:7%;border-radius:9999px;background:radial-gradient(ellipse,rgba(0,0,0,.75),transparent 70%);filter:blur(8px);
+  transform:translate(calc(var(--sx)*-30px),0) scaleX(calc(1 - var(--sp)*.5))}
+/* Pelota con estela */
+.lando-ball-tail{position:absolute;right:40%;top:30%;width:260%;height:40%;border-radius:9999px;opacity:0;transform-origin:100% 50%;transform:rotate(-33deg);
+  background:linear-gradient(90deg,transparent,rgba(246,230,179,.15) 40%,rgba(246,230,179,.85));filter:blur(3px)}
+.lando-hero[data-swing="1"] .lando-ball-tail{animation:lando-tail .9s ease-out}
+@keyframes lando-tail{0%,10%{opacity:0}25%,50%{opacity:1}60%,100%{opacity:0}}
+/* Chispas + onda expansiva + destello al hacer smash */
+.lando-ring{position:absolute;left:var(--cx,50%);top:var(--cy,50%);width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:9999px;border:2px solid #F6E6B3;opacity:0}
+.lando-hero[data-swing="1"] .lando-ring{animation:lando-ring .7s cubic-bezier(.2,.8,.2,1)}
+.lando-hero[data-swing="1"] .lando-ring-2{animation:lando-ring 1s .08s cubic-bezier(.2,.8,.2,1);border-color:#D4AF37}
+@keyframes lando-ring{from{opacity:1;transform:scale(.2)}to{opacity:0;transform:scale(9)}}
+.lando-spark{position:absolute;left:var(--cx,50%);top:var(--cy,50%);width:3px;height:22px;margin:-11px 0 0 -1.5px;border-radius:3px;opacity:0;
+  background:linear-gradient(#FFF6CF,#D4AF37 60%,transparent);transform:rotate(var(--a)) translateY(0)}
+.lando-hero[data-swing="1"] .lando-spark{animation:lando-spark .6s cubic-bezier(.15,.7,.2,1)}
+@keyframes lando-spark{0%{opacity:1;transform:rotate(var(--a)) translateY(-10px) scaleY(.4)}60%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateY(-150px) scaleY(1.2)}}
+.lando-flash{position:absolute;inset:-20% -40%;opacity:0;background:linear-gradient(105deg,transparent 40%,rgba(246,230,179,.22) 48%,rgba(255,255,255,.4) 50%,rgba(246,230,179,.22) 52%,transparent 60%)}
+.lando-hero[data-swing="1"] .lando-flash{animation:lando-flash .7s ease-out}
+@keyframes lando-flash{from{opacity:1;transform:translateX(-60%)}to{opacity:0;transform:translateX(60%)}}
+/* Impacto en las letras */
+.lando-hero[data-swing="1"] .lando-type{animation:lando-impact .4s cubic-bezier(.3,1.6,.4,1)}
+@keyframes lando-impact{0%{transform:none}20%{transform:translate(-6px,3px) skewX(-4deg)}45%{transform:translate(5px,-2px) skewX(3deg)}70%{transform:translate(-2px,1px)}100%{transform:none}}
+/* Polvo dorado flotando con profundidad */
+.lando-dust-layer{transform:translate(calc(var(--sx)*-26px),calc(var(--sy)*-18px))}
+.lando-dust{position:absolute;width:calc(2px + var(--z)*3px);height:calc(2px + var(--z)*3px);border-radius:9999px;background:#F6E6B3;opacity:0;
+  box-shadow:0 0 8px rgba(212,175,55,.9);animation:lando-dust var(--d) linear infinite;animation-delay:calc(var(--d)*-.5)}
+@keyframes lando-dust{0%{opacity:0;transform:translateY(0)}15%{opacity:calc(var(--z)*.9)}85%{opacity:calc(var(--z)*.6)}100%{opacity:0;transform:translateY(-260px) translateX(30px)}}
+@media (prefers-reduced-motion:reduce){.lando-halo,.lando-dust,.lando-ring,.lando-spark,.lando-flash,.lando-ball-tail,.lando-sheen{animation:none!important}.lando-hero .lando-type{animation:none!important}.lando-dust{opacity:.4}}
 .lando-ticker{transform:rotate(-1.5deg)}
 .lando-track{animation:lando-marquee 28s linear infinite}
 @keyframes lando-marquee{to{transform:translateX(-50%)}}
 @media (max-width:767px){.lando-hero{--pf:.25}.lando-hero[data-hover="1"]{--lens:58px}.lando-outline,.lando-lens .lando-outline,.lando-lens .lando-l3{-webkit-text-stroke-width:1.5px}}
 @media (prefers-reduced-motion:reduce){.lando-paddle,.lando-track,.lando-bolt,.lando-ball{animation:none!important}.lando-hero{transition:none}}
+
+/* ===== Dos mundos (SplitWorlds) ===== */
+.split-world-glow{position:absolute;right:-30%;bottom:-40%;width:80%;aspect-ratio:1;border-radius:9999px;background:radial-gradient(circle,rgba(212,175,55,.35),transparent 65%);filter:blur(20px);opacity:.5;transition:opacity .4s,transform .6s cubic-bezier(.2,.8,.2,1)}
+.split-world-glow-light{background:radial-gradient(circle,rgba(212,175,55,.45),transparent 65%)}
+.split-world:hover .split-world-glow{opacity:1;transform:translate(-18%,-18%) scale(1.15)}
+.split-world-btn{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.split-world:hover .split-world-btn{transform:rotate(45deg) scale(1.08)}
+@media (prefers-reduced-motion:reduce){.split-world-glow,.split-world-btn{transition:none}}
