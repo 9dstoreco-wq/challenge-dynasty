@@ -118,3 +118,15 @@ article.rounded-3xl, .rounded-3xl{transition:border-color .2s ease,transform .2s
 
 /* Opciones de <select> legibles: el fondo translucido del select deja la lista blanca con texto blanco en Chrome/Windows */
 select option,select optgroup{background-color:#141416;color:#fff}
+
+/* ===== Portada estilo Lando (LandoHero + MarqueeTicker) ===== */
+.lando-hero{--gx:75%;--gy:35%}
+.lando-glow{position:absolute;z-index:0;left:var(--gx);top:var(--gy);width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:9999px;pointer-events:none;
+  background:radial-gradient(circle,rgba(212,175,55,.5) 0%,rgba(212,175,55,.16) 38%,transparent 70%);filter:blur(30px);transition:left .35s cubic-bezier(.2,.8,.2,1),top .35s cubic-bezier(.2,.8,.2,1)}
+.lando-outline{color:transparent;-webkit-text-stroke:2px #D4AF37}
+.lando-paddle{transform-origin:200px 300px;animation:lando-float 6s ease-in-out infinite}
+@keyframes lando-float{0%,100%{transform:rotate(16deg) translateY(0)}50%{transform:rotate(16deg) translateY(-14px)}}
+.lando-ticker{transform:rotate(-1.5deg)}
+.lando-track{animation:lando-marquee 28s linear infinite}
+@keyframes lando-marquee{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.lando-paddle,.lando-track{animation:none}.lando-glow{transition:none}}

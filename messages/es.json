@@ -192,7 +192,17 @@
     "levelBadge": "NIVEL {level}",
     "xpStats": "{xp} XP · racha {streak}",
     "levelEmpty": "Juega tu primer partido para empezar a subir de nivel.",
-    "viewCard": "Ver mi carta"
+    "viewCard": "Ver mi carta",
+    "heroLine1": "RETA.",
+    "heroLine2": "GANA.",
+    "heroLine3": "REINA.",
+    "heroSideNote": "Temporada 01 · Laboratorio pádel",
+    "heroLede": "La arena donde retas a cualquiera, apuestas tu carta y subes en el ranking. Si pierdes, la carta cambia de dueño.",
+    "ticker1": "RETA",
+    "ticker2": "GANA",
+    "ticker3": "QUÍTALE LA CARTA",
+    "ticker4": "SUBE DE NIVEL",
+    "ticker5": "REINA"
   },
   "Arena": {
     "title": "Competencia en vivo",

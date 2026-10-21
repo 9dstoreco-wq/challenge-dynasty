@@ -192,7 +192,17 @@
     "levelBadge": "LEVEL {level}",
     "xpStats": "{xp} XP · streak {streak}",
     "levelEmpty": "Play your first match to start leveling up.",
-    "viewCard": "View my card"
+    "viewCard": "View my card",
+    "heroLine1": "CHALLENGE.",
+    "heroLine2": "WIN.",
+    "heroLine3": "RULE.",
+    "heroSideNote": "Season 01 · Padel lab",
+    "heroLede": "The arena where you challenge anyone, stake your card and climb the ranking. Lose, and your card changes hands.",
+    "ticker1": "CHALLENGE",
+    "ticker2": "WIN",
+    "ticker3": "TAKE THEIR CARD",
+    "ticker4": "LEVEL UP",
+    "ticker5": "RULE"
   },
   "Arena": {
     "title": "Live competition",
