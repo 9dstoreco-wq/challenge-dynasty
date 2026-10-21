@@ -233,3 +233,14 @@ select option,select optgroup{background-color:#141416;color:#fff}
 .podium-col.is-first .podium-step{height:22px;opacity:1}
 .standings-row{transition:background-color .2s ease}
 .standings-row:hover{background:rgba(212,175,55,.06)}
+
+/* ===== Arena: tarjetas VS ===== */
+.live-dot{width:8px;height:8px;border-radius:9999px;background:#00E676;box-shadow:0 0 0 0 rgba(0,230,118,.6);animation:live-ping 1.8s ease-out infinite}
+@keyframes live-ping{0%{box-shadow:0 0 0 0 rgba(0,230,118,.6)}100%{box-shadow:0 0 0 10px rgba(0,230,118,0)}}
+.vs-card{transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s}
+.vs-card:hover{transform:translateY(-6px);border-color:rgba(212,175,55,.45)}
+.vs-glow{position:absolute;left:50%;top:50%;width:70%;aspect-ratio:1;margin:-35% 0 0 -35%;border-radius:9999px;background:radial-gradient(circle,rgba(212,175,55,.22),transparent 65%);filter:blur(16px);opacity:.4;transition:opacity .35s,transform .5s}
+.vs-card:hover .vs-glow{opacity:1;transform:scale(1.2)}
+.vs-arrow{transition:transform .3s}
+.vs-card:hover .vs-arrow{transform:translateX(4px)}
+@media (prefers-reduced-motion:reduce){.live-dot{animation:none}.vs-card,.vs-glow,.vs-arrow{transition:none}}

@@ -222,7 +222,21 @@
     "defaultRival": "Rival",
     "tbd": "Por definir",
     "locationTbd": "Ubicación por definir",
-    "empty": "La Arena está esperando nuevos retos."
+    "empty": "La Arena está esperando nuevos retos.",
+    "kicker": "CHALLENGE DYNASTY · EN VIVO",
+    "heroLine1": "LA",
+    "heroLine2": "ARENA",
+    "ctaNew": "LANZAR UN RETO",
+    "ctaMine": "MIS RETOS",
+    "openCount": "{count, plural, =0 {Sin retos abiertos} one {# reto abierto} other {# retos abiertos}}",
+    "ticker1": "RETA A CUALQUIERA",
+    "ticker2": "ACEPTA EL DESAFÍO",
+    "ticker3": "APUESTA TU CARTA",
+    "ticker4": "GANA Y SUBE",
+    "challenger": "Retador",
+    "challenged": "Retado",
+    "seeChallenge": "Ver reto →",
+    "emptyTitle": "NADIE HA RETADO… TODAVÍA"
   },
   "Clubs": {
     "title": "Clubes deportivos",

@@ -222,7 +222,21 @@
     "defaultRival": "Opponent",
     "tbd": "TBD",
     "locationTbd": "Location TBD",
-    "empty": "The Arena is waiting for new challenges."
+    "empty": "The Arena is waiting for new challenges.",
+    "kicker": "CHALLENGE DYNASTY · LIVE",
+    "heroLine1": "THE",
+    "heroLine2": "ARENA",
+    "ctaNew": "LAUNCH A CHALLENGE",
+    "ctaMine": "MY CHALLENGES",
+    "openCount": "{count, plural, =0 {No open challenges} one {# open challenge} other {# open challenges}}",
+    "ticker1": "CHALLENGE ANYONE",
+    "ticker2": "ACCEPT THE DARE",
+    "ticker3": "STAKE YOUR CARD",
+    "ticker4": "WIN AND CLIMB",
+    "challenger": "Challenger",
+    "challenged": "Challenged",
+    "seeChallenge": "See challenge →",
+    "emptyTitle": "NOBODY HAS CHALLENGED… YET"
   },
   "Clubs": {
     "title": "Sports clubs",
