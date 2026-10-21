@@ -363,7 +363,19 @@
     "loadError": "No se pudo cargar el ranking en este momento.",
     "empty": "Todavía no hay suficientes posiciones competitivas registradas.",
     "defaultPlayer": "Jugador Dynasty",
-    "matchesStats": "{matches} partidos · {wins}V / {losses}D"
+    "matchesStats": "{matches} partidos · {wins}V / {losses}D",
+    "kicker": "CHALLENGE DYNASTY · TEMPORADA 01",
+    "cta": "SUBIR EN EL RANKING",
+    "ticker1": "RETA",
+    "ticker2": "GANA",
+    "ticker3": "SUBE POSICIONES",
+    "ticker4": "REINA LA TABLA",
+    "ratingLabel": "Rating",
+    "colPos": "Pos",
+    "colPlayer": "Jugador",
+    "colRecord": "Récord",
+    "colWinRate": "% Victorias",
+    "record": "{wins}V – {losses}D"
   },
   "Notifications": {
     "title": "Notificaciones",

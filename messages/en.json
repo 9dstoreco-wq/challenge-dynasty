@@ -363,7 +363,19 @@
     "loadError": "Could not load the ranking right now.",
     "empty": "Not enough competitive standings recorded yet.",
     "defaultPlayer": "Dynasty Player",
-    "matchesStats": "{matches} matches · {wins}W / {losses}L"
+    "matchesStats": "{matches} matches · {wins}W / {losses}L",
+    "kicker": "CHALLENGE DYNASTY · SEASON 01",
+    "cta": "CLIMB THE RANKING",
+    "ticker1": "CHALLENGE",
+    "ticker2": "WIN",
+    "ticker3": "CLIMB POSITIONS",
+    "ticker4": "RULE THE TABLE",
+    "ratingLabel": "Rating",
+    "colPos": "Pos",
+    "colPlayer": "Player",
+    "colRecord": "Record",
+    "colWinRate": "Win %",
+    "record": "{wins}W – {losses}L"
   },
   "Notifications": {
     "title": "Notifications",
