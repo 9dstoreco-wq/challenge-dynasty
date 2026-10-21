@@ -1313,7 +1313,18 @@
       "withdraw": "Retirar mi carta",
       "noCards": "Todavía no tienes cartas para poner en juego. Las cartas se ganan ganando retos.",
       "errorGeneric": "No se pudo actualizar la carta. Intenta de nuevo."
-    }
+    },
+    "filterAll": "Todas",
+    "filterLabel": "Filtrar por rareza",
+    "ctaChallenge": "LANZAR UN RETO",
+    "ctaRanking": "VER RANKING",
+    "lockedLabel": "Cartas por desbloquear",
+    "ticker1": "GANA RETOS",
+    "ticker2": "QUÍTALE LA CARTA",
+    "ticker3": "SUBE DE RAREZA",
+    "ticker4": "COLECCIONA",
+    "historyWonTag": "+ GANADA",
+    "historyLostTag": "− PERDIDA"
   },
   "ClubIncome": {
     "tag": "INGRESOS",

@@ -205,3 +205,23 @@ select option,select optgroup{background-color:#141416;color:#fff}
 .split-world-btn{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
 .split-world:hover .split-world-btn{transform:rotate(45deg) scale(1.08)}
 @media (prefers-reduced-motion:reduce){.split-world-glow,.split-world-btn{transition:none}}
+
+/* ===== Cartas estilo Lando (CardSpotlight, LockedCardFan, CardArchive) ===== */
+.spot-rays{position:absolute;left:50%;top:46%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:9999px;pointer-events:none;z-index:-1;
+  background:repeating-conic-gradient(from 0deg,rgba(212,175,55,.16) 0deg 6deg,transparent 6deg 18deg);
+  -webkit-mask:radial-gradient(circle,#000 18%,transparent 66%);mask:radial-gradient(circle,#000 18%,transparent 66%);animation:arena-spin 30s linear infinite}
+.spot-pedestal{position:absolute;left:8%;right:8%;bottom:-18px;height:36px;border-radius:9999px;z-index:-1;
+  background:radial-gradient(ellipse,rgba(212,175,55,.55),rgba(212,175,55,.12) 45%,transparent 70%);filter:blur(6px);animation:lando-halo 4s ease-in-out infinite}
+.spot-float{animation:spot-float 5.5s ease-in-out infinite}
+@keyframes spot-float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(1.5deg)}}
+.fan-card{transform:translateX(calc(-50% + var(--fx))) translateY(var(--fy)) rotate(var(--rot));animation:fan-bob 6s ease-in-out infinite;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.fan-card:hover{z-index:5;transform:translateX(calc(-50% + var(--fx))) translateY(calc(var(--fy) - 18px)) rotate(0deg) scale(1.04)}
+@keyframes fan-bob{0%,100%{margin-top:0}50%{margin-top:-10px}}
+.fan-card:nth-child(2){z-index:2}
+.archive-chip{--r:#D4AF37;border-color:rgba(255,255,255,.18);color:#fff;background:rgba(255,255,255,.03)}
+.archive-chip.r-rare{--r:#D4AF37}.archive-chip.r-epic{--r:#B65CFF}.archive-chip.r-legendary{--r:#FF5A1F}.archive-chip.r-common{--r:#C7CCD6}
+.archive-chip:hover{border-color:var(--r)}
+.archive-chip.is-on{background:var(--r);border-color:var(--r);color:#0A0A0C}
+.archive-item{transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.archive-item:hover{transform:translateY(-8px)}
+@media (prefers-reduced-motion:reduce){.spot-rays,.spot-pedestal,.spot-float,.fan-card{animation:none}.archive-item,.fan-card{transition:none}}

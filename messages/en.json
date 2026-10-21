@@ -1313,7 +1313,18 @@
       "withdraw": "Withdraw my card",
       "noCards": "You don't have cards to put on the line yet. Cards are won by winning challenges.",
       "errorGeneric": "Could not update the card. Try again."
-    }
+    },
+    "filterAll": "All",
+    "filterLabel": "Filter by rarity",
+    "ctaChallenge": "LAUNCH A CHALLENGE",
+    "ctaRanking": "SEE RANKING",
+    "lockedLabel": "Cards to unlock",
+    "ticker1": "WIN CHALLENGES",
+    "ticker2": "TAKE THEIR CARD",
+    "ticker3": "LEVEL UP RARITY",
+    "ticker4": "COLLECT",
+    "historyWonTag": "+ WON",
+    "historyLostTag": "− LOST"
   },
   "ClubIncome": {
     "tag": "INCOME",
