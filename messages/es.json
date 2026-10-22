@@ -1414,7 +1414,11 @@
       "active": "EN JUEGO",
       "completed": "TERMINADO",
       "cancelled": "CANCELADO"
-    }
+    },
+    "kicker": "CHALLENGE DYNASTY · TUS DUELOS",
+    "heroLine1": "MIS",
+    "heroLine2": "RETOS",
+    "emptyTitle": "TU PRIMER RETO TE ESPERA"
   },
   "Health": {
     "title": "Estado del sistema",

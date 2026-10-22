@@ -1414,7 +1414,11 @@
       "active": "IN PLAY",
       "completed": "COMPLETED",
       "cancelled": "CANCELLED"
-    }
+    },
+    "kicker": "CHALLENGE DYNASTY · YOUR DUELS",
+    "heroLine1": "MY",
+    "heroLine2": "CHALLENGES",
+    "emptyTitle": "YOUR FIRST CHALLENGE AWAITS"
   },
   "Health": {
     "title": "System status",

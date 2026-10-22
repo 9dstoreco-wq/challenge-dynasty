@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import Sidebar from '@/components/Sidebar'
 import BottomNav from '@/components/BottomNav'
-import PageHero from '@/components/PageHero'
 import { relatedRow } from '@/app/arena/related-row'
 import { getTranslations, getLocale } from 'next-intl/server'
 
@@ -17,7 +16,12 @@ export default async function MyChallengesPage() {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return <div className="min-h-screen arena-bg text-white"><Sidebar /><main className="lg:pl-64 pb-20 lg:pb-0 p-6 md:p-10"><div className="max-w-3xl rounded-2xl border border-white/10 bg-[#161616] p-6 text-white/55">{t('loginRequired')} <Link href="/login" className="text-[#D4AF37] font-bold">{t('login')}</Link></div></main><BottomNav /></div>
+    return (
+      <div className="min-h-screen arena-bg overflow-x-clip text-white"><Sidebar /><main className="lg:pl-64 pb-24 lg:pb-0"><div className="mx-auto max-w-5xl px-4 py-8 md:px-6">
+        <h1 className="font-display font-normal leading-[.84] tracking-tight text-[clamp(80px,13vw,180px)]"><span className="block">{t('heroLine1')}</span><span className="lando-outline block pl-[8%]">{t('heroLine2')}</span></h1>
+        <div className="mt-8 border border-white/10 bg-[#161616] p-6 text-white/70">{t('loginRequired')} <Link href="/login" className="font-bold text-[#D4AF37]">{t('login')}</Link></div>
+      </div></main><BottomNav /></div>
+    )
   }
 
   const [{ data: parts }, { data: invites }] = await Promise.all([
@@ -51,26 +55,72 @@ export default async function MyChallengesPage() {
   const fmt = (d: string | null) => d ? new Date(d).toLocaleString(locale === 'en' ? 'en-US' : 'es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : t('dateTBD')
   const statusLabel = (s: string) => (['open', 'accepted', 'scheduled', 'active', 'completed', 'cancelled'].includes(s) ? t(`status.${s}`) : s)
 
-  const renderCard = (c: Row, highlight?: boolean) => (
+  const renderCard = (c: Row, i: number, highlight?: boolean) => (
     <Link key={c.id} href={`/challenge/${c.id}`}
-    className={`block rounded-2xl border p-4 ${highlight ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5' : 'border-white/10 bg-[#161616]'}`}>
-      <div className="flex items-center justify-between gap-3">
-        <div className="font-black truncate">{t('vs', { name: rivalOf(c) })}</div>
-        <span className="text-[10px] font-black tracking-wider text-[#D4AF37] shrink-0">{statusLabel(c.status)}</span>
+      className={`vs-card reveal group relative block overflow-hidden rounded-[22px] border p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] ${highlight ? 'border-[#D4AF37]/50 bg-[#D4AF37]/[.07]' : 'border-white/10 bg-[#121214]'}`}
+      style={{ ['--i' as string]: Math.min(i, 10) }}>
+      <span aria-hidden="true" className="vs-glow" />
+      <div className="relative flex items-center justify-between gap-3 text-xs">
+        <span className="inline-flex items-center gap-2 font-black uppercase tracking-[.18em] text-[#D4AF37]">
+          {['active', 'accepted', 'scheduled', 'open'].includes(c.status) && <span className="live-dot" aria-hidden="true" />}
+          {statusLabel(c.status)}
+        </span>
+        <span className="truncate font-bold uppercase tracking-widest text-white/60">{sportMap.get(c.sport_id) ?? ''}</span>
       </div>
-      <div className="mt-1 text-sm text-white/50">{sportMap.get(c.sport_id) ?? ''} · {fmt(c.scheduled_at)}</div>
+      <div className="relative mt-4 flex items-baseline gap-3">
+        <span className="vs-bolt font-display text-3xl leading-none">VS</span>
+        <span className="truncate font-display text-3xl leading-none tracking-wide md:text-4xl">{rivalOf(c)}</span>
+      </div>
+      <div className="relative mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-3 text-sm">
+        <span className="truncate text-white/65">{fmt(c.scheduled_at)}</span>
+        <span className="vs-arrow shrink-0 font-black uppercase tracking-widest text-[#D4AF37]">→</span>
+      </div>
     </Link>
   )
 
   const renderSection = (title: string, items: Row[], highlight?: boolean) => items.length === 0 ? null : (
-    <section className="mt-8"><h2 className="font-display text-2xl tracking-wide mb-3">{title}</h2><div className="space-y-3">{items.map((c) => renderCard(c, highlight))}</div></section>
+    <section className="mt-12">
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <h2 className="font-display text-4xl leading-none tracking-wide md:text-6xl">{title}</h2>
+        <span className="font-display text-4xl leading-none tabular-nums text-white/25 md:text-6xl">{String(items.length).padStart(2, '0')}</span>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">{items.map((c, i) => renderCard(c, i, highlight))}</div>
+    </section>
   )
 
-  return <div className="min-h-screen arena-bg text-white"><Sidebar /><main className="lg:pl-64 pb-24 lg:pb-0 p-6 md:p-10"><div className="max-w-3xl">
-    <PageHero wide badge={false} className="p-6 md:p-8"><div className="flex items-center justify-between gap-4"><div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide leading-[.92]">{t('title')}</h1><p className="text-white/45 mt-2">{t('subtitle')}</p></div><Link href="/challenge/new" className="btn-gold px-4 py-2.5 text-sm shrink-0">{t('newBtn')}</Link></div></PageHero>
-    {renderSection(t('toAnswer'), toAnswer, true)}
-    {renderSection(t('playing'), playing)}
-    {renderSection(t('closed'), closed)}
-    {all.length === 0 && <div className="mt-8 rounded-2xl border border-white/10 bg-[#161616] p-6 text-white/45">{t('empty')}</div>}
-  </div></main><BottomNav /></div>
+  const stats: [string, number][] = [[t('toAnswer'), toAnswer.length], [t('playing'), playing.length], [t('closed'), closed.length]]
+
+  return (
+    <div className="min-h-screen arena-bg overflow-x-clip text-white"><Sidebar /><main className="lg:pl-64 pb-24 lg:pb-0"><div className="mx-auto max-w-5xl px-4 py-8 md:px-6">
+      <section className="relative isolate">
+        <div className="reveal text-xs font-black tracking-[.3em] text-[#D4AF37]">{t('kicker')}</div>
+        <h1 className="mt-3 font-display font-normal leading-[.84] tracking-tight text-[clamp(80px,13vw,180px)]">
+          <span className="reveal block" style={{ ['--i' as string]: 1 }}>{t('heroLine1')}</span>
+          <span className="reveal lando-outline block pl-[8%]" style={{ ['--i' as string]: 2 }}>{t('heroLine2')}</span>
+        </h1>
+        <div className="reveal mt-5 flex flex-wrap items-center justify-between gap-5" style={{ ['--i' as string]: 3 }}>
+          <p className="max-w-md text-base leading-relaxed text-white/70">{t('subtitle')}</p>
+          <Link href="/challenge/new" className="btn-gold shine">{t('newBtn')}</Link>
+        </div>
+        <dl className="reveal mt-10 grid grid-cols-3 border-t border-white/10" style={{ ['--i' as string]: 4 }}>
+          {stats.map(([label, n]) => (
+            <div key={label} className="py-5 pr-3">
+              <dt className="min-h-[2.6em] text-[11px] font-black uppercase leading-tight tracking-[.18em] text-white/50 md:min-h-0">{label}</dt>
+              <dd className="mt-1 font-display text-5xl leading-none tabular-nums md:text-7xl">{n}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+      {renderSection(t('toAnswer'), toAnswer, true)}
+      {renderSection(t('playing'), playing)}
+      {renderSection(t('closed'), closed)}
+      {all.length === 0 && (
+        <div className="mt-10 grid gap-5 rounded-[28px] border border-dashed border-white/15 bg-white/[.02] p-8 text-center md:p-14">
+          <div className="font-display text-5xl leading-none md:text-7xl">{t('emptyTitle')}</div>
+          <p className="mx-auto max-w-md text-white/60">{t('empty')}</p>
+          <div><Link href="/challenge/new" className="btn-gold shine">{t('newBtn')}</Link></div>
+        </div>
+      )}
+    </div></main><BottomNav /></div>
+  )
 }
