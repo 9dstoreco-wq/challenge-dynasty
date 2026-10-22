@@ -120,11 +120,23 @@ async function resolveTournament(supabase: SupabaseServerClient, userId: string,
 }
 
 async function resolveMarketplace(supabase: SupabaseServerClient, userId: string, rowId: string): Promise<ResolvedCheckoutRow> {
-  const { data, error } = await supabase
-    .from("marketplace_orders")
-    .select("total_amount, currency_code, buyer_id, status")
-    .eq("id", rowId)
-    .maybeSingle();
+  // marketplace_orders has exactly one RLS policy for `authenticated`:
+  // deny_all_authenticated_marketplace_orders (USING false / WITH CHECK false, for ALL). A raw
+  // .from("marketplace_orders").select() under the user's own session -- like the old version of
+  // this function -- was ALWAYS blocked by it, so marketplace checkout returned ORDER_NOT_FOUND
+  // for every real order. The rest of the app already avoids this (see get_my_marketplace_orders,
+  // used by app/marketplace/orders/page.tsx); this routes through the same security-definer
+  // pattern, scoped to one order id (see supabase/migrations/20261022140000_*.sql).
+  type MarketplaceCheckoutOrder = {
+    id: string
+    total_amount: number
+    currency_code: string
+    buyer_id: string
+    status: string
+  }
+  const { data, error } = (await supabase
+    .rpc("resolve_marketplace_order_for_checkout", { p_order_id: rowId })
+    .maybeSingle()) as { data: MarketplaceCheckoutOrder | null; error: unknown }
   if (error || !data) throw new CheckoutError("ORDER_NOT_FOUND", 404);
   if (data.buyer_id !== userId) throw new CheckoutError("FORBIDDEN", 403);
   if (data.status === "paid") throw new CheckoutError("ALREADY_PAID", 409);
