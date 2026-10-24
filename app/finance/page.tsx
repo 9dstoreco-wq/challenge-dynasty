@@ -8,10 +8,12 @@ import { getTranslations } from 'next-intl/server'
 export const dynamic='force-dynamic'
 export default async function FinancePage(){
  const supabase=await createClient(); const t=await getTranslations('Finance'); const {data:userData}=await supabase.auth.getUser(); const user=userData.user
- const {data:accountsData}=user?await supabase.from('finance_accounts').select('id,name,account_type,currency_code,is_active').eq('profile_id',user.id).order('name'): {data:[]}
- const {data:txData}=user?await supabase.from('finance_transactions').select('id,transaction_type,amount,currency_code,occurred_at,description,counterparty_name,status,source_type').eq('profile_id',user.id).order('occurred_at',{ascending:false}).limit(40):{data:[]}
- const {data:paymentsData}=user?await supabase.from('payment_records').select('id,booking_id,provider,amount,currency_code,status,paid_at,refunded_amount').eq('payer_profile_id',user.id).order('created_at',{ascending:false}).limit(20):{data:[]}
- const {data:invoicesData}=user?await supabase.from('finance_invoices').select('id,invoice_number,direction,counterparty_name,issue_date,due_date,total_amount,paid_amount,currency_code,status,source_type').eq('profile_id',user.id).order('issue_date',{ascending:false}).limit(30):{data:[]}
+ const [{data:accountsData},{data:txData},{data:paymentsData},{data:invoicesData}]=user?await Promise.all([
+   supabase.from('finance_accounts').select('id,name,account_type,currency_code,is_active').eq('profile_id',user.id).order('name'),
+   supabase.from('finance_transactions').select('id,transaction_type,amount,currency_code,occurred_at,description,counterparty_name,status,source_type').eq('profile_id',user.id).order('occurred_at',{ascending:false}).limit(40),
+   supabase.from('payment_records').select('id,booking_id,provider,amount,currency_code,status,paid_at,refunded_amount').eq('payer_profile_id',user.id).order('created_at',{ascending:false}).limit(20),
+   supabase.from('finance_invoices').select('id,invoice_number,direction,counterparty_name,issue_date,due_date,total_amount,paid_amount,currency_code,status,source_type').eq('profile_id',user.id).order('issue_date',{ascending:false}).limit(30),
+ ]):[{data:[]},{data:[]},{data:[]},{data:[]}]
  const accounts = accountsData ?? []
  const tx = txData ?? []
  const payments = paymentsData ?? []

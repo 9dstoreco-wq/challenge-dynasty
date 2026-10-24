@@ -14,15 +14,16 @@ export default async function Missions() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: missions } = await supabase
-    .from('missions')
-    .select('id,code,title,description,mission_type,target,xp_reward')
-    .eq('is_active', true)
-    .order('xp_reward', { ascending: true })
-
-  const { data: userMissions } = user
-    ? await supabase.from('user_missions').select('mission_id,progress,status,completed_at').eq('profile_id', user.id)
-    : { data: [] }
+  const [{ data: missions }, { data: userMissions }] = await Promise.all([
+    supabase
+      .from('missions')
+      .select('id,code,title,description,mission_type,target,xp_reward')
+      .eq('is_active', true)
+      .order('xp_reward', { ascending: true }),
+    user
+      ? supabase.from('user_missions').select('mission_id,progress,status,completed_at').eq('profile_id', user.id)
+      : Promise.resolve({ data: [] }),
+  ])
 
   const progressMap = new Map((userMissions ?? []).map((um) => [um.mission_id, um]))
 
