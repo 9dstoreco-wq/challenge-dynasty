@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
+import BottomNav from '@/components/BottomNav'
 import MarketplaceClient from '@/components/MarketplaceClient'
 import { Search, ShieldCheck, PackageCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
@@ -60,6 +61,7 @@ export default async function MarketplacePage() {
 
         <div className="mt-8 rounded-3xl border border-white/10 bg-white/[.02] p-6 flex items-start gap-4"><ShieldCheck className="text-[#D4AF37] mt-1"/><div><h2 className="font-black">{t('protectedTitle')}</h2><p className="text-white/45 text-sm mt-1">{t('protectedBody')}</p></div></div>
       </section>
+      <BottomNav />
     </main>
   )
 }

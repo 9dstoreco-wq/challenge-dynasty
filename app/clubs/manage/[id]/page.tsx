@@ -27,7 +27,7 @@ export default async function ClubManagePage({ params }: { params: Promise<{ id:
         <div className="max-w-2xl mx-auto py-10 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">{t('notOwnerTitle')}</h1>
           <p className="text-white/50 mt-2">{t('notOwnerBody')}</p>
-          <Link href="/clubs" className="text-[#6FA3D8] mt-6 inline-block">{t('backToClubs')}</Link>
+          <Link href="/clubs" className="text-[#D4AF37] mt-6 inline-block">{t('backToClubs')}</Link>
         </div>
       </BusinessShell>
     )
