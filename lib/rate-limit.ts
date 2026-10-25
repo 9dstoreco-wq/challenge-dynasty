@@ -16,8 +16,13 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 // cualquier limitador basado en IP -- no es una garantia de identidad.
 //
 // Si la migracion todavia no se aplico en este entorno (la funcion no existe todavia), la
-// llamada a rpc() falla con un error -- en ese caso se deja pasar en vez de romper la accion
-// entera por un limite que ni siquiera existe aun.
+// llamada a rpc() falla con el error de Postgres 42883 (undefined_function) -- en ese caso
+// especifico se deja pasar, para no romper la accion entera por un limite que ni siquiera
+// existe aun. Cualquier OTRO error (timeout, base de datos caida, tabla de rate-limit con
+// problemas, etc.) ahora bloquea la accion en vez de dejarla pasar -- antes, cualquier error
+// de la llamada rpc() dejaba pasar sin distincion, lo cual anulaba el limite de intentos en
+// /api/checkout/wompi (endpoint de pagos) justo durante una falla, que es cuando mas importa
+// que el limite siga activo.
 export async function checkRateLimit(
   supabase: SupabaseClient,
   action: string,
@@ -31,6 +36,9 @@ export async function checkRateLimit(
     p_window_seconds: windowSeconds,
     p_anon_key: anonKey ?? null,
   })
-  if (error) return true
+  if (error) {
+    if (error.code === '42883') return true // funcion no existe aun (migracion pendiente)
+    return false // cualquier otro error: bloquear por seguridad, no dejar pasar
+  }
   return data !== false
 }

@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { requirePublicSupabaseEnv } from '@/lib/supabase/env'
 
 // Rutas que exigen sesion iniciada. Antes el middleware solo refrescaba la cookie de sesion y
 // dejaba pasar cualquier visita -- finanzas y notificaciones quedaban "accesibles" sin iniciar
@@ -35,9 +36,10 @@ export async function middleware(request: NextRequest) {
   if (businessRewrite) return businessRewrite
 
   let response = NextResponse.next({ request })
+  const { url: supabaseUrl, key: supabaseAnonKey } = requirePublicSupabaseEnv()
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() { return request.cookies.getAll() },

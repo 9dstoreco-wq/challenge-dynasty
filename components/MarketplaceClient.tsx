@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import { CheckCircle2, Loader2, ShoppingCart, X } from 'lucide-react'
+import { CheckCircle2, Loader2, Search, ShoppingCart, X } from 'lucide-react'
 import { toSafeMessage } from '@/lib/safe-error'
 import { COUNTRIES, countryLabel, countryName } from '@/lib/countries'
 import { useTranslations, useLocale } from 'next-intl'
@@ -39,6 +39,7 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [countryFilter, setCountryFilter] = useState<string>('all')
+  const [query, setQuery] = useState('')
 
   const availableCountries = useMemo(() => {
     const codes = new Set(listings.map((x) => x.country_code).filter(Boolean) as string[])
@@ -46,10 +47,13 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
   }, [listings])
 
   const filtered = useMemo(() => {
-    if (countryFilter === 'all') return listings
-    if (countryFilter === 'none') return listings.filter((x) => !x.country_code)
-    return listings.filter((x) => x.country_code === countryFilter)
-  }, [listings, countryFilter])
+    let result = listings
+    if (countryFilter === 'none') result = result.filter((x) => !x.country_code)
+    else if (countryFilter !== 'all') result = result.filter((x) => x.country_code === countryFilter)
+    const q = query.trim().toLowerCase()
+    if (q) result = result.filter((x) => x.title.toLowerCase().includes(q) || (x.description ?? '').toLowerCase().includes(q))
+    return result
+  }, [listings, countryFilter, query])
 
   const total = useMemo(() => (selected?.price ?? 0) * qty, [selected, qty])
 
@@ -77,6 +81,19 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
 
   return (
     <>
+      <div className="rounded-2xl border border-white/10 bg-[#161616]/80 p-4 flex items-center gap-3 mb-8">
+        <Search className="text-white/40" size={20} />
+        <label htmlFor="marketplace-search" className="sr-only">{t('buscarPlaceholder')}</label>
+        <input
+          id="marketplace-search"
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t('buscarPlaceholder')}
+          className="w-full bg-transparent outline-none text-white placeholder:text-white/40"
+        />
+      </div>
+
       {availableCountries.length > 1 && (
         <div className="mb-6 flex items-center gap-3 flex-wrap">
           <span className="text-xs uppercase tracking-widest text-white/40 font-black">{t('pais')}</span>
@@ -110,7 +127,7 @@ export default function MarketplaceClient({ listings }: { listings: Listing[] })
       </div>
 
       {filtered.length === 0 && (
-        <div className="rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-8 text-center text-white/45">{t('noPublicacionesPais')}</div>
+        <div className="rounded-3xl border border-dashed border-white/15 bg-white/[.02] p-8 text-center text-white/45">{query.trim() ? t('noResultadosBusqueda') : t('noPublicacionesPais')}</div>
       )}
 
       {(message || error) && (

@@ -141,35 +141,35 @@ export default function ClubDashboard({
         <div className="text-xs tracking-[.2em] text-[#3B6EA5] font-black">{t('addTitle')}</div>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-bold text-white/40">{t('nameLabel')}</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('namePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
+            <label htmlFor="resource-name" className="text-xs font-bold text-white/40">{t('nameLabel')}</label>
+            <input id="resource-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('namePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
           </div>
           <div>
-            <label className="text-xs font-bold text-white/40">{t('typeLabel')}</label>
-            <input value={resourceType} onChange={(e) => setResourceType(e.target.value)} placeholder={t('typePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
+            <label htmlFor="resource-type" className="text-xs font-bold text-white/40">{t('typeLabel')}</label>
+            <input id="resource-type" value={resourceType} onChange={(e) => setResourceType(e.target.value)} placeholder={t('typePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
           </div>
           <div>
-            <label className="text-xs font-bold text-white/40">{t('sportLabel')}</label>
-            <select value={sportId} onChange={(e) => setSportId(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50">
+            <label htmlFor="resource-sport" className="text-xs font-bold text-white/40">{t('sportLabel')}</label>
+            <select id="resource-sport" value={sportId} onChange={(e) => setSportId(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50">
               <option value="">{t('selectSport')}</option>
               {sports.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs font-bold text-white/40">{t('capacityLabel')}</label>
-            <input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
+            <label htmlFor="resource-capacity" className="text-xs font-bold text-white/40">{t('capacityLabel')}</label>
+            <input id="resource-capacity" type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
           </div>
           <div>
-            <label className="text-xs font-bold text-white/40">{t('priceLabel')}</label>
-            <input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
+            <label htmlFor="resource-price" className="text-xs font-bold text-white/40">{t('priceLabel')}</label>
+            <input id="resource-price" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
           </div>
           <div>
-            <label className="text-xs font-bold text-white/40">{t('currencyLabel')}</label>
-            <input value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={3} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50 uppercase" />
+            <label htmlFor="resource-currency" className="text-xs font-bold text-white/40">{t('currencyLabel')}</label>
+            <input id="resource-currency" value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={3} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50 uppercase" />
           </div>
           <div className="md:col-span-2">
-            <label className="text-xs font-bold text-white/40">{t('modeLabel')}</label>
-            <select value={bookingMode} onChange={(e) => setBookingMode(e.target.value as 'instant' | 'approval_required')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50">
+            <label htmlFor="resource-mode" className="text-xs font-bold text-white/40">{t('modeLabel')}</label>
+            <select id="resource-mode" value={bookingMode} onChange={(e) => setBookingMode(e.target.value as 'instant' | 'approval_required')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50">
               <option value="instant">{t('modeInstant')}</option>
               <option value="approval_required">{t('modeApproval')}</option>
             </select>
