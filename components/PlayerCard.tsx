@@ -114,7 +114,7 @@ export default function PlayerCard({
     <div className="rounded-3xl border border-[#D4AF37]/20 bg-[#161616] p-5">
       <div className="text-xs tracking-[.2em] text-[#D4AF37] font-black mb-3">{t('title')}</div>
       <div className="rounded-2xl overflow-hidden border border-white/10">
-        <img src={imgSrc} alt={t('title')} className="w-full h-auto block" />
+        <img src={imgSrc} alt={t('title')} width={1200} height={630} className="w-full h-auto block" style={{ aspectRatio: '1200 / 630' }} />
       </div>
       <div className="mt-4 flex gap-2">
         <button
