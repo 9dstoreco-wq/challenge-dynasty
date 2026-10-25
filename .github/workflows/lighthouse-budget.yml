@@ -1,0 +1,56 @@
+name: Lighthouse Performance Budget
+
+# Non-blocking by design: this job never fails the PR. Challenge Dynasty's
+# current measured mobile performance score is ~60/100 (see
+# performance-budget.json for the reasoning behind the thresholds chosen),
+# so a hard "error" gate at the usual 0.9 default would turn every PR red
+# from day one and just get ignored or disabled. Instead this reports a
+# "warn" annotation on the PR and uploads nothing that blocks merging --
+# visibility first, enforcement later once the score has real headroom.
+# `continue-on-error: true` on the job is a second safety net in case the
+# build/serve steps themselves fail (e.g. a fork PR without the right
+# context) -- that should never turn into an unexpected required-check
+# failure either.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ggkthvewxmsmtupjzfnk.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_g6H3tifZdc0ucoxIrwUayg_xazuUb1l
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Build
+        run: npm run build
+      - name: Start server
+        run: |
+          npx --yes next start -p 4173 > /tmp/next-start.log 2>&1 &
+          echo $! > /tmp/next-start.pid
+          for i in $(seq 1 30); do
+            if curl -sSf http://localhost:4173/ -o /dev/null; then
+              echo "Server is up."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Server did not come up in time."
+          cat /tmp/next-start.log
+          exit 1
+      - name: Run Lighthouse CI
+        run: npx --yes @lhci/cli@0.15.1 autorun
+      - name: Stop server
+        if: always()
+        run: kill "$(cat /tmp/next-start.pid)" 2>/dev/null || true
