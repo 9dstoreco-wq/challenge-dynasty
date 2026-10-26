@@ -11,10 +11,14 @@ import TournamentResultForm from '@/components/TournamentResultForm'
 import TournamentPendingPaymentsPanel from '@/components/TournamentPendingPaymentsPanel'
 import TournamentKnockoutPanel from '@/components/TournamentKnockoutPanel'
 import TournamentLadderPanel from '@/components/TournamentLadderPanel'
+import TournamentRotationResultForm from '@/components/TournamentRotationResultForm'
+import TournamentRotationStandings from '@/components/TournamentRotationStandings'
 import { LADDER_TOTAL_ROUNDS } from '@/lib/tournamentBracket'
 
 type Fixture = { id: string; category_id: string; round_number: number | null; slot: number | null; next_fixture_id: string | null; scheduled_at: string | null; status: string; side_a_entry_id: string | null; side_b_entry_id: string | null; winner_entry_id: string | null; metadata: { score_a?: number; score_b?: number } | null }
 type Category = { id: string; name: string; participant_mode: string; capacity: number | null; entry_fee: number | null; status: string }
+type RotationMatch = { id: string; category_id: string; round_number: number; court: number; side_a_player1_id: string; side_a_player2_id: string; side_b_player1_id: string; side_b_player2_id: string; score_a: number | null; score_b: number | null; status: string }
+type RotationStanding = { category_id: string; entry_id: string; total_points: number; matches_played: number }
 
 export default async function CompetitionDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -26,18 +30,26 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
   const fixtureStatuses = ['scheduled', 'ready', 'in_progress', 'completed', 'walkover', 'cancelled']
   const fixtureStatusLabel = (s: string) => (fixtureStatuses.includes(s) ? t(`fixtureStatus.${s}` as 'fixtureStatus.scheduled') : s)
 
-  const [{ data: tournament }, { data: catsData }, { data: fixturesData }, { data: confirmedData }, { data: stagesData }] = await Promise.all([
+  const [{ data: tournament }, { data: catsData }, { data: fixturesData }, { data: confirmedData }, { data: stagesData }, { data: rotationMatchesData }, { data: rotationStandingsData }] = await Promise.all([
     supabase.from('tournaments').select('id,title,status,starts_at,ends_at,organization_id,organizer_profile_id,format_type').eq('id', id).maybeSingle(),
     supabase.from('tournament_categories').select('id,name,participant_mode,capacity,entry_fee,status').eq('tournament_id', id).order('name').returns<Category[]>(),
     supabase.from('tournament_fixtures').select('id,category_id,round_number,slot,next_fixture_id,scheduled_at,status,side_a_entry_id,side_b_entry_id,winner_entry_id,metadata').eq('tournament_id', id).order('scheduled_at', { ascending: true, nullsFirst: false }).limit(200).returns<Fixture[]>(),
     supabase.from('tournament_entries').select('id,category_id').eq('tournament_id', id).eq('status', 'confirmed').returns<{ id: string; category_id: string }[]>(),
     supabase.from('tournament_stages').select('category_id,stage_type').eq('tournament_id', id).returns<{ category_id: string; stage_type: string }[]>(),
+    // Americano: partidos de rotación (pareja cambia cada ronda) — viven aparte de tournament_fixtures.
+    supabase.from('tournament_rotation_matches').select('id,category_id,round_number,court,side_a_player1_id,side_a_player2_id,side_b_player1_id,side_b_player2_id,score_a,score_b,status').eq('tournament_id', id).order('round_number', { ascending: true }).order('court', { ascending: true }).returns<RotationMatch[]>(),
+    supabase.from('tournament_rotation_standings').select('category_id,entry_id,total_points,matches_played').eq('tournament_id', id).returns<RotationStanding[]>(),
   ])
   const cats = catsData ?? []
   const fixtures = fixturesData ?? []
+  const rotationMatches = rotationMatchesData ?? []
+  const rotationStandings = rotationStandingsData ?? []
   const isOrganizer = Boolean(user && tournament?.organizer_profile_id === user.id)
 
-  const categoriesWithFixtures = new Set(fixtures.map((f) => f.category_id))
+  const categoriesWithFixtures = new Set([
+    ...fixtures.map((f) => f.category_id),
+    ...rotationMatches.map((m) => m.category_id),
+  ])
   const confirmedCountByCategory = new Map<string, number>()
   for (const e of confirmedData ?? []) {
     confirmedCountByCategory.set(e.category_id, (confirmedCountByCategory.get(e.category_id) ?? 0) + 1)
@@ -68,7 +80,11 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
     })
     .filter((c): c is { id: string; name: string; currentRound: number } => c !== null)
 
-  const entryIds = Array.from(new Set(fixtures.flatMap(f => [f.side_a_entry_id, f.side_b_entry_id]).filter((v): v is string => Boolean(v))))
+  const entryIds = Array.from(new Set([
+    ...fixtures.flatMap(f => [f.side_a_entry_id, f.side_b_entry_id]).filter((v): v is string => Boolean(v)),
+    ...rotationMatches.flatMap(m => [m.side_a_player1_id, m.side_a_player2_id, m.side_b_player1_id, m.side_b_player2_id]),
+    ...rotationStandings.map(s => s.entry_id),
+  ]))
   const { data: entriesData } = entryIds.length
     ? await supabase.from('tournament_entries').select('id,captain_profile_id,entry_type').in('id', entryIds)
     : { data: [] as { id: string; captain_profile_id: string | null; entry_type: string }[] }
@@ -226,6 +242,61 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
               </div>
             )}
           </section>
+
+          {rotationMatches.length > 0 && (
+            <section className="mt-7 card-fut-plain border border-white/10 bg-[#141416] p-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-black">{t('rotationMatchesTitle')}</h2>
+                <span className="text-xs text-white/40">{t('fixturesRegistered', { count: rotationMatches.length })}</span>
+              </div>
+              <div className="mt-4 space-y-2">
+                {rotationMatches.map((m) => {
+                  const hasScore = m.score_a != null && m.score_b != null
+                  const labelA = `${entryLabel(m.side_a_player1_id)} / ${entryLabel(m.side_a_player2_id)}`
+                  const labelB = `${entryLabel(m.side_b_player1_id)} / ${entryLabel(m.side_b_player2_id)}`
+                  return (
+                    <div key={m.id} className="rounded-2xl bg-white/[.03] border border-white/10 p-4 grid md:grid-cols-[150px_1fr_1fr_120px] gap-3 items-center">
+                      <div className="text-xs text-white/40">
+                        {t('rotationRound', { round: m.round_number })}<br />{t('rotationCourt', { court: m.court })}
+                      </div>
+                      <div className="text-sm">{labelA}</div>
+                      <div className="text-sm">{labelB}</div>
+                      <div className="text-right font-black">{hasScore ? `${m.score_a} - ${m.score_b}` : fixtureStatusLabel(m.status)}</div>
+                      {isOrganizer && m.status !== 'completed' && m.status !== 'cancelled' && (
+                        <div className="md:col-span-4">
+                          <TournamentRotationResultForm matchId={m.id} />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
+          {rotationStandings.length > 0 && (
+            <section className="mt-7 card-fut-plain border border-white/10 bg-[#141416] p-6">
+              <h2 className="text-xl font-black">{t('rotationStandingsTitle')}</h2>
+              <div className="mt-4 grid md:grid-cols-2 gap-4">
+                {cats
+                  .filter((c) => rotationStandings.some((s) => s.category_id === c.id))
+                  .map((c) => (
+                    <TournamentRotationStandings
+                      key={c.id}
+                      categoryName={c.name}
+                      rows={rotationStandings
+                        .filter((s) => s.category_id === c.id)
+                        .map((s) => ({
+                          entryId: s.entry_id,
+                          playerLabel: entryLabel(s.entry_id),
+                          totalPoints: s.total_points,
+                          matchesPlayed: s.matches_played,
+                        }))}
+                    />
+                  ))}
+              </div>
+            </section>
+          )}
         </div>
       </main>
       <BottomNav />

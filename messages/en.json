@@ -715,6 +715,13 @@
     "ladderRoundNotFinished": "Some matches in this round still don't have a result.",
     "ladderComplete": "The ladder has finished all its rounds. Each court's final position is the result.",
     "ladderGenerateFailed": "Could not generate the next round. Please try again.",
+    "americanoRequiresMultipleOf4": "Americano needs a number of entries that's a multiple of 4.",
+    "rotationMatchesTitle": "Rotation matches (Americano)",
+    "rotationStandingsTitle": "Standings (Americano)",
+    "rotationRound": "Round {round}",
+    "rotationCourt": "Court {court}",
+    "rotationMatchesPlayed": "{count} played",
+    "rotationScoresRequired": "Enter the score for both sides.",
     "status": {
       "draft": "Draft",
       "published": "Published",

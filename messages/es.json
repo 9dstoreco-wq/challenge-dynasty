@@ -715,6 +715,13 @@
     "ladderRoundNotFinished": "Todavía hay partidos de esta ronda sin resultado.",
     "ladderComplete": "La escalera ya terminó sus rondas. La posición final de cada cancha es el resultado.",
     "ladderGenerateFailed": "No se pudo generar la siguiente ronda. Intenta de nuevo.",
+    "americanoRequiresMultipleOf4": "El Americano necesita un número de inscritos múltiplo de 4.",
+    "rotationMatchesTitle": "Partidos de rotación (Americano)",
+    "rotationStandingsTitle": "Tabla de posiciones (Americano)",
+    "rotationRound": "Ronda {round}",
+    "rotationCourt": "Cancha {court}",
+    "rotationMatchesPlayed": "{count} jugados",
+    "rotationScoresRequired": "Pon el marcador de los dos lados.",
     "status": {
       "draft": "Borrador",
       "published": "Publicado",

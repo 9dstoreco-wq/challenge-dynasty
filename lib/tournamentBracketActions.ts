@@ -8,6 +8,7 @@ import {
   buildLadderInitialRound,
   buildLadderNextRound,
   LADDER_TOTAL_ROUNDS,
+  buildAmericanoRounds,
   type LadderCourtResult,
 } from './tournamentBracket'
 
@@ -177,17 +178,28 @@ async function insertSingleElimination(
 export async function generateBracket(supabase: SupabaseClient, params: GenerateBracketParams) {
   const { tournamentId, categoryId, formatType, startsAt } = params
 
-  const supportedFormats = ['single_elimination', 'round_robin', 'groups_then_knockout', 'king_of_the_court']
+  const supportedFormats = ['single_elimination', 'round_robin', 'groups_then_knockout', 'king_of_the_court', 'americano']
   if (!supportedFormats.includes(formatType)) {
     throw new Error('FORMAT_NOT_SUPPORTED')
   }
 
-  const { count, error: existingError } = await supabase
-    .from('tournament_fixtures')
-    .select('id', { count: 'exact', head: true })
-    .eq('category_id', categoryId)
-  if (existingError) throw existingError
-  if ((count ?? 0) > 0) throw new Error('ALREADY_GENERATED')
+  // Americano no usa tournament_fixtures (pareja cambia cada ronda, puntaje por jugador) — usa
+  // tournament_rotation_matches, así que el chequeo de "ya se generó" mira esa tabla en vez.
+  if (formatType === 'americano') {
+    const { count: rotationCount, error: rotationExistingError } = await supabase
+      .from('tournament_rotation_matches')
+      .select('id', { count: 'exact', head: true })
+      .eq('category_id', categoryId)
+    if (rotationExistingError) throw rotationExistingError
+    if ((rotationCount ?? 0) > 0) throw new Error('ALREADY_GENERATED')
+  } else {
+    const { count, error: existingError } = await supabase
+      .from('tournament_fixtures')
+      .select('id', { count: 'exact', head: true })
+      .eq('category_id', categoryId)
+    if (existingError) throw existingError
+    if ((count ?? 0) > 0) throw new Error('ALREADY_GENERATED')
+  }
 
   const { data: entries, error: entriesError } = await supabase
     .from('tournament_entries')
@@ -207,12 +219,20 @@ export async function generateBracket(supabase: SupabaseClient, params: Generate
         ? 'Fase de grupos'
         : formatType === 'king_of_the_court'
           ? 'Escalera de canchas'
-          : 'Cuadro de eliminación'
-  // "king_of_the_court" no es un stage_type válido en la base (el constraint solo acepta
-  // group/round_robin/single_elimination/double_elimination/ladder/custom) — usa "ladder", que
-  // es justo lo que es: una escalera de canchas.
+          : formatType === 'americano'
+            ? 'Americano'
+            : 'Cuadro de eliminación'
+  // "king_of_the_court" y "americano" no son stage_type válidos en la base (el constraint solo
+  // acepta group/round_robin/single_elimination/double_elimination/ladder/custom) — king_of_the_court
+  // usa "ladder" (es justo lo que es) y americano usa "custom" (no hay un tipo de "rotación").
   const stageType =
-    formatType === 'groups_then_knockout' ? 'group' : formatType === 'king_of_the_court' ? 'ladder' : formatType
+    formatType === 'groups_then_knockout'
+      ? 'group'
+      : formatType === 'king_of_the_court'
+        ? 'ladder'
+        : formatType === 'americano'
+          ? 'custom'
+          : formatType
 
   const { data: stage, error: stageError } = await supabase
     .from('tournament_stages')
@@ -238,6 +258,29 @@ export async function generateBracket(supabase: SupabaseClient, params: Generate
     const groups = splitIntoGroups(entryIds, 4)
     const fixturesCreated = await insertMultipleGroups(supabase, { tournamentId, categoryId, stageId, startsAt, groups })
     return { fixturesCreated }
+  }
+
+  if (formatType === 'americano') {
+    // Lanza AMERICANO_REQUIRES_MULTIPLE_OF_4 si la cantidad de inscritos no es múltiplo de 4
+    // (ver buildAmericanoRounds) — el panel de creación del cuadro traduce ese código a un
+    // mensaje para el organizador.
+    const rotationFixtures = buildAmericanoRounds(entryIds)
+    const rows = rotationFixtures.map((f) => ({
+      tournament_id: tournamentId,
+      category_id: categoryId,
+      stage_id: stageId,
+      round_number: f.round,
+      court: f.court,
+      side_a_player1_id: f.sideA[0],
+      side_a_player2_id: f.sideA[1],
+      side_b_player1_id: f.sideB[0],
+      side_b_player2_id: f.sideB[1],
+      status: 'scheduled',
+      scheduled_at: roundStart(startsAt, f.round),
+    }))
+    const { error: rotationError } = await supabase.from('tournament_rotation_matches').insert(rows)
+    if (rotationError) throw rotationError
+    return { fixturesCreated: rows.length }
   }
 
   if (formatType === 'king_of_the_court') {
@@ -470,5 +513,26 @@ export async function recordFixtureResult(supabase: SupabaseClient, params: Reco
     if (advanceError) throw advanceError
   }
 
+  return data
+}
+
+export type RecordRotationResultParams = {
+  matchId: string
+  scoreA: number
+  scoreB: number
+}
+
+/**
+ * Registra el resultado de un partido de Americano/Mexicano (tournament_rotation_matches).
+ * A diferencia de recordFixtureResult, acá no hay "ganador": el puntaje de cada lado se le suma
+ * a los 2 jugadores de ese lado (ver record_rotation_match_result en la migración de rotación).
+ */
+export async function recordRotationMatchResult(supabase: SupabaseClient, params: RecordRotationResultParams) {
+  const { data, error } = await supabase.rpc('record_rotation_match_result', {
+    p_match_id: params.matchId,
+    p_score_a: params.scoreA,
+    p_score_b: params.scoreB,
+  })
+  if (error) throw error
   return data
 }

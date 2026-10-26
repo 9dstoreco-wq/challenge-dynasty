@@ -1,9 +1,12 @@
 // Generador de cuadros de torneo (puro, sin red ni base de datos — fácil de probar).
 // Hoy soporta: eliminación simple, round robin (todos contra todos), grupos+eliminación
 // (round robin por grupo + un cuadro de eliminación armado después, con los que clasifican),
-// y King of the Court / escalera de canchas (buildLadderInitialRound + buildLadderNextRound).
-// Formatos pendientes: doble eliminación, Americano, Mexicano, cuadro de consolación y sistema
-// suizo — ver el plan de "cubrir todos los formatos de torneo" para el orden de construcción.
+// King of the Court / escalera de canchas (buildLadderInitialRound + buildLadderNextRound), y
+// Americano (buildAmericanoRounds). A diferencia de los demás formatos, Americano y Mexicano no
+// usan tournament_fixtures (esa tabla asume pareja FIJA por lado) — usan
+// tournament_rotation_matches, porque la pareja cambia cada ronda y el puntaje es por JUGADOR,
+// no por pareja (ver lib/tournamentRotationActions.ts).
+// Formatos pendientes: doble eliminación, Mexicano, cuadro de consolación y sistema suizo.
 
 export type FixtureSpec = {
   round: number
@@ -183,5 +186,46 @@ export function buildLadderNextRound(roundNumber: number, previousResults: Ladde
     const sideB: string | null = occupants[1] ?? null
     fixtures.push({ round: roundNumber, slot: court, sideA, sideB, isBye: !sideA || !sideB })
   }
+  return fixtures
+}
+
+export type RotationFixtureSpec = {
+  round: number
+  court: number
+  sideA: [string, string]
+  sideB: [string, string]
+}
+
+// Dentro de una cancha de 4 jugadores (p0..p3), estas son las 3 rondas que cubren TODAS las
+// combinaciones posibles de pareja/rival sin repetir: cada jugador es pareja de cada uno de los
+// otros 3 exactamente una vez a lo largo del torneo.
+const AMERICANO_COURT_ROTATIONS: ReadonlyArray<readonly [readonly [number, number], readonly [number, number]]> = [
+  [[0, 1], [2, 3]],
+  [[0, 2], [1, 3]],
+  [[0, 3], [1, 2]],
+]
+
+/**
+ * Americano: cancha FIJA de 4 jugadores durante todo el torneo (si hay más de 4 inscritos se
+ * reparten en varias canchas, por seed, igual que splitIntoGroups) — dentro de cada cancha la
+ * pareja rota las 3 rondas según AMERICANO_COURT_ROTATIONS. No hace falta esperar resultados
+ * entre ronda y ronda (a diferencia de King of the Court): las 3 rondas se arman de una vez.
+ * El puntaje es INDIVIDUAL — ver lib/tournamentRotationActions.ts (tournament_rotation_matches /
+ * tournament_rotation_standings), porque tournament_fixtures asume pareja fija por lado.
+ */
+export function buildAmericanoRounds(entryIds: string[]): RotationFixtureSpec[] {
+  if (entryIds.length < 4 || entryIds.length % 4 !== 0) throw new Error('AMERICANO_REQUIRES_MULTIPLE_OF_4')
+  const courts = splitIntoGroups(entryIds, 4)
+  const fixtures: RotationFixtureSpec[] = []
+  courts.forEach((court, courtIdx) => {
+    AMERICANO_COURT_ROTATIONS.forEach((pairing, roundIdx) => {
+      fixtures.push({
+        round: roundIdx + 1,
+        court: courtIdx + 1,
+        sideA: [court[pairing[0][0]], court[pairing[0][1]]],
+        sideB: [court[pairing[1][0]], court[pairing[1][1]]],
+      })
+    })
+  })
   return fixtures
 }
