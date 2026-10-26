@@ -79,6 +79,9 @@ export default function TournamentCreateForm({ sports, organizationId }: { sport
             <option value="round_robin">{t('formatRoundRobin')}</option>
             <option value="groups_then_knockout">{t('formatGroups')}</option>
             <option value="ladder">{t('formatLadder')}</option>
+            <option value="americano">{t('formatAmericano')}</option>
+            <option value="mexicano">{t('formatMexicano')}</option>
+            <option value="king_of_the_court">{t('formatKingOfTheCourt')}</option>
           </select>
         </div>
         <div>
