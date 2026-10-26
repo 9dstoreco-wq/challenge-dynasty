@@ -74,14 +74,18 @@ export default function TournamentCreateForm({ sports, organizationId }: { sport
         <div>
           <label className="text-xs font-bold text-white/40">{t('formatLabel')}</label>
           <select value={formatType} onChange={(e) => setFormatType(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#D4AF37]/50">
+            {/*
+              Solo se muestran los formatos que lib/tournamentBracketActions.ts (generateBracket)
+              sabe armar automáticamente. "double_elimination", "ladder", "americano", "mexicano"
+              y "king_of_the_court" son valores válidos en la base de datos (y las claves de
+              traducción ya existen) pero hoy no tienen lógica de generación de partidos: si un
+              organizador los elegía, el torneo quedaba inscribiendo gente sin forma de generar
+              el cuadro. Ocultos aquí hasta que se construya esa lógica; no borrar las opciones
+              de los JSON de mensajes, solo falta reactivarlas cuando estén soportadas.
+            */}
             <option value="single_elimination">{t('formatSingleElim')}</option>
-            <option value="double_elimination">{t('formatDoubleElim')}</option>
             <option value="round_robin">{t('formatRoundRobin')}</option>
             <option value="groups_then_knockout">{t('formatGroups')}</option>
-            <option value="ladder">{t('formatLadder')}</option>
-            <option value="americano">{t('formatAmericano')}</option>
-            <option value="mexicano">{t('formatMexicano')}</option>
-            <option value="king_of_the_court">{t('formatKingOfTheCourt')}</option>
           </select>
         </div>
         <div>
