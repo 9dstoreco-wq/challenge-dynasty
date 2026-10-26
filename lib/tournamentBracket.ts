@@ -1,8 +1,9 @@
 // Generador de cuadros de torneo (puro, sin red ni base de datos — fácil de probar).
-// Hoy soporta: eliminación simple, round robin (todos contra todos), y grupos+eliminación
-// (round robin por grupo + un cuadro de eliminación armado después, con los que clasifican).
-// Formatos pendientes (ver Auditoría de Torneos): doble eliminación y escalera — ver la nota en
-// Auditoría de Torneos sobre por qué quedaron fuera de esta entrega.
+// Hoy soporta: eliminación simple, round robin (todos contra todos), grupos+eliminación
+// (round robin por grupo + un cuadro de eliminación armado después, con los que clasifican),
+// y King of the Court / escalera de canchas (buildLadderInitialRound + buildLadderNextRound).
+// Formatos pendientes: doble eliminación, Americano, Mexicano, cuadro de consolación y sistema
+// suizo — ver el plan de "cubrir todos los formatos de torneo" para el orden de construcción.
 
 export type FixtureSpec = {
   round: number
@@ -111,4 +112,76 @@ export function seedKnockoutFromGroups(qualifiersByGroup: string[][]): string[] 
     }
   }
   return seeded
+}
+
+/**
+ * King of the Court / "escalera de canchas": a diferencia de los otros formatos, las rondas
+ * NO se arman todas de una vez — cada ronda depende de quién ganó/perdió en la anterior, así que
+ * se arma una por una (ver generateNextLadderRound en tournamentBracketActions.ts). Total de
+ * rondas de una "noche" de escalera; se puede ajustar más adelante si hace falta por torneo.
+ */
+export const LADDER_TOTAL_ROUNDS = 4
+
+/**
+ * Ronda 1: reparte los inscritos (ya ordenados por seed/antigüedad) de a 2 por cancha —
+ * cancha 1 es la "mejor" (arriba del todo). Si la cantidad es impar, la última cancha de la
+ * ronda queda con un solo inscrito (bye): no juega, pero para el cálculo de la ronda siguiente
+ * se trata como si hubiera perdido (no sube de cancha sin jugar).
+ */
+export function buildLadderInitialRound(entryIds: string[]): FixtureSpec[] {
+  if (entryIds.length < 2) throw new Error('NOT_ENOUGH_ENTRIES')
+  const fixtures: FixtureSpec[] = []
+  let court = 1
+  for (let i = 0; i < entryIds.length; i += 2) {
+    const sideA: string | null = entryIds[i]
+    const sideB: string | null = entryIds[i + 1] ?? null
+    fixtures.push({ round: 1, slot: court, sideA, sideB, isBye: !sideB })
+    court += 1
+  }
+  return fixtures
+}
+
+export type LadderCourtResult = {
+  /** Número de cancha (1 = la mejor) en la ronda que ya se jugó. */
+  court: number
+  winnerEntryId: string
+  /** null cuando esa cancha fue un bye (nadie para enfrentar). */
+  loserEntryId: string | null
+}
+
+/**
+ * Ronda siguiente: el ganador de cada cancha sube una cancha (cancha - 1; el de la cancha 1 se
+ * queda), el perdedor baja una cancha (cancha + 1; el de la última cancha se queda). Como cada
+ * cancha intermedia manda a alguien hacia arriba y hacia abajo, y recibe exactamente uno de cada
+ * lado, las canchas siempre quedan con 2 inscritos — sin que sobre ni falte nadie.
+ */
+export function buildLadderNextRound(roundNumber: number, previousResults: LadderCourtResult[]): FixtureSpec[] {
+  if (previousResults.length === 0) throw new Error('NOT_ENOUGH_ENTRIES')
+  const maxCourt = Math.max(...previousResults.map((r) => r.court))
+
+  const byNewCourt = new Map<number, string[]>()
+  const place = (courtNumber: number, entryId: string) => {
+    const list = byNewCourt.get(courtNumber) ?? []
+    list.push(entryId)
+    byNewCourt.set(courtNumber, list)
+  }
+
+  for (const r of previousResults) {
+    const upCourt = r.court === 1 ? 1 : r.court - 1
+    place(upCourt, r.winnerEntryId)
+    if (r.loserEntryId) {
+      const downCourt = r.court === maxCourt ? maxCourt : r.court + 1
+      place(downCourt, r.loserEntryId)
+    }
+  }
+
+  const fixtures: FixtureSpec[] = []
+  const sortedCourts = Array.from(byNewCourt.keys()).sort((a, b) => a - b)
+  for (const court of sortedCourts) {
+    const occupants = byNewCourt.get(court) ?? []
+    const sideA: string | null = occupants[0] ?? null
+    const sideB: string | null = occupants[1] ?? null
+    fixtures.push({ round: roundNumber, slot: court, sideA, sideB, isBye: !sideA || !sideB })
+  }
+  return fixtures
 }

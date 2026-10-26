@@ -708,6 +708,13 @@
     "knockoutGenerated": "Done: final stage created with {count} matches.",
     "groupsNotFinished": "Some group matches still don't have a result.",
     "knockoutGenerateFailed": "Could not generate the final stage. Please try again.",
+    "ladderPanelTitle": "Ladder of courts (King of the Court)",
+    "ladderCurrentRound": "Current round: {round}",
+    "ladderNextRound": "Generate next round",
+    "ladderRoundGenerated": "Done: round {round} was generated.",
+    "ladderRoundNotFinished": "Some matches in this round still don't have a result.",
+    "ladderComplete": "The ladder has finished all its rounds. Each court's final position is the result.",
+    "ladderGenerateFailed": "Could not generate the next round. Please try again.",
     "status": {
       "draft": "Draft",
       "published": "Published",

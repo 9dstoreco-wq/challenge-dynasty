@@ -29,7 +29,10 @@ export default function TournamentBracketPanel({
   const [messages, setMessages] = useState<Record<string, string>>({})
 
   const supported =
-    formatType === 'single_elimination' || formatType === 'round_robin' || formatType === 'groups_then_knockout'
+    formatType === 'single_elimination' ||
+    formatType === 'round_robin' ||
+    formatType === 'groups_then_knockout' ||
+    formatType === 'king_of_the_court'
   const pending = categories.filter((c) => !categoriesWithFixtures.has(c.id))
   if (!supported || pending.length === 0) return null
 

@@ -5,6 +5,10 @@ import {
   buildRoundRobinPairs,
   splitIntoGroups,
   seedKnockoutFromGroups,
+  buildLadderInitialRound,
+  buildLadderNextRound,
+  LADDER_TOTAL_ROUNDS,
+  type LadderCourtResult,
 } from './tournamentBracket'
 
 // Deja 2 horas entre ronda y ronda (dentro de una ronda, los partidos se asumen en paralelo
@@ -173,7 +177,8 @@ async function insertSingleElimination(
 export async function generateBracket(supabase: SupabaseClient, params: GenerateBracketParams) {
   const { tournamentId, categoryId, formatType, startsAt } = params
 
-  if (formatType !== 'single_elimination' && formatType !== 'round_robin' && formatType !== 'groups_then_knockout') {
+  const supportedFormats = ['single_elimination', 'round_robin', 'groups_then_knockout', 'king_of_the_court']
+  if (!supportedFormats.includes(formatType)) {
     throw new Error('FORMAT_NOT_SUPPORTED')
   }
 
@@ -200,8 +205,14 @@ export async function generateBracket(supabase: SupabaseClient, params: Generate
       ? 'Todos contra todos'
       : formatType === 'groups_then_knockout'
         ? 'Fase de grupos'
-        : 'Cuadro de eliminación'
-  const stageType = formatType === 'groups_then_knockout' ? 'group' : formatType
+        : formatType === 'king_of_the_court'
+          ? 'Escalera de canchas'
+          : 'Cuadro de eliminación'
+  // "king_of_the_court" no es un stage_type válido en la base (el constraint solo acepta
+  // group/round_robin/single_elimination/double_elimination/ladder/custom) — usa "ladder", que
+  // es justo lo que es: una escalera de canchas.
+  const stageType =
+    formatType === 'groups_then_knockout' ? 'group' : formatType === 'king_of_the_court' ? 'ladder' : formatType
 
   const { data: stage, error: stageError } = await supabase
     .from('tournament_stages')
@@ -229,8 +240,112 @@ export async function generateBracket(supabase: SupabaseClient, params: Generate
     return { fixturesCreated }
   }
 
+  if (formatType === 'king_of_the_court') {
+    const roundFixtures = buildLadderInitialRound(entryIds)
+    const rows = roundFixtures.map((f) => ({
+      tournament_id: tournamentId,
+      category_id: categoryId,
+      stage_id: stageId,
+      round_number: f.round,
+      slot: f.slot,
+      side_a_entry_id: f.sideA,
+      side_b_entry_id: f.sideB,
+      // Un bye (cancha con un solo inscrito) se da por ganado de una vez, igual que en
+      // eliminación simple, para no dejarlo esperando un rival que no existe.
+      winner_entry_id: f.isBye ? f.sideA ?? f.sideB : null,
+      status: f.isBye ? 'completed' : 'scheduled',
+      scheduled_at: roundStart(startsAt, f.round),
+    }))
+    const { error: fixturesError } = await supabase.from('tournament_fixtures').insert(rows)
+    if (fixturesError) throw fixturesError
+    return { fixturesCreated: rows.length }
+  }
+
   const fixturesCreated = await insertSingleElimination(supabase, { tournamentId, categoryId, stageId, startsAt, entryIds })
   return { fixturesCreated }
+}
+
+export type GenerateNextLadderRoundParams = {
+  tournamentId: string
+  categoryId: string
+  startsAt: string | null
+}
+
+/**
+ * King of the Court, ronda 2 en adelante: toma los resultados de la última ronda jugada de la
+ * escalera (todas sus canchas ya con ganador) y arma la ronda siguiente — ganador sube de
+ * cancha, perdedor baja (ver buildLadderNextRound). Se detiene en LADDER_TOTAL_ROUNDS: después
+ * de esa ronda la escalera queda terminada y la posición final de cada cancha es el resultado.
+ */
+export async function generateNextLadderRound(supabase: SupabaseClient, params: GenerateNextLadderRoundParams) {
+  const { tournamentId, categoryId, startsAt } = params
+
+  const { data: stage, error: stageError } = await supabase
+    .from('tournament_stages')
+    .select('id')
+    .eq('category_id', categoryId)
+    .eq('stage_type', 'ladder')
+    .limit(1)
+    .maybeSingle()
+  if (stageError) throw stageError
+  if (!stage) throw new Error('LADDER_STAGE_NOT_FOUND')
+  const stageId = (stage as { id: string }).id
+
+  const { data: currentRoundFixtures, error: fixturesError } = await supabase
+    .from('tournament_fixtures')
+    .select('round_number, slot, side_a_entry_id, side_b_entry_id, winner_entry_id, status')
+    .eq('stage_id', stageId)
+    .order('round_number', { ascending: false })
+    .order('slot', { ascending: true })
+  if (fixturesError) throw fixturesError
+  const fixtures = (currentRoundFixtures ?? []) as Array<{
+    round_number: number
+    slot: number
+    side_a_entry_id: string | null
+    side_b_entry_id: string | null
+    winner_entry_id: string | null
+    status: string
+  }>
+  if (fixtures.length === 0) throw new Error('LADDER_STAGE_NOT_FOUND')
+
+  const currentRound = fixtures[0].round_number
+  if (currentRound >= LADDER_TOTAL_ROUNDS) throw new Error('LADDER_COMPLETE')
+
+  const roundFixtures = fixtures.filter((f) => f.round_number === currentRound)
+  const unfinished = roundFixtures.some((f) => f.status !== 'completed' && f.status !== 'cancelled')
+  if (unfinished) throw new Error('ROUND_NOT_FINISHED')
+
+  const results: LadderCourtResult[] = roundFixtures
+    .map((f) => {
+      if (!f.winner_entry_id) return null // cancelado, no mueve a nadie
+      const loser =
+        f.side_a_entry_id && f.side_b_entry_id
+          ? f.winner_entry_id === f.side_a_entry_id
+            ? f.side_b_entry_id
+            : f.side_a_entry_id
+          : null
+      return { court: f.slot, winnerEntryId: f.winner_entry_id, loserEntryId: loser }
+    })
+    .filter((r): r is LadderCourtResult => r !== null)
+
+  const nextRoundNumber = currentRound + 1
+  const nextFixtures = buildLadderNextRound(nextRoundNumber, results)
+  const rows = nextFixtures.map((f) => ({
+    tournament_id: tournamentId,
+    category_id: categoryId,
+    stage_id: stageId,
+    round_number: f.round,
+    slot: f.slot,
+    side_a_entry_id: f.sideA,
+    side_b_entry_id: f.sideB,
+    winner_entry_id: f.isBye ? f.sideA ?? f.sideB : null,
+    status: f.isBye ? 'completed' : 'scheduled',
+    scheduled_at: roundStart(startsAt, f.round),
+  }))
+  const { error: insertError } = await supabase.from('tournament_fixtures').insert(rows)
+  if (insertError) throw insertError
+
+  return { fixturesCreated: rows.length, roundNumber: nextRoundNumber, isFinal: nextRoundNumber >= LADDER_TOTAL_ROUNDS }
 }
 
 export type GenerateKnockoutParams = {

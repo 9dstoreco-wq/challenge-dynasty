@@ -708,6 +708,13 @@
     "knockoutGenerated": "Listo: se creó la fase final con {count} partidos.",
     "groupsNotFinished": "Todavía hay partidos de grupo sin resultado.",
     "knockoutGenerateFailed": "No se pudo armar la fase final. Intenta de nuevo.",
+    "ladderPanelTitle": "Escalera de canchas (King of the Court)",
+    "ladderCurrentRound": "Ronda actual: {round}",
+    "ladderNextRound": "Generar ronda siguiente",
+    "ladderRoundGenerated": "Listo: se generó la ronda {round}.",
+    "ladderRoundNotFinished": "Todavía hay partidos de esta ronda sin resultado.",
+    "ladderComplete": "La escalera ya terminó sus rondas. La posición final de cada cancha es el resultado.",
+    "ladderGenerateFailed": "No se pudo generar la siguiente ronda. Intenta de nuevo.",
     "status": {
       "draft": "Borrador",
       "published": "Publicado",

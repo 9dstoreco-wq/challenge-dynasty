@@ -10,6 +10,8 @@ import TournamentBracketPanel from '@/components/TournamentBracketPanel'
 import TournamentResultForm from '@/components/TournamentResultForm'
 import TournamentPendingPaymentsPanel from '@/components/TournamentPendingPaymentsPanel'
 import TournamentKnockoutPanel from '@/components/TournamentKnockoutPanel'
+import TournamentLadderPanel from '@/components/TournamentLadderPanel'
+import { LADDER_TOTAL_ROUNDS } from '@/lib/tournamentBracket'
 
 type Fixture = { id: string; category_id: string; round_number: number | null; slot: number | null; next_fixture_id: string | null; scheduled_at: string | null; status: string; side_a_entry_id: string | null; side_b_entry_id: string | null; winner_entry_id: string | null; metadata: { score_a?: number; score_b?: number } | null }
 type Category = { id: string; name: string; participant_mode: string; capacity: number | null; entry_fee: number | null; status: string }
@@ -49,6 +51,22 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
   const categoriesNeedingKnockout = cats.filter(
     (c) => tournament?.format_type === 'groups_then_knockout' && categoriesWithGroupStage.has(c.id) && !categoriesWithKnockoutStage.has(c.id)
   )
+
+  // King of the Court / escalera: categorías que ya tienen su ronda actual completa y todavía
+  // no llegaron a LADDER_TOTAL_ROUNDS — a esas les mostramos el botón "generar ronda siguiente".
+  const categoriesWithLadderStage = new Set(stages.filter((s) => s.stage_type === 'ladder').map((s) => s.category_id))
+  const categoriesReadyForNextLadderRound = cats
+    .filter((c) => tournament?.format_type === 'king_of_the_court' && categoriesWithLadderStage.has(c.id))
+    .map((c) => {
+      const categoryFixtures = fixtures.filter((f) => f.category_id === c.id)
+      if (categoryFixtures.length === 0) return null
+      const currentRound = Math.max(...categoryFixtures.map((f) => f.round_number ?? 1))
+      const roundFixtures = categoryFixtures.filter((f) => (f.round_number ?? 1) === currentRound)
+      const roundFinished = roundFixtures.every((f) => f.status === 'completed' || f.status === 'cancelled')
+      if (!roundFinished || currentRound >= LADDER_TOTAL_ROUNDS) return null
+      return { id: c.id, name: c.name, currentRound }
+    })
+    .filter((c): c is { id: string; name: string; currentRound: number } => c !== null)
 
   const entryIds = Array.from(new Set(fixtures.flatMap(f => [f.side_a_entry_id, f.side_b_entry_id]).filter((v): v is string => Boolean(v))))
   const { data: entriesData } = entryIds.length
@@ -162,6 +180,13 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
               tournamentId={tournament.id}
               startsAt={tournament.starts_at}
               categories={categoriesNeedingKnockout}
+            />
+          )}
+          {isOrganizer && (
+            <TournamentLadderPanel
+              tournamentId={tournament.id}
+              startsAt={tournament.starts_at}
+              categories={categoriesReadyForNextLadderRound}
             />
           )}
 
