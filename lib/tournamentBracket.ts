@@ -1,12 +1,13 @@
 // Generador de cuadros de torneo (puro, sin red ni base de datos — fácil de probar).
 // Hoy soporta: eliminación simple, round robin (todos contra todos), grupos+eliminación
 // (round robin por grupo + un cuadro de eliminación armado después, con los que clasifican),
-// King of the Court / escalera de canchas (buildLadderInitialRound + buildLadderNextRound), y
-// Americano (buildAmericanoRounds). A diferencia de los demás formatos, Americano y Mexicano no
-// usan tournament_fixtures (esa tabla asume pareja FIJA por lado) — usan
-// tournament_rotation_matches, porque la pareja cambia cada ronda y el puntaje es por JUGADOR,
-// no por pareja (ver lib/tournamentRotationActions.ts).
-// Formatos pendientes: doble eliminación, Mexicano, cuadro de consolación y sistema suizo.
+// King of the Court / escalera de canchas (buildLadderInitialRound + buildLadderNextRound),
+// Americano (buildAmericanoRounds) y Mexicano (buildMexicanoInitialRound + buildMexicanoNextRound).
+// A diferencia de los demás formatos, Americano y Mexicano no usan tournament_fixtures (esa tabla
+// asume pareja FIJA por lado) — usan tournament_rotation_matches, porque la pareja cambia cada
+// ronda y el puntaje es por JUGADOR, no por pareja (ver record_rotation_match_result y
+// generateNextMexicanoRound/generateBracket en tournamentBracketActions.ts).
+// Formatos pendientes: doble eliminación, cuadro de consolación y sistema suizo.
 
 export type FixtureSpec = {
   round: number
@@ -228,4 +229,64 @@ export function buildAmericanoRounds(entryIds: string[]): RotationFixtureSpec[] 
     })
   })
   return fixtures
+}
+
+/**
+ * Mexicano, cantidad fija de rondas de una "noche" (se puede ajustar más adelante si hace falta
+ * por torneo, igual que LADDER_TOTAL_ROUNDS).
+ */
+export const MEXICANO_TOTAL_ROUNDS = 5
+
+/** Reparte en bloques seguidos (1-4, 5-8, ...) — a diferencia de splitIntoGroups, que reparte
+ * intercalado (como una baraja); para Mexicano hace falta lo contiguo: los 4 mejores juntos en
+ * la cancha 1, los siguientes 4 en la cancha 2, etc. */
+function chunkContiguous(ids: string[], size: number): string[][] {
+  const chunks: string[][] = []
+  for (let i = 0; i < ids.length; i += size) chunks.push(ids.slice(i, i + size))
+  return chunks
+}
+
+/**
+ * Dentro de una cancha de 4 ya ordenados de mejor (0) a peor (3) por nivel/puntaje, la pareja es
+ * 1ro+4to contra 2do+3ro — así el más fuerte de la cancha compensa un poco al más débil, en vez
+ * de que el 1ro y el 2do (los dos mejores) siempre queden del mismo lado.
+ */
+function pairCourtByRank(court: string[]): { sideA: [string, string]; sideB: [string, string] } {
+  return { sideA: [court[0], court[3]], sideB: [court[1], court[2]] }
+}
+
+/**
+ * Mexicano, ronda 1: todavía no hay puntaje, así que se usa el orden de siembra/inscripción
+ * (mismo criterio — seed, luego antigüedad — que ya usan los demás formatos) como el "nivel"
+ * inicial para armar las canchas.
+ */
+export function buildMexicanoInitialRound(entryIds: string[]): RotationFixtureSpec[] {
+  if (entryIds.length < 4 || entryIds.length % 4 !== 0) throw new Error('MEXICANO_REQUIRES_MULTIPLE_OF_4')
+  const courts = chunkContiguous(entryIds, 4)
+  return courts.map((court, idx) => {
+    const { sideA, sideB } = pairCourtByRank(court)
+    return { round: 1, court: idx + 1, sideA, sideB }
+  })
+}
+
+export type MexicanoStandingInput = { entryId: string; totalPoints: number }
+
+/**
+ * Mexicano, ronda 2 en adelante: a diferencia de Americano (pareja fija toda la noche), acá se
+ * reordenan TODOS los inscritos de la categoría por su puntaje acumulado hasta el momento (mejor
+ * primero; en empate se respeta el orden recibido, para no reacomodar sin necesidad) y se vuelven
+ * a repartir en canchas nuevas de 4 — el nivel se empareja solo, ronda a ronda. Quien va ganando
+ * se va encontrando con gente de su nivel, no con una pareja/rival fija de antemano.
+ */
+export function buildMexicanoNextRound(roundNumber: number, standings: MexicanoStandingInput[]): RotationFixtureSpec[] {
+  if (standings.length < 4 || standings.length % 4 !== 0) throw new Error('MEXICANO_REQUIRES_MULTIPLE_OF_4')
+  const ranked = standings
+    .map((s, i) => ({ ...s, i }))
+    .sort((a, b) => b.totalPoints - a.totalPoints || a.i - b.i)
+    .map((s) => s.entryId)
+  const courts = chunkContiguous(ranked, 4)
+  return courts.map((court, idx) => {
+    const { sideA, sideB } = pairCourtByRank(court)
+    return { round: roundNumber, court: idx + 1, sideA, sideB }
+  })
 }

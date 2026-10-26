@@ -11,9 +11,10 @@ import TournamentResultForm from '@/components/TournamentResultForm'
 import TournamentPendingPaymentsPanel from '@/components/TournamentPendingPaymentsPanel'
 import TournamentKnockoutPanel from '@/components/TournamentKnockoutPanel'
 import TournamentLadderPanel from '@/components/TournamentLadderPanel'
+import TournamentMexicanoPanel from '@/components/TournamentMexicanoPanel'
 import TournamentRotationResultForm from '@/components/TournamentRotationResultForm'
 import TournamentRotationStandings from '@/components/TournamentRotationStandings'
-import { LADDER_TOTAL_ROUNDS } from '@/lib/tournamentBracket'
+import { LADDER_TOTAL_ROUNDS, MEXICANO_TOTAL_ROUNDS } from '@/lib/tournamentBracket'
 
 type Fixture = { id: string; category_id: string; round_number: number | null; slot: number | null; next_fixture_id: string | null; scheduled_at: string | null; status: string; side_a_entry_id: string | null; side_b_entry_id: string | null; winner_entry_id: string | null; metadata: { score_a?: number; score_b?: number } | null }
 type Category = { id: string; name: string; participant_mode: string; capacity: number | null; entry_fee: number | null; status: string }
@@ -76,6 +77,23 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
       const roundFixtures = categoryFixtures.filter((f) => (f.round_number ?? 1) === currentRound)
       const roundFinished = roundFixtures.every((f) => f.status === 'completed' || f.status === 'cancelled')
       if (!roundFinished || currentRound >= LADDER_TOTAL_ROUNDS) return null
+      return { id: c.id, name: c.name, currentRound }
+    })
+    .filter((c): c is { id: string; name: string; currentRound: number } => c !== null)
+
+  // Mexicano: categorías cuya ronda actual (en tournament_rotation_matches) ya terminó y todavía
+  // no llegaron a MEXICANO_TOTAL_ROUNDS — a esas les mostramos el botón "generar ronda siguiente"
+  // (la ronda 1 la arma TournamentBracketPanel, igual que Americano; de ahí en adelante depende
+  // del puntaje acumulado, así que se genera una ronda a la vez, como la escalera).
+  const categoriesReadyForNextMexicanoRound = cats
+    .filter((c) => tournament?.format_type === 'mexicano')
+    .map((c) => {
+      const categoryRotationMatches = rotationMatches.filter((m) => m.category_id === c.id)
+      if (categoryRotationMatches.length === 0) return null
+      const currentRound = Math.max(...categoryRotationMatches.map((m) => m.round_number))
+      const roundMatches = categoryRotationMatches.filter((m) => m.round_number === currentRound)
+      const roundFinished = roundMatches.every((m) => m.status === 'completed' || m.status === 'cancelled')
+      if (!roundFinished || currentRound >= MEXICANO_TOTAL_ROUNDS) return null
       return { id: c.id, name: c.name, currentRound }
     })
     .filter((c): c is { id: string; name: string; currentRound: number } => c !== null)
@@ -203,6 +221,13 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
               tournamentId={tournament.id}
               startsAt={tournament.starts_at}
               categories={categoriesReadyForNextLadderRound}
+            />
+          )}
+          {isOrganizer && (
+            <TournamentMexicanoPanel
+              tournamentId={tournament.id}
+              startsAt={tournament.starts_at}
+              categories={categoriesReadyForNextMexicanoRound}
             />
           )}
 

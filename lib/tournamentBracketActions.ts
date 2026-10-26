@@ -9,7 +9,11 @@ import {
   buildLadderNextRound,
   LADDER_TOTAL_ROUNDS,
   buildAmericanoRounds,
+  buildMexicanoInitialRound,
+  buildMexicanoNextRound,
+  MEXICANO_TOTAL_ROUNDS,
   type LadderCourtResult,
+  type MexicanoStandingInput,
 } from './tournamentBracket'
 
 // Deja 2 horas entre ronda y ronda (dentro de una ronda, los partidos se asumen en paralelo
@@ -178,14 +182,15 @@ async function insertSingleElimination(
 export async function generateBracket(supabase: SupabaseClient, params: GenerateBracketParams) {
   const { tournamentId, categoryId, formatType, startsAt } = params
 
-  const supportedFormats = ['single_elimination', 'round_robin', 'groups_then_knockout', 'king_of_the_court', 'americano']
+  const supportedFormats = ['single_elimination', 'round_robin', 'groups_then_knockout', 'king_of_the_court', 'americano', 'mexicano']
   if (!supportedFormats.includes(formatType)) {
     throw new Error('FORMAT_NOT_SUPPORTED')
   }
 
-  // Americano no usa tournament_fixtures (pareja cambia cada ronda, puntaje por jugador) — usa
-  // tournament_rotation_matches, así que el chequeo de "ya se generó" mira esa tabla en vez.
-  if (formatType === 'americano') {
+  // Americano y Mexicano no usan tournament_fixtures (pareja cambia cada ronda, puntaje por
+  // jugador) — usan tournament_rotation_matches, así que el chequeo de "ya se generó" mira esa
+  // tabla en vez.
+  if (formatType === 'americano' || formatType === 'mexicano') {
     const { count: rotationCount, error: rotationExistingError } = await supabase
       .from('tournament_rotation_matches')
       .select('id', { count: 'exact', head: true })
@@ -221,16 +226,19 @@ export async function generateBracket(supabase: SupabaseClient, params: Generate
           ? 'Escalera de canchas'
           : formatType === 'americano'
             ? 'Americano'
-            : 'Cuadro de eliminación'
-  // "king_of_the_court" y "americano" no son stage_type válidos en la base (el constraint solo
-  // acepta group/round_robin/single_elimination/double_elimination/ladder/custom) — king_of_the_court
-  // usa "ladder" (es justo lo que es) y americano usa "custom" (no hay un tipo de "rotación").
+            : formatType === 'mexicano'
+              ? 'Mexicano'
+              : 'Cuadro de eliminación'
+  // "king_of_the_court", "americano" y "mexicano" no son stage_type válidos en la base (el
+  // constraint solo acepta group/round_robin/single_elimination/double_elimination/ladder/custom)
+  // — king_of_the_court usa "ladder" (es justo lo que es); americano y mexicano usan "custom"
+  // (no hay un tipo de "rotación" dedicado, y ambos comparten tournament_rotation_matches).
   const stageType =
     formatType === 'groups_then_knockout'
       ? 'group'
       : formatType === 'king_of_the_court'
         ? 'ladder'
-        : formatType === 'americano'
+        : formatType === 'americano' || formatType === 'mexicano'
           ? 'custom'
           : formatType
 
@@ -265,6 +273,29 @@ export async function generateBracket(supabase: SupabaseClient, params: Generate
     // (ver buildAmericanoRounds) — el panel de creación del cuadro traduce ese código a un
     // mensaje para el organizador.
     const rotationFixtures = buildAmericanoRounds(entryIds)
+    const rows = rotationFixtures.map((f) => ({
+      tournament_id: tournamentId,
+      category_id: categoryId,
+      stage_id: stageId,
+      round_number: f.round,
+      court: f.court,
+      side_a_player1_id: f.sideA[0],
+      side_a_player2_id: f.sideA[1],
+      side_b_player1_id: f.sideB[0],
+      side_b_player2_id: f.sideB[1],
+      status: 'scheduled',
+      scheduled_at: roundStart(startsAt, f.round),
+    }))
+    const { error: rotationError } = await supabase.from('tournament_rotation_matches').insert(rows)
+    if (rotationError) throw rotationError
+    return { fixturesCreated: rows.length }
+  }
+
+  if (formatType === 'mexicano') {
+    // Lanza MEXICANO_REQUIRES_MULTIPLE_OF_4 si la cantidad de inscritos no es múltiplo de 4
+    // (ver buildMexicanoInitialRound). Solo se arma la ronda 1 acá — las siguientes dependen del
+    // puntaje acumulado y se generan una por una con generateNextMexicanoRound.
+    const rotationFixtures = buildMexicanoInitialRound(entryIds)
     const rows = rotationFixtures.map((f) => ({
       tournament_id: tournamentId,
       category_id: categoryId,
@@ -535,4 +566,91 @@ export async function recordRotationMatchResult(supabase: SupabaseClient, params
   })
   if (error) throw error
   return data
+}
+
+export type GenerateNextMexicanoRoundParams = {
+  tournamentId: string
+  categoryId: string
+  startsAt: string | null
+}
+
+/**
+ * Mexicano, ronda 2 en adelante: toma el puntaje acumulado de todos los que jugaron la ronda
+ * actual (tournament_rotation_standings) una vez que esa ronda queda completa, los reordena de
+ * mejor a peor y arma las canchas de la ronda siguiente (ver buildMexicanoNextRound) — a
+ * diferencia de Americano (pareja fija toda la noche), acá la pareja y el rival cambian según
+ * el nivel de cada uno en ese momento. Se detiene en MEXICANO_TOTAL_ROUNDS.
+ */
+export async function generateNextMexicanoRound(supabase: SupabaseClient, params: GenerateNextMexicanoRoundParams) {
+  const { tournamentId, categoryId, startsAt } = params
+
+  const { data: matches, error: matchesError } = await supabase
+    .from('tournament_rotation_matches')
+    .select('id, stage_id, round_number, status, side_a_player1_id, side_a_player2_id, side_b_player1_id, side_b_player2_id')
+    .eq('category_id', categoryId)
+    .order('round_number', { ascending: false })
+  if (matchesError) throw matchesError
+  const rows = (matches ?? []) as Array<{
+    id: string
+    stage_id: string | null
+    round_number: number
+    status: string
+    side_a_player1_id: string
+    side_a_player2_id: string
+    side_b_player1_id: string
+    side_b_player2_id: string
+  }>
+  if (rows.length === 0) throw new Error('MEXICANO_STAGE_NOT_FOUND')
+
+  const currentRound = rows[0].round_number
+  if (currentRound >= MEXICANO_TOTAL_ROUNDS) throw new Error('MEXICANO_COMPLETE')
+
+  const currentRoundMatches = rows.filter((r) => r.round_number === currentRound)
+  const unfinished = currentRoundMatches.some((r) => r.status !== 'completed' && r.status !== 'cancelled')
+  if (unfinished) throw new Error('ROUND_NOT_FINISHED')
+
+  const stageId = currentRoundMatches[0].stage_id
+
+  // Todos los que jugaron la ronda actual (= todos los inscritos de la categoría, en Mexicano
+  // todos juegan todas las rondas) con su puntaje acumulado hasta ahora.
+  const participantIds = Array.from(new Set(
+    currentRoundMatches.flatMap((m) => [m.side_a_player1_id, m.side_a_player2_id, m.side_b_player1_id, m.side_b_player2_id])
+  ))
+  const { data: standingsData, error: standingsError } = await supabase
+    .from('tournament_rotation_standings')
+    .select('entry_id, total_points')
+    .eq('category_id', categoryId)
+    .in('entry_id', participantIds)
+  if (standingsError) throw standingsError
+  const pointsByEntry = new Map(
+    (standingsData ?? []).map((s: { entry_id: string; total_points: number }) => [s.entry_id, s.total_points])
+  )
+  const standings: MexicanoStandingInput[] = participantIds.map((entryId) => ({
+    entryId,
+    totalPoints: pointsByEntry.get(entryId) ?? 0,
+  }))
+
+  const nextRoundNumber = currentRound + 1
+  const nextFixtures = buildMexicanoNextRound(nextRoundNumber, standings)
+  const insertRows = nextFixtures.map((f) => ({
+    tournament_id: tournamentId,
+    category_id: categoryId,
+    stage_id: stageId,
+    round_number: f.round,
+    court: f.court,
+    side_a_player1_id: f.sideA[0],
+    side_a_player2_id: f.sideA[1],
+    side_b_player1_id: f.sideB[0],
+    side_b_player2_id: f.sideB[1],
+    status: 'scheduled',
+    scheduled_at: roundStart(startsAt, f.round),
+  }))
+  const { error: insertError } = await supabase.from('tournament_rotation_matches').insert(insertRows)
+  if (insertError) throw insertError
+
+  return {
+    fixturesCreated: insertRows.length,
+    roundNumber: nextRoundNumber,
+    isFinal: nextRoundNumber >= MEXICANO_TOTAL_ROUNDS,
+  }
 }

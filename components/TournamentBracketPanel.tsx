@@ -33,7 +33,8 @@ export default function TournamentBracketPanel({
     formatType === 'round_robin' ||
     formatType === 'groups_then_knockout' ||
     formatType === 'king_of_the_court' ||
-    formatType === 'americano'
+    formatType === 'americano' ||
+    formatType === 'mexicano'
   const pending = categories.filter((c) => !categoriesWithFixtures.has(c.id))
   if (!supported || pending.length === 0) return null
 
@@ -53,7 +54,9 @@ export default function TournamentBracketPanel({
             ? 'notEnoughEntries'
             : code === 'AMERICANO_REQUIRES_MULTIPLE_OF_4'
               ? 'americanoRequiresMultipleOf4'
-              : 'bracketGenerateFailed'
+              : code === 'MEXICANO_REQUIRES_MULTIPLE_OF_4'
+                ? 'mexicanoRequiresMultipleOf4'
+                : 'bracketGenerateFailed'
       setMessages((m) => ({ ...m, [categoryId]: t(key) }))
     } finally {
       setBusyId(null)
