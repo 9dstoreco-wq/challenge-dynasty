@@ -12,9 +12,10 @@ import TournamentPendingPaymentsPanel from '@/components/TournamentPendingPaymen
 import TournamentKnockoutPanel from '@/components/TournamentKnockoutPanel'
 import TournamentLadderPanel from '@/components/TournamentLadderPanel'
 import TournamentMexicanoPanel from '@/components/TournamentMexicanoPanel'
+import TournamentSwissPanel from '@/components/TournamentSwissPanel'
 import TournamentRotationResultForm from '@/components/TournamentRotationResultForm'
 import TournamentRotationStandings from '@/components/TournamentRotationStandings'
-import { LADDER_TOTAL_ROUNDS, MEXICANO_TOTAL_ROUNDS } from '@/lib/tournamentBracket'
+import { LADDER_TOTAL_ROUNDS, MEXICANO_TOTAL_ROUNDS, swissTotalRounds } from '@/lib/tournamentBracket'
 
 type Fixture = { id: string; category_id: string; round_number: number | null; slot: number | null; next_fixture_id: string | null; scheduled_at: string | null; status: string; side_a_entry_id: string | null; side_b_entry_id: string | null; winner_entry_id: string | null; metadata: { score_a?: number; score_b?: number } | null }
 type Category = { id: string; name: string; participant_mode: string; capacity: number | null; entry_fee: number | null; status: string }
@@ -94,6 +95,22 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
       const roundMatches = categoryRotationMatches.filter((m) => m.round_number === currentRound)
       const roundFinished = roundMatches.every((m) => m.status === 'completed' || m.status === 'cancelled')
       if (!roundFinished || currentRound >= MEXICANO_TOTAL_ROUNDS) return null
+      return { id: c.id, name: c.name, currentRound }
+    })
+    .filter((c): c is { id: string; name: string; currentRound: number } => c !== null)
+
+  // Sistema suizo: a diferencia de Americano/Mexicano, usa tournament_fixtures (pareja fija por
+  // partido), así que se calcula sobre "fixtures" igual que la escalera, no sobre rotationMatches.
+  const categoriesReadyForNextSwissRound = cats
+    .filter((c) => tournament?.format_type === 'swiss')
+    .map((c) => {
+      const categoryFixtures = fixtures.filter((f) => f.category_id === c.id)
+      if (categoryFixtures.length === 0) return null
+      const currentRound = Math.max(...categoryFixtures.map((f) => f.round_number ?? 1))
+      const roundFixtures = categoryFixtures.filter((f) => (f.round_number ?? 1) === currentRound)
+      const roundFinished = roundFixtures.every((f) => f.status === 'completed' || f.status === 'cancelled')
+      const totalRounds = swissTotalRounds(confirmedCountByCategory.get(c.id) ?? categoryFixtures.length)
+      if (!roundFinished || currentRound >= totalRounds) return null
       return { id: c.id, name: c.name, currentRound }
     })
     .filter((c): c is { id: string; name: string; currentRound: number } => c !== null)
@@ -228,6 +245,13 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
               tournamentId={tournament.id}
               startsAt={tournament.starts_at}
               categories={categoriesReadyForNextMexicanoRound}
+            />
+          )}
+          {isOrganizer && (
+            <TournamentSwissPanel
+              tournamentId={tournament.id}
+              startsAt={tournament.starts_at}
+              categories={categoriesReadyForNextSwissRound}
             />
           )}
 

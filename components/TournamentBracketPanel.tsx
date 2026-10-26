@@ -34,7 +34,8 @@ export default function TournamentBracketPanel({
     formatType === 'groups_then_knockout' ||
     formatType === 'king_of_the_court' ||
     formatType === 'americano' ||
-    formatType === 'mexicano'
+    formatType === 'mexicano' ||
+    formatType === 'swiss'
   const pending = categories.filter((c) => !categoriesWithFixtures.has(c.id))
   if (!supported || pending.length === 0) return null
 

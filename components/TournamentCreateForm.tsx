@@ -81,9 +81,9 @@ export default function TournamentCreateForm({ sports, organizationId }: { sport
               generación de partidos: si un organizador lo elegía, el torneo quedaba inscribiendo
               gente sin forma de generar el cuadro. Oculto aquí hasta que se construya esa lógica;
               no borrar la opción del JSON de mensajes, solo falta reactivarla cuando esté
-              soportada. "king_of_the_court", "americano" y "mexicano" ya tienen su motor completo
-              (ver TournamentLadderPanel / TournamentRotationResultForm / TournamentMexicanoPanel)
-              y están reactivados.
+              soportada. "king_of_the_court", "americano", "mexicano" y "swiss" ya tienen su motor
+              completo (ver TournamentLadderPanel / TournamentRotationResultForm /
+              TournamentMexicanoPanel / TournamentSwissPanel) y están reactivados.
             */}
             <option value="single_elimination">{t('formatSingleElim')}</option>
             <option value="round_robin">{t('formatRoundRobin')}</option>
@@ -91,6 +91,7 @@ export default function TournamentCreateForm({ sports, organizationId }: { sport
             <option value="king_of_the_court">{t('formatKingOfTheCourt')}</option>
             <option value="americano">{t('formatAmericano')}</option>
             <option value="mexicano">{t('formatMexicano')}</option>
+            <option value="swiss">{t('formatSwiss')}</option>
           </select>
         </div>
         <div>

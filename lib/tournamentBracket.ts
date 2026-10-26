@@ -2,12 +2,16 @@
 // Hoy soporta: eliminación simple, round robin (todos contra todos), grupos+eliminación
 // (round robin por grupo + un cuadro de eliminación armado después, con los que clasifican),
 // King of the Court / escalera de canchas (buildLadderInitialRound + buildLadderNextRound),
-// Americano (buildAmericanoRounds) y Mexicano (buildMexicanoInitialRound + buildMexicanoNextRound).
+// Americano (buildAmericanoRounds), Mexicano (buildMexicanoInitialRound + buildMexicanoNextRound)
+// y sistema suizo (buildSwissInitialRound + buildSwissNextRound).
 // A diferencia de los demás formatos, Americano y Mexicano no usan tournament_fixtures (esa tabla
 // asume pareja FIJA por lado) — usan tournament_rotation_matches, porque la pareja cambia cada
 // ronda y el puntaje es por JUGADOR, no por pareja (ver record_rotation_match_result y
-// generateNextMexicanoRound/generateBracket en tournamentBracketActions.ts).
-// Formatos pendientes: doble eliminación, cuadro de consolación y sistema suizo.
+// generateNextMexicanoRound/generateBracket en tournamentBracketActions.ts). El sistema suizo SÍ
+// usa tournament_fixtures (pareja/equipo fijo en cada partido, como round robin) pero agrupado en
+// un único "grupo" de tournament_groups/tournament_group_entries para reusar tal cual la tabla de
+// posiciones y el conteo de puntos que ya mantiene record_tournament_fixture_result.
+// Formatos pendientes: doble eliminación y cuadro de consolación.
 
 export type FixtureSpec = {
   round: number
@@ -289,4 +293,81 @@ export function buildMexicanoNextRound(roundNumber: number, standings: MexicanoS
     const { sideA, sideB } = pairCourtByRank(court)
     return { round: roundNumber, court: idx + 1, sideA, sideB }
   })
+}
+
+/**
+ * Sistema suizo: cantidad de rondas en función de la cantidad de inscritos — con pocas rondas no
+ * alcanza a separar bien la tabla, con demasiadas sobran partidos. Fórmula estándar (como en
+ * ajedrez): techo(log2(n)) + 1, con un mínimo de 3 rondas aunque el campo sea chico.
+ */
+export function swissTotalRounds(entryCount: number): number {
+  return Math.max(3, Math.ceil(Math.log2(Math.max(entryCount, 2))) + 1)
+}
+
+export type SwissPairing = { round: number; sideA: string; sideB: string | null }
+
+/**
+ * Sistema suizo, ronda 1: todavía no hay resultados, así que se empareja por orden de siembra
+ * (adyacentes: 1vs2, 3vs4, ...) — igual que la ronda inicial de la escalera. Si la cantidad es
+ * impar, el último de la lista descansa esta ronda (bye, gana los puntos de un partido ganado
+ * sin jugar).
+ */
+export function buildSwissInitialRound(entryIds: string[]): SwissPairing[] {
+  if (entryIds.length < 2) throw new Error('NOT_ENOUGH_ENTRIES')
+  const pairings: SwissPairing[] = []
+  for (let i = 0; i < entryIds.length; i += 2) {
+    pairings.push({ round: 1, sideA: entryIds[i], sideB: entryIds[i + 1] ?? null })
+  }
+  return pairings
+}
+
+/** Clave única (sin importar el orden) para una pareja de rivales — sirve para no repetir cruce. */
+function swissPairKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`
+}
+
+/**
+ * Sistema suizo, ronda 2 en adelante: reordena a todos por puntaje acumulado (mejor primero —
+ * rankedEntryIds ya debe venir en ese orden) y empareja de arriba hacia abajo, evitando un cruce
+ * que ya se jugó antes cuando hay alguna otra opción disponible (si el campo es chico y ya se
+ * agotaron los rivales nuevos, se permite repetir en vez de dejar a alguien sin partido). Si la
+ * cantidad de jugadores es impar, descansa (bye) el de MENOR puntaje que todavía no haya
+ * descansado ninguna ronda anterior — así el bye no cae siempre en la misma persona.
+ */
+export function buildSwissNextRound(
+  roundNumber: number,
+  rankedEntryIds: string[],
+  alreadyPlayedPairs: Set<string>,
+  entriesWithBye: Set<string>
+): SwissPairing[] {
+  if (rankedEntryIds.length < 2) throw new Error('NOT_ENOUGH_ENTRIES')
+  const pool = [...rankedEntryIds]
+  const pairings: SwissPairing[] = []
+
+  if (pool.length % 2 !== 0) {
+    let byeIdx = -1
+    for (let i = pool.length - 1; i >= 0; i--) {
+      if (!entriesWithBye.has(pool[i])) {
+        byeIdx = i
+        break
+      }
+    }
+    if (byeIdx === -1) byeIdx = pool.length - 1 // ya todos descansaron alguna vez: el último de la tabla
+    const [byeEntry] = pool.splice(byeIdx, 1)
+    pairings.push({ round: roundNumber, sideA: byeEntry, sideB: null })
+  }
+
+  const used = new Set<string>()
+  for (const entryId of pool) {
+    if (used.has(entryId)) continue
+    used.add(entryId)
+    let opponent =
+      pool.find((c) => c !== entryId && !used.has(c) && !alreadyPlayedPairs.has(swissPairKey(entryId, c))) ?? null
+    if (!opponent) opponent = pool.find((c) => c !== entryId && !used.has(c)) ?? null
+    if (opponent) {
+      used.add(opponent)
+      pairings.push({ round: roundNumber, sideA: entryId, sideB: opponent })
+    }
+  }
+  return pairings
 }

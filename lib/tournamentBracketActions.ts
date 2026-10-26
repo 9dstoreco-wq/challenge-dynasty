@@ -12,9 +12,18 @@ import {
   buildMexicanoInitialRound,
   buildMexicanoNextRound,
   MEXICANO_TOTAL_ROUNDS,
+  buildSwissInitialRound,
+  buildSwissNextRound,
+  swissTotalRounds,
   type LadderCourtResult,
   type MexicanoStandingInput,
 } from './tournamentBracket'
+
+// Puntaje que record_tournament_fixture_result le da a un partido ganado (ver esa función en la
+// base de datos: points += 3 al ganador). Un bye de sistema suizo no pasa por esa función (no hay
+// rival), así que hay que sumarle lo mismo a mano para que la tabla de posiciones quede igual que
+// si hubiera ganado un partido de verdad.
+const SWISS_WIN_POINTS = 3
 
 // Deja 2 horas entre ronda y ronda (dentro de una ronda, los partidos se asumen en paralelo
 // en varias canchas). Es una fecha de referencia simple; el organizador puede ajustarla luego
@@ -182,7 +191,7 @@ async function insertSingleElimination(
 export async function generateBracket(supabase: SupabaseClient, params: GenerateBracketParams) {
   const { tournamentId, categoryId, formatType, startsAt } = params
 
-  const supportedFormats = ['single_elimination', 'round_robin', 'groups_then_knockout', 'king_of_the_court', 'americano', 'mexicano']
+  const supportedFormats = ['single_elimination', 'round_robin', 'groups_then_knockout', 'king_of_the_court', 'americano', 'mexicano', 'swiss']
   if (!supportedFormats.includes(formatType)) {
     throw new Error('FORMAT_NOT_SUPPORTED')
   }
@@ -228,17 +237,19 @@ export async function generateBracket(supabase: SupabaseClient, params: Generate
             ? 'Americano'
             : formatType === 'mexicano'
               ? 'Mexicano'
-              : 'Cuadro de eliminación'
-  // "king_of_the_court", "americano" y "mexicano" no son stage_type válidos en la base (el
-  // constraint solo acepta group/round_robin/single_elimination/double_elimination/ladder/custom)
-  // — king_of_the_court usa "ladder" (es justo lo que es); americano y mexicano usan "custom"
-  // (no hay un tipo de "rotación" dedicado, y ambos comparten tournament_rotation_matches).
+              : formatType === 'swiss'
+                ? 'Sistema suizo'
+                : 'Cuadro de eliminación'
+  // "king_of_the_court", "americano", "mexicano" y "swiss" no son stage_type válidos en la base
+  // (el constraint solo acepta group/round_robin/single_elimination/double_elimination/ladder/
+  // custom) — king_of_the_court usa "ladder" (es justo lo que es); americano, mexicano y swiss
+  // usan "custom" (no hay un tipo dedicado para ninguno de los tres).
   const stageType =
     formatType === 'groups_then_knockout'
       ? 'group'
       : formatType === 'king_of_the_court'
         ? 'ladder'
-        : formatType === 'americano' || formatType === 'mexicano'
+        : formatType === 'americano' || formatType === 'mexicano' || formatType === 'swiss'
           ? 'custom'
           : formatType
 
@@ -312,6 +323,77 @@ export async function generateBracket(supabase: SupabaseClient, params: Generate
     const { error: rotationError } = await supabase.from('tournament_rotation_matches').insert(rows)
     if (rotationError) throw rotationError
     return { fixturesCreated: rows.length }
+  }
+
+  if (formatType === 'swiss') {
+    // A diferencia de Americano/Mexicano, el sistema suizo SÍ usa tournament_fixtures (pareja
+    // fija por partido) — pero agrupado en un único "grupo" de tournament_groups, para que la
+    // tabla de posiciones (tournament_group_entries) y el conteo de puntos se mantengan solos
+    // con la misma función que ya usan round_robin y groups_then_knockout.
+    const { data: group, error: groupError } = await supabase
+      .from('tournament_groups')
+      .insert({ stage_id: stageId, name: 'Suizo', group_order: 1 })
+      .select('id')
+      .single()
+    if (groupError) throw groupError
+    const groupId = (group as { id: string }).id
+
+    const { error: groupEntriesError } = await supabase.from('tournament_group_entries').insert(
+      entryIds.map((entryId: string) => ({
+        group_id: groupId,
+        entry_id: entryId,
+        points: 0,
+        played: 0,
+        wins: 0,
+        losses: 0,
+        score_for: 0,
+        score_against: 0,
+      }))
+    )
+    if (groupEntriesError) throw groupEntriesError
+
+    const pairings = buildSwissInitialRound(entryIds)
+    let fixturesCreated = 0
+    for (const p of pairings) {
+      if (p.sideB) {
+        const { error: fixtureError } = await supabase.from('tournament_fixtures').insert({
+          tournament_id: tournamentId,
+          category_id: categoryId,
+          stage_id: stageId,
+          group_id: groupId,
+          round_number: p.round,
+          side_a_entry_id: p.sideA,
+          side_b_entry_id: p.sideB,
+          status: 'scheduled',
+          scheduled_at: roundStart(startsAt, p.round),
+        })
+        if (fixtureError) throw fixtureError
+      } else {
+        // Bye: no hay rival, así que se guarda ya completado y se le suma a mano el puntaje de
+        // un partido ganado (no pasa por record_tournament_fixture_result, que exige 2 lados).
+        const { error: byeError } = await supabase.from('tournament_fixtures').insert({
+          tournament_id: tournamentId,
+          category_id: categoryId,
+          stage_id: stageId,
+          group_id: groupId,
+          round_number: p.round,
+          side_a_entry_id: p.sideA,
+          side_b_entry_id: null,
+          winner_entry_id: p.sideA,
+          status: 'completed',
+          scheduled_at: roundStart(startsAt, p.round),
+        })
+        if (byeError) throw byeError
+        const { error: byePointsError } = await supabase
+          .from('tournament_group_entries')
+          .update({ points: SWISS_WIN_POINTS, played: 1, wins: 1 })
+          .eq('group_id', groupId)
+          .eq('entry_id', p.sideA)
+        if (byePointsError) throw byePointsError
+      }
+      fixturesCreated += 1
+    }
+    return { fixturesCreated }
   }
 
   if (formatType === 'king_of_the_court') {
@@ -653,4 +735,133 @@ export async function generateNextMexicanoRound(supabase: SupabaseClient, params
     roundNumber: nextRoundNumber,
     isFinal: nextRoundNumber >= MEXICANO_TOTAL_ROUNDS,
   }
+}
+
+export type GenerateNextSwissRoundParams = {
+  tournamentId: string
+  categoryId: string
+  startsAt: string | null
+}
+
+/**
+ * Sistema suizo, ronda 2 en adelante: toma la tabla de posiciones actual (tournament_group_entries,
+ * ya mantenida sola por record_tournament_fixture_result) una vez que la ronda actual está
+ * completa, y arma los cruces de la ronda siguiente evitando repetir rival cuando se puede (ver
+ * buildSwissNextRound). Se detiene en swissTotalRounds(cantidad de inscritos).
+ */
+export async function generateNextSwissRound(supabase: SupabaseClient, params: GenerateNextSwissRoundParams) {
+  const { tournamentId, categoryId, startsAt } = params
+
+  const { data: fixturesData, error: fixturesError } = await supabase
+    .from('tournament_fixtures')
+    .select('id, group_id, stage_id, round_number, status, side_a_entry_id, side_b_entry_id')
+    .eq('category_id', categoryId)
+    .order('round_number', { ascending: false })
+  if (fixturesError) throw fixturesError
+  const allFixtures = (fixturesData ?? []) as Array<{
+    id: string
+    group_id: string | null
+    stage_id: string | null
+    round_number: number
+    status: string
+    side_a_entry_id: string | null
+    side_b_entry_id: string | null
+  }>
+  if (allFixtures.length === 0) throw new Error('SWISS_STAGE_NOT_FOUND')
+  const groupId = allFixtures[0].group_id
+  const stageId = allFixtures[0].stage_id
+  if (!groupId) throw new Error('SWISS_STAGE_NOT_FOUND')
+
+  const { data: groupEntriesData, error: groupEntriesError } = await supabase
+    .from('tournament_group_entries')
+    .select('entry_id, rank, points, played, wins')
+    .eq('group_id', groupId)
+    .order('rank', { ascending: true, nullsFirst: false })
+  if (groupEntriesError) throw groupEntriesError
+  const groupEntries = (groupEntriesData ?? []) as Array<{
+    entry_id: string
+    rank: number | null
+    points: number
+    played: number
+    wins: number
+  }>
+  const totalEntries = groupEntries.length
+  const totalRounds = swissTotalRounds(totalEntries)
+
+  const currentRound = allFixtures[0].round_number
+  if (currentRound >= totalRounds) throw new Error('SWISS_COMPLETE')
+
+  const currentRoundFixtures = allFixtures.filter((f) => f.round_number === currentRound)
+  const unfinished = currentRoundFixtures.some((f) => f.status !== 'completed' && f.status !== 'cancelled')
+  if (unfinished) throw new Error('ROUND_NOT_FINISHED')
+
+  // Orden de mejor a peor: si por algún motivo "rank" no está al día para alguien (no debería
+  // pasar, record_tournament_fixture_result lo recalcula en cada resultado), se ordena por
+  // puntaje como respaldo.
+  const rankedEntryIds = [...groupEntries]
+    .sort((a, b) => (a.rank ?? 999999) - (b.rank ?? 999999) || b.points - a.points)
+    .map((e) => e.entry_id)
+
+  const alreadyPlayedPairs = new Set<string>()
+  const entriesWithBye = new Set<string>()
+  for (const f of allFixtures) {
+    if (f.side_a_entry_id && f.side_b_entry_id) {
+      const key = [f.side_a_entry_id, f.side_b_entry_id].sort().join('|')
+      alreadyPlayedPairs.add(key)
+    } else if (f.side_a_entry_id && !f.side_b_entry_id) {
+      entriesWithBye.add(f.side_a_entry_id)
+    }
+  }
+
+  const nextRoundNumber = currentRound + 1
+  const pairings = buildSwissNextRound(nextRoundNumber, rankedEntryIds, alreadyPlayedPairs, entriesWithBye)
+
+  let fixturesCreated = 0
+  for (const p of pairings) {
+    if (p.sideB) {
+      const { error: insertError } = await supabase.from('tournament_fixtures').insert({
+        tournament_id: tournamentId,
+        category_id: categoryId,
+        stage_id: stageId,
+        group_id: groupId,
+        round_number: p.round,
+        side_a_entry_id: p.sideA,
+        side_b_entry_id: p.sideB,
+        status: 'scheduled',
+        scheduled_at: roundStart(startsAt, p.round),
+      })
+      if (insertError) throw insertError
+    } else {
+      const { error: byeError } = await supabase.from('tournament_fixtures').insert({
+        tournament_id: tournamentId,
+        category_id: categoryId,
+        stage_id: stageId,
+        group_id: groupId,
+        round_number: p.round,
+        side_a_entry_id: p.sideA,
+        side_b_entry_id: null,
+        winner_entry_id: p.sideA,
+        status: 'completed',
+        scheduled_at: roundStart(startsAt, p.round),
+      })
+      if (byeError) throw byeError
+      // Incrementa sobre lo que ya tenía (no pisa el historial de rondas anteriores) — un bye en
+      // una ronda posterior a la 1 solo puede pasar si TODOS ya descansaron alguna vez (ver
+      // buildSwissNextRound), así que conviene no asumir que este es su primer partido.
+      const current = groupEntries.find((e) => e.entry_id === p.sideA)
+      const { error: byePointsError } = await supabase
+        .from('tournament_group_entries')
+        .update({
+          points: (current?.points ?? 0) + SWISS_WIN_POINTS,
+          played: (current?.played ?? 0) + 1,
+          wins: (current?.wins ?? 0) + 1,
+        })
+        .eq('group_id', groupId)
+        .eq('entry_id', p.sideA)
+      if (byePointsError) throw byePointsError
+    }
+    fixturesCreated += 1
+  }
+
+  return { fixturesCreated, roundNumber: nextRoundNumber, isFinal: nextRoundNumber >= totalRounds }
 }
