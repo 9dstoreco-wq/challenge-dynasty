@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import PageHero from '@/components/PageHero'
 import { getTranslations } from 'next-intl/server'
 import TournamentCategoryForm from '@/components/TournamentCategoryForm'
+import TournamentStatusPanel from '@/components/TournamentStatusPanel'
 import TournamentRegisterForm from '@/components/TournamentRegisterForm'
 import TournamentBracketPanel from '@/components/TournamentBracketPanel'
 import TournamentResultForm from '@/components/TournamentResultForm'
@@ -214,6 +215,7 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
             )}
           </div>
 
+          {isOrganizer && <TournamentStatusPanel tournamentId={tournament.id} status={tournament.status as 'draft'} />}
           {isOrganizer && <TournamentCategoryForm tournamentId={tournament.id} />}
           {isOrganizer && (
             <TournamentBracketPanel

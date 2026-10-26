@@ -48,6 +48,11 @@ const KNOWN_RPC_MESSAGES: Record<string, string> = {
   'Result already confirmed': 'El resultado ya fue confirmado.',
   'Submitter cannot review own result': 'No puedes confirmar tu propio resultado: debe hacerlo tu rival.',
   'Existing result was submitted by you': 'Ya enviaste un resultado. Espera a que tu rival lo revise.',
+  // BUG ENCONTRADO EN PRUEBAS QA (2026-10-26): register_tournament_entry lanza estos dos mensajes
+  // en ingles cuando el torneo todavia no fue publicado / no abrio inscripciones; como no estaban
+  // en este diccionario, el jugador veia el texto crudo en ingles en medio de una app en espanol.
+  'Registrations are not open': 'Las inscripciones de este torneo todavía no están abiertas.',
+  'Registration has not opened': 'Las inscripciones de este torneo todavía no están abiertas.',
 }
 
 /**
