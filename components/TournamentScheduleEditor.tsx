@@ -23,6 +23,7 @@ type Row = {
   labelA: string
   labelB: string
   scheduledAt: string | null
+  court: string | null
   status: string
 }
 
@@ -48,6 +49,7 @@ export default function TournamentScheduleEditor({ tournamentId, categoryIds, ro
   const router = useRouter()
   const supabase = createClient()
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [courtDrafts, setCourtDrafts] = useState<Record<string, string>>({})
   const [savingId, setSavingId] = useState<string | null>(null)
   const [rowMessages, setRowMessages] = useState<Record<string, string>>({})
   const [issues, setIssues] = useState<ScheduleIssue[]>([])
@@ -101,11 +103,12 @@ export default function TournamentScheduleEditor({ tournamentId, categoryIds, ro
   async function handleSave(row: Row) {
     const value = drafts[row.id] ?? toLocalInputValue(row.scheduledAt)
     if (!value) return
+    const court = courtDrafts[row.id] ?? (row.court ?? '')
     setSavingId(row.id)
     setRowMessages((m) => ({ ...m, [row.id]: '' }))
     try {
       const iso = new Date(value).toISOString()
-      const { error } = await supabase.rpc('reschedule_tournament_fixture', { p_fixture_id: row.id, p_scheduled_at: iso })
+      const { error } = await supabase.rpc('reschedule_tournament_fixture', { p_fixture_id: row.id, p_scheduled_at: iso, p_court: court })
       if (error) throw error
       setRowMessages((m) => ({ ...m, [row.id]: t('scheduleSaved') }))
       await loadIssues()
@@ -174,7 +177,14 @@ export default function TournamentScheduleEditor({ tournamentId, categoryIds, ro
                 {conflicts.length > 0 && <div className="text-xs text-red-400 mt-1">⚠ {describeConflict(row, conflicts)}</div>}
                 {rowMessages[row.id] && <div className="text-xs text-[#D4AF37] mt-1">{rowMessages[row.id]}</div>}
               </div>
-              <div />
+              <input
+                type="text"
+                placeholder={t('scheduleCourtPlaceholder')}
+                value={courtDrafts[row.id] ?? (row.court ?? '')}
+                onChange={(e) => setCourtDrafts((d) => ({ ...d, [row.id]: e.target.value }))}
+                disabled={row.status === 'completed' || row.status === 'cancelled'}
+                className="bg-[#0A0A0C] border border-white/10 rounded-xl p-2 text-sm disabled:opacity-40"
+              />
               <input
                 type="datetime-local"
                 value={drafts[row.id] ?? toLocalInputValue(row.scheduledAt)}

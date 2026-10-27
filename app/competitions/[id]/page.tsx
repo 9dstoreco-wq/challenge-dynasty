@@ -20,7 +20,7 @@ import TournamentRotationResultForm from '@/components/TournamentRotationResultF
 import TournamentRotationStandings from '@/components/TournamentRotationStandings'
 import { LADDER_TOTAL_ROUNDS, MEXICANO_TOTAL_ROUNDS, swissTotalRounds } from '@/lib/tournamentBracket'
 
-type Fixture = { id: string; category_id: string; round_number: number | null; slot: number | null; next_fixture_id: string | null; scheduled_at: string | null; status: string; side_a_entry_id: string | null; side_b_entry_id: string | null; winner_entry_id: string | null; metadata: { score_a?: number; score_b?: number } | null }
+type Fixture = { id: string; category_id: string; round_number: number | null; slot: number | null; next_fixture_id: string | null; scheduled_at: string | null; court: string | null; status: string; side_a_entry_id: string | null; side_b_entry_id: string | null; winner_entry_id: string | null; metadata: { score_a?: number; score_b?: number } | null }
 type Category = { id: string; name: string; participant_mode: string; capacity: number | null; entry_fee: number | null; status: string }
 type RotationMatch = { id: string; category_id: string; round_number: number; court: number; side_a_player1_id: string; side_a_player2_id: string; side_b_player1_id: string; side_b_player2_id: string; score_a: number | null; score_b: number | null; status: string }
 type RotationStanding = { category_id: string; entry_id: string; total_points: number; matches_played: number }
@@ -38,7 +38,7 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
   const [{ data: tournament }, { data: catsData }, { data: fixturesData }, { data: confirmedData }, { data: stagesData }, { data: rotationMatchesData }, { data: rotationStandingsData }] = await Promise.all([
     supabase.from('tournaments').select('id,title,status,starts_at,ends_at,organization_id,organizer_profile_id,format_type').eq('id', id).maybeSingle(),
     supabase.from('tournament_categories').select('id,name,participant_mode,capacity,entry_fee,status').eq('tournament_id', id).order('name').returns<Category[]>(),
-    supabase.from('tournament_fixtures').select('id,category_id,round_number,slot,next_fixture_id,scheduled_at,status,side_a_entry_id,side_b_entry_id,winner_entry_id,metadata').eq('tournament_id', id).order('scheduled_at', { ascending: true, nullsFirst: false }).limit(200).returns<Fixture[]>(),
+    supabase.from('tournament_fixtures').select('id,category_id,round_number,slot,next_fixture_id,scheduled_at,court,status,side_a_entry_id,side_b_entry_id,winner_entry_id,metadata').eq('tournament_id', id).order('scheduled_at', { ascending: true, nullsFirst: false }).limit(200).returns<Fixture[]>(),
     supabase.from('tournament_entries').select('id,category_id').eq('tournament_id', id).eq('status', 'confirmed').returns<{ id: string; category_id: string }[]>(),
     supabase.from('tournament_stages').select('category_id,stage_type').eq('tournament_id', id).returns<{ category_id: string; stage_type: string }[]>(),
     // Americano: partidos de rotación (pareja cambia cada ronda) — viven aparte de tournament_fixtures.
@@ -183,6 +183,7 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
       labelA: entryLabel(f.side_a_entry_id),
       labelB: entryLabel(f.side_b_entry_id),
       scheduledAt: f.scheduled_at,
+      court: f.court,
       status: f.status,
     }))
 
@@ -297,7 +298,11 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
                   const hasScore = scoreA != null && scoreB != null
                   return (
                     <div key={f.id} className="rounded-2xl bg-white/[.03] border border-white/10 p-4 grid md:grid-cols-[150px_1fr_1fr_120px] gap-3 items-center">
-                      <div className="text-xs text-white/40">{t('round', { round: f.round_number ?? '—' })}<br />{f.scheduled_at ? new Date(f.scheduled_at).toLocaleString('es-CO') : t('timeTBD')}</div>
+                      <div className="text-xs text-white/40">
+                        {t('round', { round: f.round_number ?? '—' })}<br />
+                        {f.scheduled_at ? new Date(f.scheduled_at).toLocaleString('es-CO') : t('timeTBD')}
+                        {f.court ? ` · ${f.court}` : ''}
+                      </div>
                       <div className="text-sm">{entryLabel(f.side_a_entry_id)}</div>
                       <div className="text-sm">{entryLabel(f.side_b_entry_id)}</div>
                       <div className="text-right font-black">{hasScore ? `${scoreA} - ${scoreB}` : fixtureStatusLabel(f.status)}</div>
