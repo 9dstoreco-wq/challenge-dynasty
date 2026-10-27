@@ -29,7 +29,18 @@ export default function TournamentKnockoutPanel({
     setMessages((m) => ({ ...m, [categoryId]: '' }))
     try {
       const result = await generateKnockoutStage(supabase, { tournamentId, categoryId, startsAt })
-      setMessages((m) => ({ ...m, [categoryId]: t('knockoutGenerated', { count: result.fixturesCreated }) }))
+      // AVISO AUTOMATICO (pedido de Luis, 2026-10-26): ver TournamentBracketPanel.tsx.
+      let notified = 0
+      try {
+        const { data: notifyResult } = await supabase.rpc('notify_category_fixture_schedule', { p_category_id: categoryId })
+        notified = (notifyResult as { fixtures_notified?: number } | null)?.fixtures_notified ?? 0
+      } catch {
+        // silencioso: el cuadro final ya se generó; el aviso es un extra, no debe tumbar el flujo.
+      }
+      setMessages((m) => ({
+        ...m,
+        [categoryId]: `${t('knockoutGenerated', { count: result.fixturesCreated })}${notified > 0 ? ' ' + t('bracketNotified', { count: notified }) : ''}`,
+      }))
       router.refresh()
     } catch (err) {
       const code = err instanceof Error ? err.message : ''

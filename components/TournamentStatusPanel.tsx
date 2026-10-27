@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
+import { toSafeMessage } from '@/lib/safe-error'
 
 type TournamentStatus = 'draft' | 'published' | 'registration_open' | 'registration_closed' | 'in_progress' | 'completed' | 'cancelled'
 
@@ -40,22 +41,6 @@ const HINT_KEY: Record<TournamentStatus, string> = {
 
 const CANCELLABLE_FROM: TournamentStatus[] = ['draft', 'published', 'registration_open', 'registration_closed', 'in_progress']
 
-function describeError(code: string): string {
-  switch (code) {
-    case 'not_authenticated':
-      return 'Debes iniciar sesión.'
-    case 'tournament_not_found':
-      return 'No encontramos ese torneo.'
-    case 'forbidden':
-      return 'No tienes permiso para cambiar el estado de este torneo.'
-    case 'invalid_tournament_status':
-      return 'Ese estado no es válido.'
-    default:
-      if (code.startsWith('invalid_status_transition')) return 'Ese cambio de estado no está permitido desde el estado actual.'
-      return 'No se pudo cambiar el estado del torneo. Intenta de nuevo.'
-  }
-}
-
 export default function TournamentStatusPanel({ tournamentId, status }: { tournamentId: string; status: TournamentStatus }) {
   const t = useTranslations('Competitions')
   const router = useRouter()
@@ -74,7 +59,7 @@ export default function TournamentStatusPanel({ tournamentId, status }: { tourna
     })
     setBusy(false)
     if (rpcError) {
-      setError(describeError(rpcError.message || ''))
+      setError(toSafeMessage(rpcError, 'TournamentStatusPanel.transition', 'No se pudo cambiar el estado del torneo. Intenta de nuevo.'))
       return
     }
     router.refresh()

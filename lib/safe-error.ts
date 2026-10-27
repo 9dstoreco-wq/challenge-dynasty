@@ -30,6 +30,11 @@ const SQL_INTERNAL_PATTERN =
   /relation "|column "|constraint "|violates|syntax error|permission denied for|duplicate key value|invalid input syntax|null value in column|does not exist|pg_|P0001|42501|23505|23503|23502|22P02/i
 
 const SCREAMING_CASE_PATTERN = /^[A-Z][A-Z0-9_]*$/
+// Codigo lower_snake_case de una sola palabra sin espacios (p.ej. "forbidden",
+// "tournament_not_found") que una RPC nuestra lanzo a proposito pero que no quedo en el
+// diccionario de arriba. Red de seguridad: mejor humanizarlo igual que un SCREAMING_CASE que
+// dejarlo pasar crudo en ingles/snake_case a la UI.
+const LOWER_SNAKE_CASE_PATTERN = /^[a-z][a-z0-9_]*$/
 
 export const DEFAULT_SAFE_FALLBACK = 'No se pudo completar la acción. Intenta de nuevo.'
 
@@ -53,7 +58,29 @@ const KNOWN_RPC_MESSAGES: Record<string, string> = {
   // en este diccionario, el jugador veia el texto crudo en ingles en medio de una app en espanol.
   'Registrations are not open': 'Las inscripciones de este torneo todavía no están abiertas.',
   'Registration has not opened': 'Las inscripciones de este torneo todavía no están abiertas.',
+  // Codigos lower_snake_case que lanza transition_tournament_status (ver TournamentStatusPanel.tsx).
+  // Antes TournamentStatusPanel traducia estos a mano con un switch local que leia
+  // rpcError.message directamente -- eso duplicaba este diccionario y además lo saltaba, así que
+  // lo centralizamos aquí (el check-error-sanitization del repo exige que todo pase por
+  // toSafeMessage, no por un switch aparte).
+  not_authenticated: 'Debes iniciar sesión.',
+  tournament_not_found: 'No encontramos ese torneo.',
+  forbidden: 'No tienes permiso para hacer esto.',
+  invalid_tournament_status: 'Ese estado no es válido.',
+  // Codigos de reschedule_tournament_fixture / notify_category_fixture_schedule (ver
+  // TournamentScheduleEditor.tsx).
+  category_not_found: 'No encontramos esa categoría.',
+  fixture_not_found: 'No encontramos ese partido.',
+  fixture_already_finalized: 'Ese partido ya terminó, no se puede cambiar su hora.',
+  scheduled_at_required: 'Elige una fecha y hora para el partido.',
 }
+
+// Mismo caso que invalid_status_transition: % -> % (transition_tournament_status interpola el
+// estado actual y el pedido en el propio mensaje, así que no puede ser una llave exacta del
+// diccionario de arriba).
+const LOWER_SNAKE_PREFIX_MESSAGES: Array<{ prefix: string; message: string }> = [
+  { prefix: 'invalid_status_transition', message: 'Ese cambio de estado no está permitido desde el estado actual.' },
+]
 
 /**
  * Converts a Supabase/Postgres error (or any thrown value) into a message
@@ -87,10 +114,15 @@ export function toSafeMessage(
   if (SQL_INTERNAL_PATTERN.test(raw)) return fallback
 
   // Mensajes en ingles que lanzan las funciones de la base de datos: se muestran en espanol.
-  const known = KNOWN_RPC_MESSAGES[raw.trim()]
+  const trimmed = raw.trim()
+  const known = KNOWN_RPC_MESSAGES[trimmed]
   if (known) return known
 
-  if (SCREAMING_CASE_PATTERN.test(raw)) {
+  for (const { prefix, message } of LOWER_SNAKE_PREFIX_MESSAGES) {
+    if (trimmed.startsWith(prefix)) return message
+  }
+
+  if (SCREAMING_CASE_PATTERN.test(raw) || LOWER_SNAKE_CASE_PATTERN.test(trimmed)) {
     return raw.replace(/_/g, ' ').toLowerCase().replace(/^./, (c) => c.toUpperCase()) + '.'
   }
 

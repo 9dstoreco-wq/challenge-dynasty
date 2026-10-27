@@ -44,7 +44,22 @@ export default function TournamentBracketPanel({
     setMessages((m) => ({ ...m, [categoryId]: '' }))
     try {
       const result = await generateBracket(supabase, { tournamentId, categoryId, formatType, startsAt })
-      setMessages((m) => ({ ...m, [categoryId]: t('bracketGenerated', { count: result.fixturesCreated }) }))
+      // AVISO AUTOMATICO (pedido de Luis, 2026-10-26): en cuanto sale el cuadro, cada jugador
+      // inscrito recibe una alerta dentro de la app con su rival y la hora de su partido (ver
+      // notify_category_fixture_schedule en la base de datos). Si este aviso falla por algun
+      // motivo no se bloquea la generacion del cuadro -- el cuadro ya quedo creado, solo no hubo
+      // aviso, y el organizador puede reintentarlo abriendo la categoria de nuevo.
+      let notified = 0
+      try {
+        const { data: notifyResult } = await supabase.rpc('notify_category_fixture_schedule', { p_category_id: categoryId })
+        notified = (notifyResult as { fixtures_notified?: number } | null)?.fixtures_notified ?? 0
+      } catch {
+        // silencioso: el cuadro ya se generó; el aviso es un extra, no debe tumbar el flujo.
+      }
+      setMessages((m) => ({
+        ...m,
+        [categoryId]: `${t('bracketGenerated', { count: result.fixturesCreated })}${notified > 0 ? ' ' + t('bracketNotified', { count: notified }) : ''}`,
+      }))
       router.refresh()
     } catch (err) {
       const code = err instanceof Error ? err.message : ''

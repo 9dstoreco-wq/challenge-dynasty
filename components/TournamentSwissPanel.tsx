@@ -29,9 +29,20 @@ export default function TournamentSwissPanel({
     setMessages((m) => ({ ...m, [categoryId]: '' }))
     try {
       const result = await generateNextSwissRound(supabase, { tournamentId, categoryId, startsAt })
+      // AVISO AUTOMATICO (pedido de Luis, 2026-10-26): cada vez que sale una ronda nueva del
+      // suizo, se avisa a los jugadores de esa ronda. notify_category_fixture_schedule solo
+      // avisa los partidos que todavia no se habian avisado, asi que rondas anteriores no se
+      // vuelven a notificar.
+      let notified = 0
+      try {
+        const { data: notifyResult } = await supabase.rpc('notify_category_fixture_schedule', { p_category_id: categoryId })
+        notified = (notifyResult as { fixtures_notified?: number } | null)?.fixtures_notified ?? 0
+      } catch {
+        // silencioso: la ronda ya se generó; el aviso es un extra, no debe tumbar el flujo.
+      }
       setMessages((m) => ({
         ...m,
-        [categoryId]: result.isFinal ? t('swissComplete') : t('swissRoundGenerated', { round: result.roundNumber }),
+        [categoryId]: `${result.isFinal ? t('swissComplete') : t('swissRoundGenerated', { round: result.roundNumber })}${notified > 0 ? ' ' + t('bracketNotified', { count: notified }) : ''}`,
       }))
       router.refresh()
     } catch (err) {

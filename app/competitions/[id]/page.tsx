@@ -14,6 +14,7 @@ import TournamentKnockoutPanel from '@/components/TournamentKnockoutPanel'
 import TournamentLadderPanel from '@/components/TournamentLadderPanel'
 import TournamentMexicanoPanel from '@/components/TournamentMexicanoPanel'
 import TournamentSwissPanel from '@/components/TournamentSwissPanel'
+import TournamentScheduleEditor from '@/components/TournamentScheduleEditor'
 import TournamentRotationResultForm from '@/components/TournamentRotationResultForm'
 import TournamentRotationStandings from '@/components/TournamentRotationStandings'
 import { LADDER_TOTAL_ROUNDS, MEXICANO_TOTAL_ROUNDS, swissTotalRounds } from '@/lib/tournamentBracket'
@@ -168,6 +169,22 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
     return entry.entry_type === 'individual' ? name : `${name} ${t('andTeam')}`
   }
 
+  // FEATURE PEDIDA POR LUIS (2026-10-26): panel de horarios con TODAS las categorías juntas, para
+  // que el organizador vea y corrija choques de un mismo jugador que juega varias categorías
+  // (p.ej. mixto + quinta) antes de avisarle a todo el mundo su hora de partido.
+  const scheduleRows = fixtures
+    .filter((f) => f.status !== 'completed' && f.status !== 'cancelled')
+    .map((f) => ({
+      id: f.id,
+      categoryId: f.category_id,
+      categoryName: categoryNameById.get(f.category_id) ?? '',
+      round: f.round_number,
+      labelA: entryLabel(f.side_a_entry_id),
+      labelB: entryLabel(f.side_b_entry_id),
+      scheduledAt: f.scheduled_at,
+      status: f.status,
+    }))
+
   // Jugadores "descubribles" para elegir pareja al inscribirse (misma regla que Retos).
   const { data: playersData } = user
     ? await supabase.from('profiles').select('id,username,display_name').neq('id', user.id).order('display_name').limit(200)
@@ -254,6 +271,13 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
               tournamentId={tournament.id}
               startsAt={tournament.starts_at}
               categories={categoriesReadyForNextSwissRound}
+            />
+          )}
+          {isOrganizer && (
+            <TournamentScheduleEditor
+              tournamentId={tournament.id}
+              categoryIds={cats.map((c) => c.id)}
+              rows={scheduleRows}
             />
           )}
 
