@@ -1253,6 +1253,18 @@
     "imageHint": "For Instagram or TikTok: download the image and upload it from your app.",
     "shareText": "Check out my Challenge Dynasty card, {name}"
   },
+  "ShareableCard": {
+    "shareBtn": "Share",
+    "downloadBtn": "Download",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
+    "imageHint": "For Instagram or TikTok: download the image and upload it from your app."
+  },
+  "TournamentResultCard": {
+    "title": "RESULT CARD",
+    "viewResultCard": "View result card",
+    "shareText": "Check out my match result in {tournament}, Challenge Dynasty"
+  },
   "ClubRegister": {
     "tag": "CLUB OS · SELF-SERVICE",
     "title": "Register your club",

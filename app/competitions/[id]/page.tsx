@@ -15,6 +15,7 @@ import TournamentLadderPanel from '@/components/TournamentLadderPanel'
 import TournamentMexicanoPanel from '@/components/TournamentMexicanoPanel'
 import TournamentSwissPanel from '@/components/TournamentSwissPanel'
 import TournamentScheduleEditor from '@/components/TournamentScheduleEditor'
+import TournamentResultCardToggle from '@/components/TournamentResultCardToggle'
 import TournamentRotationResultForm from '@/components/TournamentRotationResultForm'
 import TournamentRotationStandings from '@/components/TournamentRotationStandings'
 import { LADDER_TOTAL_ROUNDS, MEXICANO_TOTAL_ROUNDS, swissTotalRounds } from '@/lib/tournamentBracket'
@@ -309,6 +310,11 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
                             labelA={entryLabel(f.side_a_entry_id)}
                             labelB={entryLabel(f.side_b_entry_id)}
                           />
+                        </div>
+                      )}
+                      {hasScore && (
+                        <div className="md:col-span-4">
+                          <TournamentResultCardToggle fixtureId={f.id} tournamentId={tournament.id} tournamentTitle={tournament.title} />
                         </div>
                       )}
                     </div>

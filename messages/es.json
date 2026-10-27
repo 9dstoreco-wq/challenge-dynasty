@@ -1253,6 +1253,18 @@
     "imageHint": "Para Instagram o TikTok: descarga la imagen y súbela desde tu app.",
     "shareText": "Mira mi carta en Challenge Dynasty, {name}"
   },
+  "ShareableCard": {
+    "shareBtn": "Compartir",
+    "downloadBtn": "Descargar",
+    "copyLink": "Copiar enlace",
+    "linkCopied": "Enlace copiado",
+    "imageHint": "Para Instagram o TikTok: descarga la imagen y súbela desde tu app."
+  },
+  "TournamentResultCard": {
+    "title": "CARTA DEL RESULTADO",
+    "viewResultCard": "Ver carta del resultado",
+    "shareText": "Mira el resultado de mi partido en {tournament}, Challenge Dynasty"
+  },
   "ClubRegister": {
     "tag": "CLUB OS · AUTOREGISTRO",
     "title": "Registra tu club",
