@@ -4,6 +4,7 @@ import BusinessShell from '@/components/business/BusinessShell'
 import BusinessHeader from '@/components/business/BusinessHeader'
 import ClubDashboard from '@/components/ClubDashboard'
 import ClubIncomePanel from '@/components/ClubIncomePanel'
+import ClubAcademyPanel, { type CoachRow, type ClassRow } from '@/components/ClubAcademyPanel'
 import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 
@@ -62,6 +63,62 @@ export default async function ClubManagePage({ params }: { params: Promise<{ id:
     }
   })
 
+  const { data: relationshipRows } = await supabase
+    .from('provider_organization_relationships')
+    .select('id,provider_id,relationship_type')
+    .eq('organization_id', organization.id)
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+
+  const coachProviderIds = (relationshipRows ?? []).map((r) => r.provider_id)
+  const { data: coachProviderRows } = coachProviderIds.length
+    ? await supabase.from('provider_profiles').select('id,profile_id,headline').in('id', coachProviderIds)
+    : { data: [] }
+  const coachProfileIds = (coachProviderRows ?? []).map((p) => p.profile_id)
+  const { data: coachProfileRows } = coachProfileIds.length
+    ? await supabase.from('profiles').select('id,display_name,username').in('id', coachProfileIds)
+    : { data: [] }
+  const coachProviderById = new Map((coachProviderRows ?? []).map((p) => [p.id, p]))
+  const coachProfileById = new Map((coachProfileRows ?? []).map((p) => [p.id, p]))
+
+  const coaches: CoachRow[] = (relationshipRows ?? []).map((r) => {
+    const provider = coachProviderById.get(r.provider_id)
+    const profile = provider ? coachProfileById.get(provider.profile_id) : undefined
+    return {
+      relationshipId: r.id,
+      providerId: r.provider_id,
+      profileId: provider?.profile_id ?? '',
+      displayName: profile?.display_name ?? null,
+      username: profile?.username ?? null,
+      headline: provider?.headline ?? null,
+      relationshipType: r.relationship_type,
+    }
+  })
+
+  const { data: serviceRows } = await supabase
+    .from('provider_services')
+    .select('id,provider_id,title,description,service_mode,duration_minutes,capacity,price,currency_code,status')
+    .eq('organization_id', organization.id)
+    .order('created_at', { ascending: false })
+
+  const classes: ClassRow[] = (serviceRows ?? []).map((s) => {
+    const provider = coachProviderById.get(s.provider_id)
+    const profile = provider ? coachProfileById.get(provider.profile_id) : undefined
+    return {
+      id: s.id,
+      providerId: s.provider_id,
+      coachDisplayName: profile?.display_name ?? provider?.headline ?? null,
+      title: s.title,
+      description: s.description,
+      serviceMode: s.service_mode,
+      durationMinutes: s.duration_minutes,
+      capacity: s.capacity,
+      price: s.price,
+      currencyCode: s.currency_code,
+      status: s.status,
+    }
+  })
+
   return (
     <BusinessShell>
       <BusinessHeader
@@ -72,6 +129,7 @@ export default async function ClubManagePage({ params }: { params: Promise<{ id:
       <div className="space-y-7">
         <ClubIncomePanel organizationId={organization.id} />
         <ClubDashboard organizationId={organization.id} sports={sports ?? []} resources={resourceRows} />
+        <ClubAcademyPanel organizationId={organization.id} coaches={coaches} classes={classes} />
       </div>
     </BusinessShell>
   )
