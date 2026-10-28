@@ -9,8 +9,23 @@ export default async function SeasonPage(){
   const supabase = await createClient()
   const t = await getTranslations('Season')
   const { data: tournamentsData } = await supabase.from('tournaments').select('id,title,status,starts_at,ends_at').order('starts_at',{ascending:true}).limit(20)
-  const tournaments = tournamentsData ?? []
+  const rawTournaments = tournamentsData ?? []
+
+  // Mismo criterio de orden que /competitions: "Destacado"/"Boost" activo va primero. Ver
+  // supabase/migrations/20261028190000_add_tournament_promotions.sql.
+  const tournamentIds = rawTournaments.map((tr) => tr.id)
+  const { data: activePromoRows } = tournamentIds.length
+    ? await supabase.from('tournament_promotions').select('tournament_id,package_code').in('tournament_id', tournamentIds).eq('status', 'active').gt('ends_at', new Date().toISOString())
+    : { data: [] }
+  const promoWeight = new Map<string, number>()
+  for (const row of activePromoRows ?? []) {
+    const weight = row.package_code === 'tournament_promo_destacado' ? 2 : 1
+    const prev = promoWeight.get(row.tournament_id as string) ?? 0
+    if (weight > prev) promoWeight.set(row.tournament_id as string, weight)
+  }
+  const tournaments = [...rawTournaments].sort((a, b) => (promoWeight.get(b.id) ?? 0) - (promoWeight.get(a.id) ?? 0))
+
   const tournamentStatuses = ['draft', 'published', 'registration_open', 'registration_closed', 'in_progress', 'completed', 'cancelled']
   const statusLabel = (s: string) => (tournamentStatuses.includes(s) ? t(`status.${s}` as 'status.draft') : s)
-  return <div className="min-h-screen arena-bg text-white "><Sidebar/><main className="lg:pl-64 pb-20 lg:pb-0"><div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">CHALLENGE SEASON</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{t('title')}</h1><p className="text-white/50 mt-2">{t('subtitle')}</p></PageHero><div className="mt-7 card-fut-plain border border-white/10 bg-[#141416] p-8">{tournaments.length===0?<div className="text-center text-white/45">{t('empty')}</div>:<div className="space-y-3">{tournaments.map((t2)=><div key={t2.id} className="rounded-2xl border border-white/10 p-4 flex items-center justify-between"><div><div className="font-black">{t2.title}</div><div className="text-xs text-white/40 mt-1">{t2.starts_at ? new Date(t2.starts_at).toLocaleString('es-CO') : t('noDate')}{t2.ends_at ? ` → ${new Date(t2.ends_at).toLocaleString('es-CO')}` : ''}</div></div><span className="text-xs font-black text-[#D4AF37]">{statusLabel(t2.status)}</span></div>)}</div>}</div></div></main><BottomNav/></div>
+  return <div className="min-h-screen arena-bg text-white "><Sidebar/><main className="lg:pl-64 pb-20 lg:pb-0"><div className="max-w-5xl mx-auto px-4 md:px-6 py-8"><PageHero><div className="text-xs tracking-[.3em] text-[#D4AF37] font-black">CHALLENGE SEASON</div><h1 className="text-4xl md:text-6xl font-display font-black tracking-wide mt-2">{t('title')}</h1><p className="text-white/50 mt-2">{t('subtitle')}</p></PageHero><div className="mt-7 card-fut-plain border border-white/10 bg-[#141416] p-8">{tournaments.length===0?<div className="text-center text-white/45">{t('empty')}</div>:<div className="space-y-3">{tournaments.map((t2)=><div key={t2.id} className={`rounded-2xl border p-4 flex items-center justify-between ${(promoWeight.get(t2.id) ?? 0) > 0 ? 'border-[#D4AF37]/50 bg-[#1a1710]' : 'border-white/10'}`}><div><div className="font-black flex items-center gap-2">{t2.title}{(promoWeight.get(t2.id) ?? 0) === 2 && <span className="text-[10px] font-black uppercase tracking-widest text-black bg-[#D4AF37] rounded-full px-2 py-0.5">{t('featuredBadge')}</span>}{(promoWeight.get(t2.id) ?? 0) === 1 && <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37]/50 rounded-full px-2 py-0.5">{t('boostBadge')}</span>}</div><div className="text-xs text-white/40 mt-1">{t2.starts_at ? new Date(t2.starts_at).toLocaleString('es-CO') : t('noDate')}{t2.ends_at ? ` → ${new Date(t2.ends_at).toLocaleString('es-CO')}` : ''}</div></div><span className="text-xs font-black text-[#D4AF37]">{statusLabel(t2.status)}</span></div>)}</div>}</div></div></main><BottomNav/></div>
 }

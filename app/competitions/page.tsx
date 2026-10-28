@@ -15,7 +15,32 @@ export default async function CompetitionsPage() {
     .select('id,title,status,starts_at,ends_at,organization_id')
     .order('starts_at', { ascending: true })
     .limit(50)
-  const tournaments = tournamentsData ?? []
+  const rawTournaments = tournamentsData ?? []
+
+  // "Destacado"/"Boost" (app/promote): torneos con una ventana activa en tournament_promotions
+  // van primero -- destacado antes que boost -- y el resto mantiene el orden por fecha de
+  // siempre. Ver supabase/migrations/20261028190000_add_tournament_promotions.sql.
+  const tournamentIds = rawTournaments.map((tr) => tr.id)
+  const { data: activePromoRows } = tournamentIds.length
+    ? await supabase
+        .from('tournament_promotions')
+        .select('tournament_id,package_code')
+        .in('tournament_id', tournamentIds)
+        .eq('status', 'active')
+        .gt('ends_at', new Date().toISOString())
+    : { data: [] }
+  const promoWeight = new Map<string, number>()
+  for (const row of activePromoRows ?? []) {
+    const weight = row.package_code === 'tournament_promo_destacado' ? 2 : 1
+    const prev = promoWeight.get(row.tournament_id as string) ?? 0
+    if (weight > prev) promoWeight.set(row.tournament_id as string, weight)
+  }
+  const tournaments = [...rawTournaments].sort((a, b) => {
+    const wa = promoWeight.get(a.id) ?? 0
+    const wb = promoWeight.get(b.id) ?? 0
+    if (wa !== wb) return wb - wa
+    return 0 // conserva el orden relativo por starts_at que ya trajo la query
+  })
 
   return (
     <div className="min-h-screen arena-bg text-white ">
@@ -35,9 +60,19 @@ export default async function CompetitionsPage() {
               <a
                 key={t2.id}
                 href={`/competitions/${t2.id}`}
-                className="card-fut-plain border border-white/10 bg-[#141416] p-6 block hover:border-[#D4AF37]/30"
+                className={`card-fut-plain border p-6 block hover:border-[#D4AF37]/30 ${
+                  (promoWeight.get(t2.id) ?? 0) > 0 ? 'border-[#D4AF37]/50 bg-[#1a1710]' : 'border-white/10 bg-[#141416]'
+                }`}
               >
-                <div className="text-xs text-[#D4AF37] font-black uppercase tracking-widest">{t2.status}</div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-xs text-[#D4AF37] font-black uppercase tracking-widest">{t2.status}</div>
+                  {(promoWeight.get(t2.id) ?? 0) === 2 && (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-black bg-[#D4AF37] rounded-full px-2 py-0.5">{t('featuredBadge')}</span>
+                  )}
+                  {(promoWeight.get(t2.id) ?? 0) === 1 && (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37]/50 rounded-full px-2 py-0.5">{t('boostBadge')}</span>
+                  )}
+                </div>
                 <h2 className="text-xl font-black mt-2">{t2.title}</h2>
                 <p className="text-white/40 text-sm mt-2">
                   {t2.starts_at || t('dateTBD')}
