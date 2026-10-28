@@ -73,6 +73,24 @@ const KNOWN_RPC_MESSAGES: Record<string, string> = {
   fixture_not_found: 'No encontramos ese partido.',
   fixture_already_finalized: 'Ese partido ya terminó, no se puede cambiar su hora.',
   scheduled_at_required: 'Elige una fecha y hora para el partido.',
+  // BUG ENCONTRADO EN AUDITORIA DE NAV (2026-10-28): create_atomic_booking / cancel_booking
+  // lanzan estos mensajes/codigos en ingles (algunos SCREAMING_CASE, otros frases con espacios
+  // que no calzan en SCREAMING_CASE_PATTERN ni LOWER_SNAKE_CASE_PATTERN, asi que pasaban crudos
+  // en ingles hasta el usuario en BookingControlCenter.tsx). Se agregan aqui explicitamente.
+  'Booking not found': 'No encontramos esa reserva.',
+  'Not authorized to cancel this booking': 'No tienes permiso para cancelar esta reserva.',
+  'Booking cannot be cancelled in its current state': 'Esta reserva no se puede cancelar en su estado actual.',
+  'Cancellation deadline has passed': 'Ya pasó el plazo para cancelar esta reserva.',
+  AUTH_REQUIRED: 'Debes iniciar sesión.',
+  BOOKING_ACTOR_MISMATCH: 'No puedes reservar en nombre de otra persona.',
+  INVALID_BOOKING_RANGE: 'El horario de la reserva no es válido.',
+  BOOKING_ITEMS_INVALID: 'Los datos de la reserva no son válidos.',
+  BOOKABLE_ID_REQUIRED: 'Falta elegir qué vas a reservar.',
+  INVALID_BOOKING_QUANTITY: 'La cantidad de la reserva no es válida.',
+  BOOKABLE_NOT_AVAILABLE: 'Eso ya no está disponible para reservar.',
+  INVALID_BOOKABLE_PRICE: 'El precio de eso no está configurado correctamente.',
+  BOOKABLE_CURRENCY_REQUIRED: 'Falta configurar la moneda de eso.',
+  MIXED_CURRENCY_BOOKING_NOT_ALLOWED: 'No puedes reservar varias cosas con monedas distintas en la misma reserva.',
 }
 
 // Mismo caso que invalid_status_transition: % -> % (transition_tournament_status interpola el

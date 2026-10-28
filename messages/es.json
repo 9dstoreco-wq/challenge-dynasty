@@ -112,6 +112,8 @@
     "tipo": "Tipo",
     "precioOpcional": "Precio (opcional)",
     "precioPlaceholder": "Ej: 150000",
+    "cantidadDisponible": "Cupos/unidades disponibles",
+    "cantidadDisponiblePlaceholder": "Ej: 10",
     "ciudadPlaceholder2": "Ej: Medellín",
     "publicarBtn": "Publicar en el Marketplace",
     "publicando": "Publicando…",

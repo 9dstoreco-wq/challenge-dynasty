@@ -112,6 +112,8 @@
     "tipo": "Type",
     "precioOpcional": "Price (optional)",
     "precioPlaceholder": "E.g: 150000",
+    "cantidadDisponible": "Available spots/units",
+    "cantidadDisponiblePlaceholder": "E.g: 10",
     "ciudadPlaceholder2": "E.g: Medellín",
     "publicarBtn": "Publish on the Marketplace",
     "publicando": "Publishing…",

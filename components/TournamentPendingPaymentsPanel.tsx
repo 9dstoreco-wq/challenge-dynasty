@@ -19,21 +19,16 @@ export default function TournamentPendingPaymentsPanel({ rows }: { rows: Row[] }
   async function markPaid(entryId: string, amountDue: number, amountPaid: number) {
     setBusyId(entryId)
     setErrorId(null)
-    // F12: confirm_tournament_registration_payment now takes full payment identity
-    // (provider/provider_payment_id/provider_event_id) and SUMS events instead of
-    // replacing amount_paid -- see Challenge_Dynasty_SQL_F04_F12_para_pegar.sql.
-    // This manual "mark as paid" action has no real provider transaction, so it uses
-    // provider: 'manual' with a fresh, unique id per click (the UI already disables
-    // the button while busy, so no duplicate-click risk). Pass only the REMAINING
-    // balance as the amount for this event, not the full amountDue -- the RPC adds it
-    // to whatever was already paid, it no longer overwrites.
+    // BUG ENCONTRADO EN AUDITORIA DE NAV (2026-10-28): este boton llamaba directo a
+    // confirm_tournament_registration_payment, que solo puede ejecutar el rol administrativo de
+    // los webhooks reales de Wompi (nunca el navegador) y ni siquiera tiene permiso de ejecucion
+    // para un usuario autenticado normal -- el boton fallaba el 100% de las veces para cualquier
+    // organizador. Ahora usa mark_tournament_entry_paid_manually, la version segura para que el
+    // propio organizador del torneo marque un pago en efectivo (verifica que quien llama sea el
+    // organizador; ver supabase/migrations/20261028180000_add_mark_tournament_entry_paid_manually_rpc.sql).
     const remaining = amountDue - amountPaid
-    const eventId = crypto.randomUUID()
-    const { error } = await supabase.rpc('confirm_tournament_registration_payment', {
+    const { error } = await supabase.rpc('mark_tournament_entry_paid_manually', {
       p_entry_id: entryId,
-      p_provider: 'manual',
-      p_provider_payment_id: eventId,
-      p_provider_event_id: eventId,
       p_amount: remaining,
     })
     setBusyId(null)

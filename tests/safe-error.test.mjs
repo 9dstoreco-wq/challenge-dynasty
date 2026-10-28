@@ -46,6 +46,21 @@ test('las frases en espanol escritas por nuestras funciones pasan sin cambios', 
   }
 })
 
+test('los mensajes/codigos en ingles de las reservas se muestran en espanol', () => {
+  const esperados = {
+    'Booking not found': 'No encontramos esa reserva.',
+    'Not authorized to cancel this booking': 'No tienes permiso para cancelar esta reserva.',
+    'Booking cannot be cancelled in its current state': 'Esta reserva no se puede cancelar en su estado actual.',
+    'Cancellation deadline has passed': 'Ya pasó el plazo para cancelar esta reserva.',
+    AUTH_REQUIRED: 'Debes iniciar sesión.',
+    BOOKABLE_NOT_AVAILABLE: 'Eso ya no está disponible para reservar.',
+    MIXED_CURRENCY_BOOKING_NOT_ALLOWED: 'No puedes reservar varias cosas con monedas distintas en la misma reserva.',
+  }
+  for (const [raw, es] of Object.entries(esperados)) {
+    assert.equal(toSafeMessage(new Error(raw), 'test'), es)
+  }
+})
+
 test('los codigos EN_MAYUSCULAS se vuelven una frase legible', () => {
   assert.equal(toSafeMessage('PRODUCT_NOT_AVAILABLE', 'test'), 'Product not available.')
   assert.equal(toSafeMessage('SELLER_NOT_OWNED', 'test'), 'Seller not owned.')

@@ -93,7 +93,7 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
       ? await supabase.from('provider_profiles').update(payload).eq('id', profile.id)
       : await supabase.from('provider_profiles').insert(payload)
     setBusy(false)
-    if (upsertError) { setError(upsertError.message); return }
+    if (upsertError) { setError(toSafeMessage(upsertError, 'coach.saveProfile')); return }
     router.refresh()
   }
 
@@ -119,7 +119,7 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
       status: 'active',
     }).select('id').single()
 
-    if (svcError || !newService) { setBusy(false); setError(svcError?.message || t('errCreateServiceFailed')); return }
+    if (svcError || !newService) { setBusy(false); setError(svcError ? toSafeMessage(svcError, 'coach.addService') : t('errCreateServiceFailed')); return }
 
     const { error: bookableError } = await supabase.from('bookable_entities').insert({
       owner_id: myProfileId,
@@ -137,7 +137,7 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
     if (bookableError) {
       await supabase.from('provider_services').delete().eq('id', newService.id)
       setBusy(false)
-      setError(t('errPublishServiceFailed', { message: bookableError.message }))
+      setError(t('errPublishServiceFailed', { message: toSafeMessage(bookableError, 'coach.addService.bookable') }))
       return
     }
 
@@ -154,7 +154,7 @@ export default function CoachDashboard({ profile, services, bookings, myProfileI
       await supabase.from('bookable_entities').update({ status: nextStatus === 'active' ? 'active' : 'paused' }).eq('id', svc.bookable_id)
     }
     setBusy(false)
-    if (svcError) { setError(svcError.message); return }
+    if (svcError) { setError(toSafeMessage(svcError, 'coach.toggleService')); return }
     router.refresh()
   }
 

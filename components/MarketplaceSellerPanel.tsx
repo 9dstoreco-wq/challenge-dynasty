@@ -109,6 +109,7 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
   const [city, setCity] = useState(sellerProfile?.city || '')
   const [countryCode, setCountryCode] = useState(sellerProfile?.country_code || 'CO')
   const [price, setPrice] = useState('')
+  const [quantityAvailable, setQuantityAvailable] = useState('10')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [statusBusyId, setStatusBusyId] = useState<string | null>(null)
@@ -130,7 +131,7 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
     if (!title.trim()) { setError(t('escribeTitulo')); return }
     setBusy(true)
     setError(null)
-    const { error: insertError } = await supabase.from('marketplace_listings').insert({
+    const { data: newListing, error: insertError } = await supabase.from('marketplace_listings').insert({
       owner_id: (await supabase.auth.getUser()).data.user?.id,
       seller_id: sellerProfile.id,
       title: title.trim(),
@@ -142,10 +143,24 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
       currency_code: 'COP',
       status: 'published',
       published_at: new Date().toISOString(),
+    }).select('id').single()
+    if (insertError || !newListing) { setBusy(false); setError(friendlyError(insertError?.message || '')); return }
+
+    // BUG ENCONTRADO EN AUDITORIA DE NAV (2026-10-28): publish() nunca creaba la fila en
+    // marketplace_listing_inventory, pero create_marketplace_order la exige (sin ella lanza
+    // inventory_not_configured) -- asi que nadie podia comprar nada publicado desde aqui.
+    const qty = Math.max(1, Number(quantityAvailable) || 0)
+    const { error: invError } = await supabase.from('marketplace_listing_inventory').insert({
+      listing_id: newListing.id,
+      quantity_available: qty,
     })
     setBusy(false)
-    if (insertError) { setError(friendlyError(insertError.message)); return }
-    setTitle(''); setDescription(''); setPrice(''); setShowForm(false)
+    if (invError) {
+      await supabase.from('marketplace_listings').delete().eq('id', newListing.id)
+      setError(friendlyError(invError.message))
+      return
+    }
+    setTitle(''); setDescription(''); setPrice(''); setQuantityAvailable('10'); setShowForm(false)
     router.refresh()
   }
 
@@ -187,6 +202,10 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
             <div>
               <label className="text-xs uppercase tracking-widest text-white/45 font-black">{t('precioOpcional')}</label>
               <input value={price} onChange={(e) => setPrice(e.target.value.replace(/[^0-9]/g, ''))} placeholder={t('precioPlaceholder')} className="mt-2 w-full rounded-xl bg-white/[.05] border border-white/10 px-4 py-3 text-white" />
+            </div>
+            <div>
+              <label className="text-xs uppercase tracking-widest text-white/45 font-black">{t('cantidadDisponible')}</label>
+              <input value={quantityAvailable} onChange={(e) => setQuantityAvailable(e.target.value.replace(/[^0-9]/g, ''))} placeholder={t('cantidadDisponiblePlaceholder')} className="mt-2 w-full rounded-xl bg-white/[.05] border border-white/10 px-4 py-3 text-white" />
             </div>
             <div>
               <label className="text-xs uppercase tracking-widest text-white/45 font-black">{t('pais')}</label>
