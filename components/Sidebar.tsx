@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Home, Swords, Trophy, Radio, Users, Building2, Medal, Bell, UserRound, Zap, Sparkles, ShoppingBag, GraduationCap, Megaphone, CreditCard, CalendarDays, WalletCards, LayoutGrid, History, ShieldCheck, Layers, TrendingUp } from 'lucide-react'
 import LocaleSwitcher from './LocaleSwitcher'
+import { useHasFinanceActivity } from '@/lib/useHasFinanceActivity'
 
 export const navGroups = [
   { group: 'jugar', items: [['inicio', Home, '/'], ['retos', Swords, '/challenge/new'], ['misRetos', Swords, '/challenges'], ['deportes', LayoutGrid, '/sports'], ['trucos', Sparkles, '/tricks'], ['ranking', Trophy, '/ranking'], ['cartas', Layers, '/cards'], ['competiciones', Medal, '/competitions'], ['circuitos', TrendingUp, '/circuits'], ['historial', History, '/history'], ['arena', Radio, '/arena']] },
@@ -20,6 +21,7 @@ export default function Sidebar() {
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/'))
   const [isMaster, setIsMaster] = useState(false)
   const [club, setClub] = useState<{ ownsClub: boolean; organizationId: string | null }>({ ownsClub: false, organizationId: null })
+  const hasFinanceActivity = useHasFinanceActivity()
   useEffect(() => {
     let cancelled = false
     fetch('/api/master/status')
@@ -47,7 +49,7 @@ export default function Sidebar() {
           <div key={group}>
             <div className="px-3 mb-1 text-[10px] font-bold uppercase tracking-wider text-white/35">{t(`groups.${group}`)}</div>
             <div className="space-y-1">
-              {items.map(([itemKey, Icon, href]) => (
+              {items.filter(([itemKey]) => itemKey !== 'finanzas' || hasFinanceActivity).map(([itemKey, Icon, href]) => (
                 <Link key={itemKey} href={href} aria-current={isActive(href) ? 'page' : undefined} className={`relative flex items-center gap-3 px-3 py-2.5 text-sm transition ${isActive(href) ? 'bg-gradient-to-r from-[#D4AF37]/20 to-transparent text-white font-bold before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[3px] before:bg-[#D4AF37] before:shadow-[0_0_10px_#D4AF37]' : 'text-white/65 hover:bg-white/5 hover:text-white hover:translate-x-0.5'}`}><Icon size={18} className={isActive(href) ? 'text-[#D4AF37]' : ''} />{t(`items.${itemKey}`)}</Link>
               ))}
             </div>

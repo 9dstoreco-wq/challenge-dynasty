@@ -7,6 +7,7 @@ import { Home, Layers, Zap, Trophy, Menu, X, UserRound } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { navGroups } from './Sidebar'
 import LocaleSwitcher from './LocaleSwitcher'
+import { useHasFinanceActivity } from '@/lib/useHasFinanceActivity'
 
 // Barra inferior del celular. El quinto boton abre el menu completo (antes el celular no tenia
 // forma de llegar a clubes, mercado, notificaciones, historial, etc.).
@@ -18,6 +19,7 @@ export default function BottomNav() {
   const open = openAt === pathname
   const setOpen = (v: boolean) => setOpenAt(v ? pathname : null)
   const [loggedIn, setLoggedIn] = useState<boolean | null>(null)
+  const hasFinanceActivity = useHasFinanceActivity()
 
   useEffect(() => {
     let cancelled = false
@@ -49,7 +51,7 @@ export default function BottomNav() {
                 <div key={group} className="mb-5">
                   <div className="px-1 mb-2 text-[10px] font-bold uppercase tracking-wider text-white/35">{t(`groups.${group}`)}</div>
                   <div className="grid grid-cols-2 gap-2">
-                    {items.map(([itemKey, Icon, href]) => (
+                    {items.filter(([itemKey]) => itemKey !== 'finanzas' || hasFinanceActivity).map(([itemKey, Icon, href]) => (
                       <Link key={itemKey} href={href} className={`flex items-center gap-2 rounded-xl border px-3 py-3 text-sm ${active(href) ? 'border-[#D4AF37]/50 bg-[#D4AF37]/10 font-bold' : 'border-white/10 bg-white/5 text-white/80'}`}>
                         <Icon size={16} className={active(href) ? 'text-[#D4AF37]' : ''} />{t(`items.${itemKey}`)}
                       </Link>
