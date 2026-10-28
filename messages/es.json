@@ -74,7 +74,7 @@
     "subtotal": "Subtotal",
     "crearOrdenReservada": "Crear orden reservada",
     "procesando": "Procesando…",
-    "footNote": "La orden reserva inventario. El pago real se confirma posteriormente mediante el proveedor conectado.",
+    "footNote": "Esto solo reserva el cupo/producto. El pago lo acuerdas directamente con el vendedor (efectivo, transferencia, etc.) — Challenge Dynasty no cobra ni procesa el pago de esta venta.",
     "debesIniciarSesion": "Debes iniciar sesión para comprar.",
     "ordenReservada": "Orden reservada correctamente",
     "noSePudoCrearOrden": "No se pudo crear la orden."
@@ -114,6 +114,7 @@
     "precioPlaceholder": "Ej: 150000",
     "cantidadDisponible": "Cupos/unidades disponibles",
     "cantidadDisponiblePlaceholder": "Ej: 10",
+    "pagoDirectoHint": "El pago lo recibes tú directamente del comprador (efectivo, transferencia, etc.). Challenge Dynasty no cobra comisión por tus ventas ni procesa el pago.",
     "ciudadPlaceholder2": "Ej: Medellín",
     "publicarBtn": "Publicar en el Marketplace",
     "publicando": "Publicando…",

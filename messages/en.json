@@ -74,7 +74,7 @@
     "subtotal": "Subtotal",
     "crearOrdenReservada": "Create reserved order",
     "procesando": "Processing…",
-    "footNote": "The order reserves inventory. Real payment is confirmed afterward through the connected provider.",
+    "footNote": "This only reserves the spot/item. Payment is arranged directly with the seller (cash, bank transfer, etc.) — Challenge Dynasty does not charge or process payment for this sale.",
     "debesIniciarSesion": "You must sign in to buy.",
     "ordenReservada": "Order reserved successfully",
     "noSePudoCrearOrden": "Could not create the order."
@@ -114,6 +114,7 @@
     "precioPlaceholder": "E.g: 150000",
     "cantidadDisponible": "Available spots/units",
     "cantidadDisponiblePlaceholder": "E.g: 10",
+    "pagoDirectoHint": "You receive payment directly from the buyer (cash, bank transfer, etc.). Challenge Dynasty doesn't charge a commission on your sales or process the payment.",
     "ciudadPlaceholder2": "E.g: Medellín",
     "publicarBtn": "Publish on the Marketplace",
     "publicando": "Publishing…",

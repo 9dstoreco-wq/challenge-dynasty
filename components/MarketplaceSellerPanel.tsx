@@ -218,6 +218,7 @@ export default function MarketplaceSellerPanel({ sellerProfile, myListings }: { 
               <input value={city} onChange={(e) => setCity(e.target.value)} placeholder={t('ciudadPlaceholder2')} className="mt-2 w-full rounded-xl bg-white/[.05] border border-white/10 px-4 py-3 text-white" />
             </div>
           </div>
+          <p className="text-xs text-white/35 mt-3">{t('pagoDirectoHint')}</p>
           {error && <p className="text-red-300 text-sm mt-3">{error}</p>}
           <button disabled={busy} onClick={publish} className="mt-4 rounded-2xl bg-white text-black font-black px-5 py-3 inline-flex items-center gap-2 disabled:opacity-60">
             {busy ? <Loader2 size={17} className="animate-spin" /> : null} {busy ? t('publicando') : t('publicarBtn')}
