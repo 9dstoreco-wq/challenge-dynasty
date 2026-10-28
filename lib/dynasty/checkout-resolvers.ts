@@ -146,7 +146,7 @@ async function resolveMarketplace(supabase: SupabaseServerClient, userId: string
 async function resolveBilling(supabase: SupabaseServerClient, userId: string, rowId: string): Promise<ResolvedCheckoutRow> {
   const { data, error } = await supabase
     .from("billing_invoices")
-    .select("amount_due, currency_code, profile_id, organization_id, seller_profile_id, status")
+    .select("amount_due, currency_code, profile_id, organization_id, seller_profile_id, status, metadata")
     .eq("id", rowId)
     .maybeSingle();
   if (error || !data) throw new CheckoutError("INVOICE_NOT_FOUND", 404);
@@ -175,7 +175,13 @@ async function resolveBilling(supabase: SupabaseServerClient, userId: string, ro
   }
 
   if (!owns) throw new CheckoutError("FORBIDDEN", 403);
-  return { amount: Number(data.amount_due), currencyCode: data.currency_code ?? "COP", redirectPath: "/business" };
+  // create_subscription_invoice (supabase/migrations/20261028160000_*.sql) stamps the invoice's
+  // own metadata.redirect_path with where the buyer should land after paying (their club's
+  // manage page, or the tournament organizer page) -- fall back to /business for older invoices
+  // created before that metadata existed (e.g. marketplace seller invoices).
+  const metadata = (data as { metadata?: Record<string, unknown> | null }).metadata;
+  const redirectPath = typeof metadata?.redirect_path === "string" ? metadata.redirect_path : "/business";
+  return { amount: Number(data.amount_due), currencyCode: data.currency_code ?? "COP", redirectPath };
 }
 
 export const CHECKOUT_RESOLVERS: Record<

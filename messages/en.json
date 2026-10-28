@@ -1172,6 +1172,33 @@
     "preparing": "Preparing payment…",
     "payWithWompi": "Pay with Wompi"
   },
+  "MembershipPaywall": {
+    "tag": "SUBSCRIPTION",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "subscribeBtn": "Subscribe",
+    "preparing": "Preparing…",
+    "errorGeneric": "Could not start the subscription. Try again.",
+    "chargeNote": "The charge is made in Colombian pesos (COP) through Wompi.",
+    "readyTitle": "Almost there. Complete the payment",
+    "readyBody": "Click to pay with Wompi and activate your plan instantly."
+  },
+  "ClubMembershipGate": {
+    "title": "Activate the Club Membership",
+    "description": "You need an active plan to use your club's courts, academy, and finances.",
+    "feature1": "Court booking and management",
+    "feature2": "Academy: coaches and classes",
+    "feature3": "Club finances and income"
+  },
+  "TournamentOrganizerGate": {
+    "title": "Activate the Organizer Plan",
+    "description": "You need an active plan to create tournaments on Challenge Dynasty.",
+    "feature1": "Create unlimited tournaments",
+    "feature2": "Automatic formats: brackets, groups, americano, mexicano, and more",
+    "feature3": "Entry-fee collection built in with Wompi"
+  },
   "LegalTerms": {
     "title": "Terms of Service",
     "lastUpdated": "Last updated: September 27, 2026",

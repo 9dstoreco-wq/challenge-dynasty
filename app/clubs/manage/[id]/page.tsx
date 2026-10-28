@@ -5,6 +5,7 @@ import BusinessHeader from '@/components/business/BusinessHeader'
 import ClubDashboard from '@/components/ClubDashboard'
 import ClubIncomePanel from '@/components/ClubIncomePanel'
 import ClubAcademyPanel, { type CoachRow, type ClassRow } from '@/components/ClubAcademyPanel'
+import MembershipPaywall, { type PaywallPlanOption } from '@/components/MembershipPaywall'
 import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 
@@ -30,6 +31,45 @@ export default async function ClubManagePage({ params }: { params: Promise<{ id:
           <p className="text-white/50 mt-2">{t('notOwnerBody')}</p>
           <Link href="/clubs" className="text-[#D4AF37] mt-6 inline-block">{t('backToClubs')}</Link>
         </div>
+      </BusinessShell>
+    )
+  }
+
+  // Membresía de Club (reservas + academia + finanzas): sin plan activo no se muestran las
+  // herramientas del club, solo la pantalla para suscribirse. Ver supabase/migrations/
+  // 20261028160000_add_subscription_billing_enforcement.sql.
+  const { data: hasMembership } = await supabase.rpc('organization_has_active_club_membership', {
+    p_organization_id: organization.id,
+  })
+
+  if (!hasMembership) {
+    const tGate = await getTranslations('ClubMembershipGate')
+    const { data: planRows } = await supabase
+      .from('billing_plans')
+      .select('code,billing_interval,price,currency_code')
+      .eq('plan_family', 'club_membership')
+      .eq('is_active', true)
+    const plans: PaywallPlanOption[] = (planRows ?? []).map((p) => ({
+      code: p.code,
+      billingInterval: p.billing_interval as 'monthly' | 'yearly',
+      price: Number(p.price),
+      currencyCode: p.currency_code,
+    }))
+
+    return (
+      <BusinessShell>
+        <BusinessHeader
+          eyebrow={t('tag')}
+          title={organization.name}
+          subtitle={[organization.city, organization.country_code].filter(Boolean).join(' · ') || undefined}
+        />
+        <MembershipPaywall
+          title={tGate('title')}
+          description={tGate('description')}
+          features={[tGate('feature1'), tGate('feature2'), tGate('feature3')]}
+          organizationId={organization.id}
+          plans={plans}
+        />
       </BusinessShell>
     )
   }
