@@ -1,0 +1,67 @@
+name: Respaldo de la base de datos
+
+# Supabase Pro trae backups automaticos, pero Luis decidio no pagarlo por ahora (plan free).
+# Este workflow es el reemplazo manual/periodico: corre pg_dump contra la base de produccion
+# (solo el esquema "public" -- ahi viven TODAS las tablas de la app: torneos, perfiles,
+# facturacion, circuitos, etc. El esquema "auth" lo administra Supabase por su cuenta y
+# restaurarlo manualmente no es algo que se pueda hacer desde este repo, asi que no se
+# incluye) y sube el archivo resultante como un Release de GitHub -- a diferencia de un
+# artifact de Actions (que se borra solo despues de unos dias), un Release no expira.
+#
+# Corre solo cada lunes y tambien se puede disparar a mano desde la pestana "Actions" del
+# repo (boton "Run workflow"), por ejemplo justo antes de aplicar un cambio riesgoso en la
+# base de datos.
+#
+# Necesita un secreto nuevo en GitHub, SUPABASE_DB_URL, que Luis agrega el mismo siguiendo
+# docs/RESPALDO_BASE_DE_DATOS.md -- el valor real nunca se escribe en este archivo ni se le
+# pide a Claude (regla de challenge-dynasty-release: nunca secretos en archivos/commits).
+#
+# Mismo patron que los otros workflows de este repo: accion fijada por SHA (no por tag
+# mutable), permisos minimos explicitos.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '17 9 * * 1' # cada lunes ~9:17am UTC (minuto corrido para no caer en punta de hora)
+
+permissions:
+  contents: write # solo para crear el Release con el archivo de respaldo
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Instalar cliente de PostgreSQL
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Respaldar base de datos (solo esquema public)
+        id: respaldo
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGSSLMODE: require
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::error::Falta el secreto SUPABASE_DB_URL (Settings -> Secrets and variables -> Actions). Ver docs/RESPALDO_BASE_DE_DATOS.md"
+            exit 1
+          fi
+          STAMP="$(date -u +%Y-%m-%d_%H%M)"
+          ARCHIVO="respaldo-challenge-dynasty-${STAMP}.dump"
+          pg_dump "$SUPABASE_DB_URL" --schema=public --no-owner --no-privileges -F c -f "${ARCHIVO}"
+          ls -lh "${ARCHIVO}"
+          echo "archivo=${ARCHIVO}" >> "$GITHUB_OUTPUT"
+          echo "stamp=${STAMP}" >> "$GITHUB_OUTPUT"
+
+      - name: Subir respaldo como Release de GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "respaldo-${{ steps.respaldo.outputs.stamp }}-${{ github.run_number }}" \
+            "${{ steps.respaldo.outputs.archivo }}" \
+            --repo "${{ github.repository }}" \
+            --title "Respaldo DB - ${{ steps.respaldo.outputs.stamp }}" \
+            --notes "Respaldo automatico (o manual) de la base de datos de Challenge Dynasty, esquema public. No incluye el esquema auth (cuentas de login), lo administra Supabase aparte." \
+            --prerelease
