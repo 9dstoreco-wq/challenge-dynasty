@@ -6,7 +6,7 @@ se pague ese plan, este repo tiene un reemplazo gratis: un robot de GitHub
 y que tú también puedes correr a mano cuando quieras (por ejemplo justo antes de que yo
 aplique un cambio grande a la base de datos).
 
-Para que funcione necesita UN solo paso de configuración tuyo. Yo (Claude) nunca puedo
+Para que funcione necesita DOS secretos en GitHub (pasos 1-2 y paso 3). Yo (Claude) nunca puedo
 hacer este paso por ti ni escribir la contraseña en ningún lado — es una regla de
 seguridad que no se salta.
 
@@ -38,6 +38,19 @@ seguridad que no se salta.
 
 Eso es todo. No hace falta tocar nada más — ni este repo, ni Vercel, ni nada de pagos.
 
+### 3. Agregar el secreto `BACKUP_PASSPHRASE` (obligatorio)
+
+El repositorio es **público**: cualquiera puede descargar sus Releases. Por eso cada
+respaldo se guarda **cifrado** y el robot se niega a correr sin esta clave.
+
+1. Inventa una frase larga (por ejemplo 5 o 6 palabras al azar) y **guárdala en tu gestor
+   de contraseñas**. Sin ella los respaldos no se pueden abrir nunca.
+2. En GitHub: **Settings** → **Secrets and variables** → **Actions** → **New repository secret**.
+3. **Name:** `BACKUP_PASSPHRASE` — **Value:** tu frase. **Add secret**.
+
+Para abrir un respaldo: `gpg -d respaldo-....dump.gpg > respaldo.dump` (te pide la frase),
+y luego `pg_restore` como se explica abajo.
+
 ## Cómo correrlo manualmente cuando quieras
 
 1. En GitHub, pestaña **Actions**.
@@ -50,7 +63,7 @@ Eso es todo. No hace falta tocar nada más — ni este repo, ni Vercel, ni nada 
 
 En la pestaña **Releases** del repositorio
 (`github.com/9dstoreco-wq/challenge-dynasty/releases`). Cada respaldo aparece como un
-archivo `.dump` que no se abre como un documento normal — es solo para restaurar la base de
+archivo `.dump.gpg` (cifrado) que no se abre como un documento normal — es solo para restaurar la base de
 datos si algún día algo sale muy mal. Estos archivos quedan guardados para siempre (no se
 borran solos como pasaría con otros tipos de respaldo de GitHub).
 

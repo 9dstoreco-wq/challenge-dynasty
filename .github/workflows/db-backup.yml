@@ -40,6 +40,7 @@ jobs:
         id: respaldo
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
           PGSSLMODE: require
         run: |
           set -euo pipefail
@@ -47,9 +48,20 @@ jobs:
             echo "::error::Falta el secreto SUPABASE_DB_URL (Settings -> Secrets and variables -> Actions). Ver docs/RESPALDO_BASE_DE_DATOS.md"
             exit 1
           fi
+          if [ -z "${BACKUP_PASSPHRASE:-}" ]; then
+            echo "::error::Falta el secreto BACKUP_PASSPHRASE. El repo es publico y el respaldo NUNCA se sube sin cifrar. Ver docs/RESPALDO_BASE_DE_DATOS.md"
+            exit 1
+          fi
           STAMP="$(date -u +%Y-%m-%d_%H%M)"
           ARCHIVO="respaldo-challenge-dynasty-${STAMP}.dump"
           pg_dump "$SUPABASE_DB_URL" --schema=public --no-owner --no-privileges -F c -f "${ARCHIVO}"
+          # El repo es PUBLICO: un Release lo puede descargar cualquiera. Por eso el respaldo
+          # se cifra (AES256) con BACKUP_PASSPHRASE antes de subirlo y el .dump sin cifrar
+          # nunca sale de esta maquina temporal.
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" \
+            --symmetric --cipher-algo AES256 -o "${ARCHIVO}.gpg" "${ARCHIVO}"
+          shred -u "${ARCHIVO}" || rm -f "${ARCHIVO}"
+          ARCHIVO="${ARCHIVO}.gpg"
           ls -lh "${ARCHIVO}"
           echo "archivo=${ARCHIVO}" >> "$GITHUB_OUTPUT"
           echo "stamp=${STAMP}" >> "$GITHUB_OUTPUT"
@@ -63,5 +75,5 @@ jobs:
             "${{ steps.respaldo.outputs.archivo }}" \
             --repo "${{ github.repository }}" \
             --title "Respaldo DB - ${{ steps.respaldo.outputs.stamp }}" \
-            --notes "Respaldo automatico (o manual) de la base de datos de Challenge Dynasty, esquema public. No incluye el esquema auth (cuentas de login), lo administra Supabase aparte." \
+            --notes "Respaldo automatico (o manual) de la base de datos de Challenge Dynasty, esquema public, CIFRADO con BACKUP_PASSPHRASE. No incluye el esquema auth (cuentas de login), lo administra Supabase aparte." \
             --prerelease
