@@ -31,6 +31,34 @@ const MODE_FEATURE_KEY: Record<string, string | null> = {
 
 const ENTERPRISE_FEATURE_KEY = "ai.enterprise.full";
 
+// AUDITORIA 2026-11-23: antes, el modo "club" y "tournament" no tenian NINGUNA informacion
+// real sobre como funciona Challenge Dynasty -- solo el framing generico de "coach de
+// fitness" de abajo. Si un club o un organizador preguntaba "como armo un torneo", el modelo
+// contestaba con generalidades de padel, no con la mecanica real de esta app (y podia
+// inventar reglas que no existen). Este bloque viene directo del codigo (lib/tournamentBracket.ts,
+// RPCs de reservas/ranking), no es texto de marketing inventado, para que el agente explique
+// solo lo que la app realmente hace.
+const MODE_PRODUCT_KNOWLEDGE: Record<string, string> = {
+  tournament: [
+    "Formatos de torneo disponibles en Challenge Dynasty (el organizador elige uno al crear el torneo):",
+    "- Eliminacion simple: cuadro de llaves, quien pierde queda eliminado. Si los inscritos no son potencia de 2, algunos avanzan directo (bye) en la primera ronda.",
+    "- Round robin (todos contra todos): cada inscrito juega una vez contra cada uno de los demas.",
+    "- Grupos + eliminacion: primero round robin en grupos chicos, luego los mejores de cada grupo pasan a un cuadro de eliminacion.",
+    "- Suizo: las parejas de cada ronda se arman emparejando a quienes llevan puntaje parecido (nunca se repiten rivales).",
+    "- King of the Court / escalera de canchas: se reparten por canchas (cancha 1 es la mejor); el ganador sube de cancha y el perdedor baja, ronda a ronda (4 rondas por noche).",
+    "- Americano y Mexicano: la pareja rota cada ronda y se juega por puntaje individual, no por pareja fija (en Mexicano la pareja de la siguiente ronda se arma emparejando por puntaje acumulado, como el suizo; en Americano rota sin mirar puntaje).",
+    "Antes de publicar el calendario, el organizador puede previsualizar y validar: el sistema avisa si un mismo jugador queda con partidos muy seguidos (menos del descanso minimo configurado) y bloquea publicar hasta que se resuelva. Publicar la programacion le notifica a todos los inscritos confirmados -- no es reversible, hay que revisar antes.",
+    "Formatos que la app todavia NO tiene: doble eliminacion y cuadro de consolacion -- si preguntan por esos, decir que no existen todavia, no inventarlos.",
+  ].join("\n"),
+  club: [
+    "Como funcionan los clubes y reservas en Challenge Dynasty:",
+    "- Un club carga sus \"reservables\" (canchas, clases, servicios) con duracion, precio, capacidad, y si la reserva se confirma al instante o necesita aprobacion del club.",
+    "- Los jugadores reservan eligiendo fecha/hora y cantidad de cupos; el club ve todas sus reservas desde su panel y puede cancelarlas (si ya estaba pagada, el sistema pide confirmar antes de cancelar).",
+    "- Los cobros se hacen con Wompi (tarjeta, PSE, Nequi segun lo que el club tenga activo).",
+    "- El ranking: cada deporte tiene su propio puntaje por jugador (arranca en 1000, tipo Elo). Cuando se confirma el resultado de un partido, el ganador sube puntaje y el perdedor baja, y gana mas puntos ganandole a alguien con puntaje mas alto que a alguien con puntaje mas bajo. Tambien se registran racha de victorias, XP y nivel de jugador.",
+  ].join("\n"),
+};
+
 async function hasFeature(
   supabase: ReturnType<typeof createClient>,
   featureKey: string,
@@ -135,12 +163,17 @@ Deno.serve(async (req) => {
     const { error: userMessageError } = await supabase.from("ai_messages").insert({ conversation_id: conversation.id, profile_id: profileId, role: "user", content: message, metadata: { mode } });
     if (userMessageError) throw new Error(`MESSAGE_SAVE_ERROR: ${userMessageError.message}`);
 
+    const productKnowledge = MODE_PRODUCT_KNOWLEDGE[mode];
+    const roleLine = productKnowledge
+      ? "You are Dynasty Guide AI, the assistant inside Challenge Dynasty that explains exactly how the product works -- tournament formats, club/booking setup, and ranking -- to organizers and club owners, including people evaluating it during a free trial."
+      : "You are Dynasty Coach AI, a premium daily sports and fitness coach inside the Dynasty ecosystem.";
     const system = [
-      "You are Dynasty Coach AI, a premium daily sports and fitness coach inside the Dynasty ecosystem.",
+      roleLine,
       "Answer in clear Spanish unless the user asks for another language.",
-      "Use only the authorized Dynasty context and memory. Never invent account, club, purchase, financial, or performance facts.",
+      "Use only the authorized Dynasty context, memory, and product knowledge below. Never invent account, club, purchase, financial, or performance facts, and never invent a feature, format, or rule that isn't listed in the product knowledge.",
       "For medical or clinical issues, encourage appropriate professional evaluation rather than diagnosing.",
       `Mode: ${mode}`,
+      ...(productKnowledge ? [`Product knowledge (the only source of truth on how Challenge Dynasty works):\n${productKnowledge}`] : []),
       `Authorized context: ${JSON.stringify(context ?? {})}`,
       `Long-term memory: ${JSON.stringify(memory ?? [])}`,
     ].join("\n\n");
