@@ -128,11 +128,11 @@ export default function ClubAcademyPanel({
 
   return (
     <div className="space-y-6">
-      <div className="text-xs tracking-[.2em] text-[#3B6EA5] font-black">{t('tag')}</div>
+      <div className="text-xs tracking-[.2em] text-[#6FA3D8] font-black">{t('tag')}</div>
       {error && <div className="text-sm text-red-400">{error}</div>}
 
       <div>
-        <div className="text-xs tracking-[.2em] text-[#3B6EA5] font-black mb-3">{t('coachesTitle')}</div>
+        <div className="text-xs tracking-[.2em] text-[#6FA3D8] font-black mb-3">{t('coachesTitle')}</div>
         <div className="space-y-3">
           {coaches.map((c) => (
             <div key={c.relationshipId} className="rounded-2xl bg-white/5 p-4 flex items-center justify-between gap-3">
@@ -148,18 +148,18 @@ export default function ClubAcademyPanel({
         </div>
       </div>
 
-      <form onSubmit={handleSearch} className="rounded-3xl border border-[#3B6EA5]/20 bg-[#161616] p-6 space-y-4">
-        <div className="text-xs tracking-[.2em] text-[#3B6EA5] font-black">{t('addCoachTitle')}</div>
+      <form onSubmit={handleSearch} className="rounded-3xl border border-[#6FA3D8]/20 bg-[#161616] p-6 space-y-4">
+        <div className="text-xs tracking-[.2em] text-[#6FA3D8] font-black">{t('addCoachTitle')}</div>
         <p className="text-white/45 text-sm">{t('addCoachSubtitle')}</p>
         <div className="flex gap-2">
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('searchPlaceholder')} className="flex-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
-          <select value={relationshipType} onChange={(e) => setRelationshipType(e.target.value)} className="rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-white text-sm outline-none focus:border-[#3B6EA5]/50">
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('searchPlaceholder')} className="flex-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#6FA3D8]/50" />
+          <select value={relationshipType} onChange={(e) => setRelationshipType(e.target.value)} className="rounded-xl bg-white/5 border border-white/10 px-3 py-2.5 text-white text-sm outline-none focus:border-[#6FA3D8]/50">
             <option value="employee">{t('relEmployee')}</option>
             <option value="contractor">{t('relContractor')}</option>
             <option value="partner">{t('relPartner')}</option>
             <option value="guest">{t('relGuest')}</option>
           </select>
-          <button type="submit" disabled={searching} className="rounded-xl bg-[#3B6EA5] text-black font-black px-5 disabled:opacity-50">
+          <button type="submit" disabled={searching} className="rounded-xl bg-[#6FA3D8] text-black font-black px-5 disabled:opacity-50">
             {searching ? t('searching') : t('searchBtn')}
           </button>
         </div>
@@ -171,7 +171,7 @@ export default function ClubAcademyPanel({
                   <div className="font-bold truncate">{r.display_name ?? r.headline ?? t('unnamedCoach')}</div>
                   <div className="text-white/40 text-xs">{r.username ? `@${r.username}` : ''}</div>
                 </div>
-                <button type="button" onClick={() => handleAddCoach(r.provider_id)} disabled={busy} className="text-xs text-[#3B6EA5] hover:text-white shrink-0 font-bold">{t('addBtn')}</button>
+                <button type="button" onClick={() => handleAddCoach(r.provider_id)} disabled={busy} className="text-xs text-[#6FA3D8] hover:text-white shrink-0 font-bold">{t('addBtn')}</button>
               </div>
             ))}
           </div>
@@ -180,7 +180,7 @@ export default function ClubAcademyPanel({
       </form>
 
       <div>
-        <div className="text-xs tracking-[.2em] text-[#3B6EA5] font-black mb-3">{t('classesTitle')}</div>
+        <div className="text-xs tracking-[.2em] text-[#6FA3D8] font-black mb-3">{t('classesTitle')}</div>
         <div className="space-y-3">
           {classes.map((c) => (
             <div key={c.id} className="rounded-2xl bg-white/5 p-4 flex items-center justify-between gap-3">
@@ -204,25 +204,25 @@ export default function ClubAcademyPanel({
         </div>
       </div>
 
-      <form onSubmit={handleAddClass} className="rounded-3xl border border-[#3B6EA5]/20 bg-[#161616] p-6 space-y-4">
-        <div className="text-xs tracking-[.2em] text-[#3B6EA5] font-black">{t('addClassTitle')}</div>
+      <form onSubmit={handleAddClass} className="rounded-3xl border border-[#6FA3D8]/20 bg-[#161616] p-6 space-y-4">
+        <div className="text-xs tracking-[.2em] text-[#6FA3D8] font-black">{t('addClassTitle')}</div>
         {coaches.length === 0 ? (
           <p className="text-white/45 text-sm">{t('errNoCoaches')}</p>
         ) : (
           <div className="grid md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="text-xs font-bold text-white/40">{t('coachLabel')}</label>
-              <select value={coachForClass} onChange={(e) => setCoachForClass(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50">
+              <select value={coachForClass} onChange={(e) => setCoachForClass(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50">
                 {coaches.map((c) => <option key={c.providerId} value={c.providerId}>{c.displayName ?? c.headline ?? t('unnamedCoach')}</option>)}
               </select>
             </div>
             <div className="md:col-span-2">
               <label className="text-xs font-bold text-white/40">{t('classTitleLabel')}</label>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t('classTitlePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
+              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t('classTitlePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#6FA3D8]/50" />
             </div>
             <div>
               <label className="text-xs font-bold text-white/40">{t('modeLabel')}</label>
-              <select value={serviceMode} onChange={(e) => setServiceMode(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50">
+              <select value={serviceMode} onChange={(e) => setServiceMode(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50">
                 <option value="in_person">{t('modeInPerson')}</option>
                 <option value="online">{t('modeOnline')}</option>
                 <option value="hybrid">{t('modeHybrid')}</option>
@@ -230,27 +230,27 @@ export default function ClubAcademyPanel({
             </div>
             <div>
               <label className="text-xs font-bold text-white/40">{t('durationLabel')}</label>
-              <input type="number" min={1} value={duration} onChange={(e) => setDuration(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
+              <input type="number" min={1} value={duration} onChange={(e) => setDuration(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50" />
             </div>
             <div>
               <label className="text-xs font-bold text-white/40">{t('capacityLabel')}</label>
-              <input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
+              <input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50" />
             </div>
             <div>
               <label className="text-xs font-bold text-white/40">{t('priceLabel')}</label>
-              <input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} placeholder={t('pricePlaceholder', { currency })} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
+              <input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} placeholder={t('pricePlaceholder', { currency })} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#6FA3D8]/50" />
             </div>
             <div>
               <label className="text-xs font-bold text-white/40">{t('currencyLabel')}</label>
-              <input value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={3} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50 uppercase" />
+              <input value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={3} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50 uppercase" />
             </div>
             <div className="md:col-span-2">
               <label className="text-xs font-bold text-white/40">{t('descriptionLabel')}</label>
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50" />
             </div>
           </div>
         )}
-        <button type="submit" disabled={busy || coaches.length === 0} className="w-full rounded-xl bg-[#3B6EA5] text-black font-black py-3 disabled:opacity-50">
+        <button type="submit" disabled={busy || coaches.length === 0} className="w-full rounded-xl bg-[#6FA3D8] text-black font-black py-3 disabled:opacity-50">
           {busy ? t('submitting') : t('addClassBtn')}
         </button>
       </form>

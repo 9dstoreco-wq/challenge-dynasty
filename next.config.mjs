@@ -9,8 +9,8 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
   { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
   // CSP ya revisada y activa de verdad (antes estaba en modo "solo reporte"). Se verificaron todos
-  // los recursos externos que carga la app hoy: el script de checkout de ePayco (script-src,
-  // connect-src, frame-src) y Supabase (connect-src, img-src) -- no hay CDNs externos, iframes, ni
+  // los recursos externos que carga la app hoy: Wompi (script-src, connect-src, frame-src) y
+  // Supabase (connect-src, img-src) -- no hay CDNs externos, iframes, ni
   // fuentes externas (las fuentes van empaquetadas via @fontsource, por eso ya no se permite
   // fonts.googleapis.com/fonts.gstatic.com: no se usan y solo ampliaban la superficie sin razon).
   // La analitica de Vercel (@vercel/analytics) no necesita ninguna entrada aqui: su script y sus
@@ -28,6 +28,11 @@ const securityHeaders = [
   // iframe de un subdominio suyo. Se uso el comodin *.wompi.co en vez de listar cada subdominio
   // porque Wompi no documenta una lista cerrada de los que usa.
   //
+  // 2026-11-23: se quitaron las entradas de ePayco (checkout.epayco.co / *.epayco.co) de
+  // script-src, connect-src y frame-src -- ese proveedor y todo su codigo se eliminaron del
+  // repo el 2026-10-16 (ver lib/dynasty/checkout-resolvers.ts), asi que la app ya no carga nada
+  // de ese dominio y dejarlo en la CSP solo ampliaba la superficie de ataque sin razon.
+  //
   // Pendiente (no resuelto en esta pasada, documentado aqui para no perderlo): script-src y
   // style-src siguen con 'unsafe-inline'. style-src lo necesita el propio JSX de la app (atributos
   // style={{...}} inline en varios componentes) -- quitarlo implicaria sacar esos estilos a clases.
@@ -40,12 +45,12 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://checkout.epayco.co https://*.epayco.co https://*.wompi.co",
+      "script-src 'self' 'unsafe-inline' https://*.wompi.co",
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
       "img-src 'self' data: blob: https://*.supabase.co",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.epayco.co https://*.wompi.co",
-      "frame-src https://*.epayco.co https://*.wompi.co",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.wompi.co",
+      "frame-src https://*.wompi.co",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

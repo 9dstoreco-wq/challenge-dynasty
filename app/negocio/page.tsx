@@ -19,7 +19,7 @@ export default async function NegocioPage() {
         <div className="max-w-md mx-auto py-10 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">Panel de negocio</h1>
           <p className="text-white/50 mt-2 text-sm">Inicia sesión con tu cuenta para administrar tu club.</p>
-          <Link href="/login?next=/negocio" className="inline-block mt-6 rounded-lg bg-[#3B6EA5] px-5 py-2.5 text-sm font-semibold">Iniciar sesión</Link>
+          <Link href="/login?next=/negocio" className="inline-block mt-6 rounded-lg bg-[#6FA3D8] px-5 py-2.5 text-sm font-semibold">Iniciar sesión</Link>
         </div>
       </BusinessShell>
     )
@@ -50,7 +50,7 @@ export default async function NegocioPage() {
           <p className="text-white/55 mt-3 text-sm max-w-sm mx-auto">
             Todavía no tienes un club registrado. Regístralo para empezar a recibir reservas y ver tus ingresos aquí.
           </p>
-          <Link href="/clubs/new" className="inline-flex items-center gap-2 mt-5 rounded-lg bg-[#3B6EA5] px-5 py-2.5 text-sm font-semibold">
+          <Link href="/clubs/new" className="inline-flex items-center gap-2 mt-5 rounded-lg bg-[#6FA3D8] px-5 py-2.5 text-sm font-semibold">
             <Plus size={16} /> Registrar mi club
           </Link>
         </div>

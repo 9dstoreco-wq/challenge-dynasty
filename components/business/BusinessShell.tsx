@@ -13,7 +13,7 @@ export default function BusinessShell({ children }: { children: React.ReactNode 
         <div className="max-w-5xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span className="font-semibold text-[15px] tracking-tight">Challenge Dynasty</span>
-            <span className="rounded-full border border-[#3B6EA5]/40 bg-[#3B6EA5]/10 px-2.5 py-0.5 text-[11px] font-medium text-[#8FB8E8]">Negocio</span>
+            <span className="rounded-full border border-[#6FA3D8]/40 bg-[#6FA3D8]/10 px-2.5 py-0.5 text-[11px] font-medium text-[#8FB8E8]">Negocio</span>
           </div>
           <Link href="/" className="flex items-center gap-1.5 text-sm text-white/55 hover:text-white transition">
             <ArrowLeft size={15} /> Volver a la app

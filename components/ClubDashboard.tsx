@@ -108,7 +108,7 @@ export default function ClubDashboard({
   return (
     <div className="space-y-6">
       <div>
-        <div className="text-xs tracking-[.2em] text-[#3B6EA5] font-black mb-3">{t('resourcesTitle')}</div>
+        <div className="text-xs tracking-[.2em] text-[#6FA3D8] font-black mb-3">{t('resourcesTitle')}</div>
         <div className="space-y-3">
           {resources.map((r) => (
             <div key={r.id} className="rounded-2xl bg-white/5 p-4 flex items-center justify-between gap-3">
@@ -137,46 +137,46 @@ export default function ClubDashboard({
         </div>
       </div>
 
-      <form onSubmit={handleAddResource} className="rounded-3xl border border-[#3B6EA5]/20 bg-[#161616] p-6 space-y-4">
-        <div className="text-xs tracking-[.2em] text-[#3B6EA5] font-black">{t('addTitle')}</div>
+      <form onSubmit={handleAddResource} className="rounded-3xl border border-[#6FA3D8]/20 bg-[#161616] p-6 space-y-4">
+        <div className="text-xs tracking-[.2em] text-[#6FA3D8] font-black">{t('addTitle')}</div>
         <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="resource-name" className="text-xs font-bold text-white/40">{t('nameLabel')}</label>
-            <input id="resource-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('namePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
+            <input id="resource-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('namePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#6FA3D8]/50" />
           </div>
           <div>
             <label htmlFor="resource-type" className="text-xs font-bold text-white/40">{t('typeLabel')}</label>
-            <input id="resource-type" value={resourceType} onChange={(e) => setResourceType(e.target.value)} placeholder={t('typePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#3B6EA5]/50" />
+            <input id="resource-type" value={resourceType} onChange={(e) => setResourceType(e.target.value)} placeholder={t('typePlaceholder')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white placeholder:text-white/25 outline-none focus:border-[#6FA3D8]/50" />
           </div>
           <div>
             <label htmlFor="resource-sport" className="text-xs font-bold text-white/40">{t('sportLabel')}</label>
-            <select id="resource-sport" value={sportId} onChange={(e) => setSportId(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50">
+            <select id="resource-sport" value={sportId} onChange={(e) => setSportId(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50">
               <option value="">{t('selectSport')}</option>
               {sports.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div>
             <label htmlFor="resource-capacity" className="text-xs font-bold text-white/40">{t('capacityLabel')}</label>
-            <input id="resource-capacity" type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
+            <input id="resource-capacity" type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50" />
           </div>
           <div>
             <label htmlFor="resource-price" className="text-xs font-bold text-white/40">{t('priceLabel')}</label>
-            <input id="resource-price" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50" />
+            <input id="resource-price" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50" />
           </div>
           <div>
             <label htmlFor="resource-currency" className="text-xs font-bold text-white/40">{t('currencyLabel')}</label>
-            <input id="resource-currency" value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={3} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50 uppercase" />
+            <input id="resource-currency" value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={3} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50 uppercase" />
           </div>
           <div className="md:col-span-2">
             <label htmlFor="resource-mode" className="text-xs font-bold text-white/40">{t('modeLabel')}</label>
-            <select id="resource-mode" value={bookingMode} onChange={(e) => setBookingMode(e.target.value as 'instant' | 'approval_required')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#3B6EA5]/50">
+            <select id="resource-mode" value={bookingMode} onChange={(e) => setBookingMode(e.target.value as 'instant' | 'approval_required')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50">
               <option value="instant">{t('modeInstant')}</option>
               <option value="approval_required">{t('modeApproval')}</option>
             </select>
           </div>
         </div>
         {error && <div className="text-sm text-red-400">{error}</div>}
-        <button type="submit" disabled={busy} className="w-full rounded-xl bg-[#3B6EA5] text-black font-black py-3 disabled:opacity-50">
+        <button type="submit" disabled={busy} className="w-full rounded-xl bg-[#6FA3D8] text-black font-black py-3 disabled:opacity-50">
           {busy ? t('submitting') : t('submitBtn')}
         </button>
       </form>
