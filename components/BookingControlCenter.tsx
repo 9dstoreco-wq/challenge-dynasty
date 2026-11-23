@@ -36,7 +36,10 @@ export default function BookingControlCenter({bookables,bookings}:{bookables:Boo
    setMessage(t('bookingCreated',{id:String(data).slice(0,8)}))
   }catch(e){setError(toSafeMessage(e,'bookings.reserve',t('bookingFailed')))}finally{setBusy(false)}
  }
- async function cancel(id:string){setBusy(true);setError(null);setMessage(null);try{const {error:e}=await supabase.rpc('cancel_booking',{p_booking_id:id});if(e)throw e;setMessage(t('bookingCancelled'))}catch(e){setError(toSafeMessage(e,'bookings.cancel',t('cancelFailed')))}finally{setBusy(false)}}
+ // BUG ENCONTRADO EN AUDITORIA (2026-11-23): cancelar una reserva YA PAGADA no pedia ninguna
+ // confirmacion -- un toque sin querer la cancelaba de una. El flujo gemelo de cancelar inscripcion
+ // a torneo (TournamentStatusPanel) si confirma; se copia el mismo candado aqui.
+ async function cancel(id:string){if(!window.confirm(t('cancelBookingConfirm')))return;setBusy(true);setError(null);setMessage(null);try{const {error:e}=await supabase.rpc('cancel_booking',{p_booking_id:id});if(e)throw e;setMessage(t('bookingCancelled'))}catch(e){setError(toSafeMessage(e,'bookings.cancel',t('cancelFailed')))}finally{setBusy(false)}}
  return <div className="space-y-6">
   <section className="card-fut-plain border border-white/10 bg-[#141416] p-6">
    <div className="flex items-start justify-between gap-4"><div><div className="text-xs tracking-[.25em] text-[#D4AF37] font-black">BOOKING ENGINE</div><h2 className="text-2xl font-black mt-1">{t('engineTitle')}</h2><p className="text-sm text-white/45 mt-2 max-w-2xl">{t('engineBody')}</p></div><ShieldCheck className="text-[#D4AF37]"/></div>

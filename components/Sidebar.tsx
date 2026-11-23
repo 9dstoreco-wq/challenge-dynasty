@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -38,7 +39,9 @@ export default function Sidebar() {
     <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 border-r border-[#D4AF37]/15 bg-[#0A0A0C]/95 backdrop-blur p-5 flex-col z-40">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <img src="/dynasty-badge.png" alt="Challenge Dynasty" className="w-11 h-11 object-contain glow" />
+          {/* Antes <img> sin optimizar (fuente de 221KB) renderizado a 44x44 en CADA pagina
+              autenticada; next/image sirve el tamano real en WebP/AVIF cuando el navegador lo soporta. */}
+          <Image src="/dynasty-badge.png" alt="Challenge Dynasty" width={44} height={44} priority className="w-11 h-11 object-contain glow" />
           <div className="font-display text-2xl leading-none tracking-wide">CHALLENGE<span className="text-[#D4AF37]"> DYNASTY</span></div>
         </div>
       </div>

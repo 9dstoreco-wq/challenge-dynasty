@@ -16,15 +16,27 @@ export default function SocialPostCard({ post, currentUserId }: { post:Post; cur
   const [following, setFollowing] = useState(Boolean(post.following_by_me))
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
+  const [shared, setShared] = useState(false)
   async function like(){ if(!currentUserId||busy) return; setBusy(true); setErr(''); try { const r=await toggleLike(post.id); if(!r.ok){setErr(r.error);return} setLiked(r.data); setLikes(v=>v+(r.data?1:-1)) } catch { setErr(t('errGeneric')) } finally { setBusy(false) } }
   async function commentSubmit(e:React.FormEvent){ e.preventDefault(); if(!currentUserId || !comment.trim() || busy) return; setBusy(true); setErr(''); try { const r=await addComment(post.id,comment.trim()); if(!r.ok){setErr(r.error);return} setComments(v=>[...v,{id:crypto.randomUUID(),content:comment.trim(),user_name:t('you')}]); setComment('') } catch { setErr(t('errGeneric')) } finally { setBusy(false) } }
   async function follow(){ if(!currentUserId || !post.user_id || busy) return; setBusy(true); setErr(''); try { const r=await toggleFollow(post.user_id); if(!r.ok){setErr(r.error);return} setFollowing(r.data) } catch { setErr(t('errGeneric')) } finally { setBusy(false) } }
+  // BUG ENCONTRADO EN AUDITORIA (2026-11-23): el boton de compartir no tenia onClick, no hacia
+  // absolutamente nada al tocarlo. Usa el share nativo del celular cuando existe (Web Share API);
+  // si no, copia el link al portapapeles y lo confirma visualmente un momento.
+  async function share(){
+    const url = match ? `${window.location.origin}/challenge/${match.challenge_id}` : `${window.location.origin}/u/${post.username}`
+    const shareText = post.title || post.content || t('post')
+    try {
+      if (navigator.share) { await navigator.share({ title: shareText, url }) }
+      else { await navigator.clipboard.writeText(url); setShared(true); setTimeout(()=>setShared(false),2000) }
+    } catch { /* usuario cerro el panel nativo de compartir: no es un error */ }
+  }
   const match = post.match
   return <article className="card-fut-plain border border-white/10 bg-[#141416] overflow-hidden">
     <div className="p-5 flex items-start justify-between"><div className="flex items-center gap-3"><div className="h-10 w-10 rounded-full bg-gradient-to-br from-gold-300 to-gold-600"/><div><a href={`/u/${post.username}`} className="font-bold hover:text-[#D4AF37]">{post.full_name}</a><div className="text-xs text-white/40">{new Date(post.created_at).toLocaleString('es-CO')}</div></div></div>{currentUserId && post.user_id!==currentUserId && <button onClick={follow} disabled={busy} className="text-xs rounded-full border border-white/10 px-3 py-1.5 text-white/60">{following?t('following'):t('follow')}</button>}</div>
     <div className="px-5 pb-5"><div className="text-xs tracking-[.2em] text-[#D4AF37]">{post.type==='AUTO_MATCH_RESULT'?t('officialResult'):t('post')}</div>{post.title && <h3 className="text-xl font-black mt-2">{post.title}</h3>}<p className="mt-3 text-white/80 whitespace-pre-wrap">{post.content}</p>
       {match && <div className="mt-4 rounded-2xl bg-white/5 p-4"><div className="text-xs text-white/40">{t('resultLabel')}</div><div className="text-lg font-black mt-1">{match.winner_name} {match.score_set1 && `· ${match.score_set1}`} {match.score_set2 && `· ${match.score_set2}`} {match.score_set3 && `· ${match.score_set3}`} <span className="text-white/30">vs</span> {match.loser_name}</div><a href={`/challenge/${match.challenge_id}`} className="inline-flex mt-3 rounded-xl bg-[#D4AF37] text-black px-3 py-2 text-xs font-black"><Swords size={14}/> {t('rematch')}</a></div>}
-      <div className="flex items-center gap-5 pt-4 mt-4 border-t border-white/10"><button disabled={busy||!currentUserId} onClick={like} className={`flex items-center gap-2 text-sm ${liked?'text-pink-400':'text-white/55'}`}><Heart size={17} fill={liked?'currentColor':'none'}/>{likes}</button><span className="flex items-center gap-2 text-sm text-white/45"><MessageCircle size={17}/>{comments.length}</span><button className="text-white/45 ml-auto"><Share2 size={17}/></button></div>
+      <div className="flex items-center gap-5 pt-4 mt-4 border-t border-white/10"><button disabled={busy||!currentUserId} onClick={like} className={`flex items-center gap-2 text-sm ${liked?'text-pink-400':'text-white/55'}`}><Heart size={17} fill={liked?'currentColor':'none'}/>{likes}</button><span className="flex items-center gap-2 text-sm text-white/45"><MessageCircle size={17}/>{comments.length}</span><button onClick={share} className="text-white/45 ml-auto hover:text-[#D4AF37]" aria-label={t('shareBtn')}>{shared?<span className="text-xs text-[#D4AF37] font-bold">{t('linkCopied')}</span>:<Share2 size={17}/>}</button></div>
       {currentUserId && <form onSubmit={commentSubmit} className="mt-4 flex gap-2"><input value={comment} onChange={e=>setComment(e.target.value)} placeholder={t('commentPlaceholder')} className="flex-1 rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm"/><button disabled={busy||!comment.trim()} className="rounded-xl bg-white/10 px-4 text-sm font-black">{t('sendBtn')}</button></form>}
       {err && <p className="mt-3 rounded-xl bg-red-500/10 border border-red-400/20 p-2 text-xs text-red-200">{err}</p>}
       {comments.slice(-3).map(c=><div key={c.id} className="mt-3 text-sm"><span className="font-bold">{c.user_name||t('defaultCommenter')}:</span> <span className="text-white/65">{c.content}</span></div>)}
