@@ -79,6 +79,30 @@ function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
+// AUDITORIA 2026-11-23: antes, si esto fallaba de verdad (ej. un pago verificado por Wompi
+// que no se logra guardar en la base), nadie se enteraba hasta que un jugador o club se
+// quejara. Avisa por Telegram en los puntos donde algo salio mal de una forma que SI importa
+// (no los casos esperados/manejados como un evento repetido o un estado ya terminal).
+// Secretos de Edge Function (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID), se ponen solo desde el
+// Dashboard de Supabase -- si no estan configurados, esto simplemente no hace nada: nunca
+// bloquea ni hace fallar la respuesta al webhook, y cualquier error al enviar el aviso solo
+// se registra en los logs.
+async function alertTelegram(message: string): Promise<void> {
+  const token = Deno.env.get("TELEGRAM_BOT_TOKEN");
+  const chatId = Deno.env.get("TELEGRAM_CHAT_ID");
+  if (!token || !chatId) return;
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text: `⚠️ Challenge Dynasty (wompi-webhook)\n${message}` }),
+    });
+    if (!res.ok) console.error("wompi-webhook: telegram alert rejected", res.status, await res.text().catch(() => ""));
+  } catch (err) {
+    console.error("wompi-webhook: telegram alert failed", err instanceof Error ? err.message : err);
+  }
+}
+
 type Domain = "booking" | "tournament" | "marketplace" | "billing";
 
 // Wompi's four terminal/non-terminal transaction states -> this platform's payment_records
@@ -183,8 +207,14 @@ Deno.serve(async (req) => {
 
   const eventsSecret = Deno.env.get("WOMPI_EVENTS_SECRET");
   const publicKey = Deno.env.get("WOMPI_PUBLIC_KEY");
-  if (!eventsSecret) return json({ error: "WOMPI_EVENTS_SECRET_MISSING" }, 500);
-  if (!publicKey) return json({ error: "WOMPI_PUBLIC_KEY_MISSING" }, 500);
+  if (!eventsSecret) {
+    await alertTelegram("Falta el secreto WOMPI_EVENTS_SECRET -- no se puede verificar NINGUN pago hasta que se configure.");
+    return json({ error: "WOMPI_EVENTS_SECRET_MISSING" }, 500);
+  }
+  if (!publicKey) {
+    await alertTelegram("Falta el secreto WOMPI_PUBLIC_KEY -- no se puede verificar NINGUN pago hasta que se configure.");
+    return json({ error: "WOMPI_PUBLIC_KEY_MISSING" }, 500);
+  }
 
   const bodyText = await req.text();
   let payload: WompiEvent | null = null;
@@ -258,7 +288,10 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !serviceKey) return json({ error: "SUPABASE_CONFIG_MISSING" }, 500);
+  if (!supabaseUrl || !serviceKey) {
+    await alertTelegram("Faltan las variables de Supabase (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY) -- esto no deberia pasar nunca, revisar la configuracion de la funcion.");
+    return json({ error: "SUPABASE_CONFIG_MISSING" }, 500);
+  }
   const supabase = createClient(supabaseUrl, serviceKey);
 
   const rawPayload = payload as unknown as Record<string, unknown>;
@@ -331,6 +364,7 @@ Deno.serve(async (req) => {
         if (error) {
           if (String(error.message ?? "").includes("AMOUNT_OR_CURRENCY_MISMATCH")) {
             console.error("wompi-webhook: billing amount mismatch", rowId, amount, currencyCode);
+            await alertTelegram(`Factura ${rowId}: el monto pagado (${amount} ${currencyCode}) no coincide con lo esperado -- revisar antes de marcarla como pagada.`);
             return json({ error: "AMOUNT_MISMATCH" }, 422);
           }
           if (String(error.message ?? "").includes("INVOICE_NOT_FOUND")) {
@@ -351,6 +385,7 @@ Deno.serve(async (req) => {
       return json({ ok: true, ignored: message });
     }
     console.error("wompi-webhook: RPC/DB update failed", domain, rowId, message);
+    await alertTelegram(`Un pago verificado por Wompi NO se pudo guardar (dominio: ${domain}, fila: ${rowId}): ${message}`);
     return json({ error: "DB_UPDATE_FAILED" }, 500);
   }
 
