@@ -90,7 +90,7 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
   // (la ronda 1 la arma TournamentBracketPanel, igual que Americano; de ahí en adelante depende
   // del puntaje acumulado, así que se genera una ronda a la vez, como la escalera).
   const categoriesReadyForNextMexicanoRound = cats
-    .filter((c) => tournament?.format_type === 'mexicano')
+    .filter(() => tournament?.format_type === 'mexicano')
     .map((c) => {
       const categoryRotationMatches = rotationMatches.filter((m) => m.category_id === c.id)
       if (categoryRotationMatches.length === 0) return null
@@ -105,7 +105,7 @@ export default async function CompetitionDetail({ params }: { params: Promise<{ 
   // Sistema suizo: a diferencia de Americano/Mexicano, usa tournament_fixtures (pareja fija por
   // partido), así que se calcula sobre "fixtures" igual que la escalera, no sobre rotationMatches.
   const categoriesReadyForNextSwissRound = cats
-    .filter((c) => tournament?.format_type === 'swiss')
+    .filter(() => tournament?.format_type === 'swiss')
     .map((c) => {
       const categoryFixtures = fixtures.filter((f) => f.category_id === c.id)
       if (categoryFixtures.length === 0) return null

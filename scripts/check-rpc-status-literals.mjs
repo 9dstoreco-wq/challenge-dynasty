@@ -121,28 +121,70 @@ for (const file of files) {
     while ((um = STMT_RE.exec(src))) {
       const table = um[1]
       const stmt = um[0]
-      const key = `${table}.${column}`
-      const allowed = contract[key]
-      if (!allowed) continue
-      checkedStatements++
-      // Alias-aware: `cp2.status = 'accepted'` pertenece a la tabla enlazada a `cp2`, no a la tabla
-      // que abre la sentencia. Solo se compara contra el contrato de ESTA tabla cuando el calificador
-      // apunta a ella (o no es un alias conocido, p. ej. NEW/OLD o una variable).
+      // Alias-aware AND table-position-aware: `cp2.status = 'accepted'` pertenece a la tabla
+      // enlazada a `cp2`, no a la tabla que abre la sentencia -- y un literal SIN calificador
+      // tampoco pertenece siempre a la tabla que abre la sentencia. Esta regla ("ends at the
+      // next semicolon") captura como una sola `stmt` un bloque PL/pgSQL completo
+      // (`IF EXISTS (...) AND NOT EXISTS (...) THEN UPDATE ... END IF;`) que legitimamente toca
+      // VARIAS tablas distintas antes de ese `;`. Revisar todo literal sin calificador contra la
+      // tabla que abre la sentencia producia falsos positivos reales (2026-11-23 CI siempre en
+      // rojo): en respond_tournament_entry_invite, `status='paid'` es de
+      // tournament_registration_payments (abre la sentencia), pero `status<>'confirmed'` dos
+      // lineas despues es de tournament_entry_members (declarada en su propio `from` dentro del
+      // mismo bloque) y `status='confirmed'` mas abajo es de tournament_entries (declarada en su
+      // propio `update`) -- ninguna de las dos es tournament_registration_payments, y 'confirmed'
+      // nunca fue una violacion real. Por eso cada literal se resuelve contra la declaracion
+      // `from|join|update public.<tabla>` MAS CERCANA que lo precede dentro de la sentencia (o
+      // contra el alias que lo califica, si tiene uno), nunca contra la tabla que abre la
+      // sentencia por defecto.
+      // Paren-depth-aware too: `update ... set status='released' where challenge_id =
+      // (select challenge_id from public.matches where id=new.match_id) and status = 'locked'`
+      // has `public.matches` declared INSIDE the scalar subquery's parens -- once that `)`
+      // closes, the statement is back to the outer UPDATE's own table (challenge_card_stakes),
+      // so the trailing `status = 'locked'` is a challenge_card_stakes WHERE-clause condition,
+      // not a matches column. A plain "nearest preceding declaration by index" would wrongly
+      // pick `matches` here (it precedes 'locked' textually, even though its scope already
+      // closed), so every declaration and every literal is also tagged with its paren depth,
+      // and only a declaration whose depth is <= the literal's own depth is eligible --
+      // deeper (already-closed-off) declarations are skipped.
+      function depthAt(idx) {
+        let d = 0
+        for (let i = 0; i < idx; i++) {
+          if (stmt[i] === '(') d++
+          else if (stmt[i] === ')') d--
+        }
+        return d
+      }
       const aliasToTable = new Map()
+      const tableDecls = []
       for (const am of stmt.matchAll(/\b(?:from|join|update)\s+public\.(\w+)(?:\s+(?:as\s+)?(?!(?:where|set|join|left|right|inner|on|using|returning|order|group|limit|cross|full|for)\b)(\w+))?/gi)) {
         aliasToTable.set(am[2] || am[1], am[1])
         aliasToTable.set(am[1], am[1])
+        tableDecls.push({ index: am.index, table: am[1], depth: depthAt(am.index) })
+      }
+      tableDecls.sort((a, b) => a.index - b.index)
+      function nearestTable(idx) {
+        const depth = depthAt(idx)
+        let found = table
+        for (const d of tableDecls) {
+          if (d.index > idx) break
+          if (d.depth <= depth) found = d.table
+        }
+        return found
       }
       const LIT_RE = new RegExp(`(?:\\b(\\w+)\\.)?\\b${column}\\s*(?:=|<>)\\s*'([a-z_0-9]+)'`, 'gi')
       let lm
       while ((lm = LIT_RE.exec(stmt))) {
         const qualifier = lm[1]
-        if (qualifier && aliasToTable.has(qualifier) && aliasToTable.get(qualifier) !== table) continue
+        const resolvedTable = (qualifier && aliasToTable.has(qualifier)) ? aliasToTable.get(qualifier) : nearestTable(lm.index)
+        const resolvedAllowed = contract[`${resolvedTable}.${column}`]
+        if (!resolvedAllowed) continue
+        checkedStatements++
         const value = lm[2]
-        if (!allowed.includes(value)) {
+        if (!resolvedAllowed.includes(value)) {
           const line = lineOf(src, um.index + lm.index)
           violations.push(
-            `${rel}:${line} statement touching public.${table} compares/sets ${column} = '${value}', but the live CHECK constraint only allows: ${allowed.join(', ')}`
+            `${rel}:${line} statement touching public.${resolvedTable} compares/sets ${column} = '${value}', but the live CHECK constraint only allows: ${resolvedAllowed.join(', ')}`
           )
         }
       }
