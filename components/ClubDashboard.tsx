@@ -37,7 +37,12 @@ export default function ClubDashboard({
   const [capacity, setCapacity] = useState('4')
   const [price, setPrice] = useState('0')
   const [currency, setCurrency] = useState('COP')
-  const [bookingMode, setBookingMode] = useState<'instant' | 'approval_required'>('instant')
+  // BUG ENCONTRADO EN AUDITORIA FUNCIONAL (2026-11-25): esta pantalla dejaba elegir
+  // "requiere aprobacion del club" para una cancha/clase, pero ningun lado del sistema
+  // revisaba ese valor -- toda reserva se confirmaba sola igual, sin ninguna cola de
+  // aprobacion. Mientras no se construya esa funcion de verdad, se oculta la opcion para
+  // no prometer algo que hoy no pasa; todo queda como 'instant' (el unico comportamiento real).
+  const bookingMode: 'instant' | 'approval_required' = 'instant'
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -166,13 +171,6 @@ export default function ClubDashboard({
           <div>
             <label htmlFor="resource-currency" className="text-xs font-bold text-white/40">{t('currencyLabel')}</label>
             <input id="resource-currency" value={currency} onChange={(e) => setCurrency(e.target.value.toUpperCase())} maxLength={3} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50 uppercase" />
-          </div>
-          <div className="md:col-span-2">
-            <label htmlFor="resource-mode" className="text-xs font-bold text-white/40">{t('modeLabel')}</label>
-            <select id="resource-mode" value={bookingMode} onChange={(e) => setBookingMode(e.target.value as 'instant' | 'approval_required')} className="w-full mt-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-white outline-none focus:border-[#6FA3D8]/50">
-              <option value="instant">{t('modeInstant')}</option>
-              <option value="approval_required">{t('modeApproval')}</option>
-            </select>
           </div>
         </div>
         {error && <div className="text-sm text-red-400">{error}</div>}
