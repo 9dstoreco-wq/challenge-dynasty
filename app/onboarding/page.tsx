@@ -9,17 +9,43 @@ import { Swords, Medal, Layers, Trophy } from 'lucide-react'
 
 type Sport = { id:string; slug:string; name:string; icon:string|null; color:string|null }
 
+// BUG ENCONTRADO EN AUDITORIA FUNCIONAL (2026-11-25): esta pagina era el UNICO lugar de toda la
+// app que creaba la fila en `profiles`, y solo la creaba DENTRO de save(), despues de elegir un
+// deporte. Alguien que llegara aqui y no eligiera deporte (o cerrara la pestana) se quedaba sin
+// perfil para siempre -- y como casi toda la app tiene llave foranea a profiles(id), no podia
+// crear ni un reto, con un error generico que no explicaba nada. Fix: asegurar el perfil apenas
+// carga la pagina (independiente de si elige deporte o no), ademas del fix en /register que ya
+// lo crea apenas hay sesion.
+async function ensureProfile(supabase: ReturnType<typeof createClient>, fallbackName: string, metaUsername: string | null, userId: string){
+  const {error}=await supabase.from('profiles').upsert({id:userId,display_name:fallbackName,username:metaUsername},{onConflict:'id',ignoreDuplicates:true})
+  if(error&&error.code==='23505'){await supabase.from('profiles').upsert({id:userId,display_name:fallbackName},{onConflict:'id',ignoreDuplicates:true})}
+}
+
 export default function OnboardingPage(){
   const t=useTranslations('Onboarding')
   const [sports,setSports]=useState<Sport[]>([]); const [sport,setSport]=useState(''); const [message,setMessage]=useState(''); const [loading,setLoading]=useState(true); const [saving,setSaving]=useState(false)
-  useEffect(()=>{(async()=>{const {data,error}=await createClient().from('sports').select('id,slug,name,icon,color').order('name'); if(error)setMessage(toSafeMessage(error,'onboarding.loadSports')); else setSports(data??[]); setLoading(false)})()},[])
+  useEffect(()=>{(async()=>{
+    const supabase=createClient()
+    const [{data:sportsData,error:sportsError},{data:{user}}]=await Promise.all([
+      supabase.from('sports').select('id,slug,name,icon,color').order('name'),
+      supabase.auth.getUser(),
+    ])
+    if(sportsError)setMessage(toSafeMessage(sportsError,'onboarding.loadSports')); else setSports(sportsData??[])
+    if(user){
+      const meta=(user.user_metadata||{}) as Record<string,unknown>
+      const metaFullName=typeof meta.full_name==='string'?meta.full_name:null
+      const metaUsername=typeof meta.username==='string'?meta.username:null
+      const fallbackName=metaFullName||metaUsername||(user.email?user.email.split('@')[0]:t('defaultName'))
+      await ensureProfile(supabase,fallbackName,metaUsername,user.id)
+    }
+    setLoading(false)
+  })()},[t])
   async function save(){const supabase=createClient();if(!sport){setMessage(t('selectSport'));return} setSaving(true); setMessage(''); const {data:{user}}=await supabase.auth.getUser(); if(!user){setMessage(t('loginFirst'));setSaving(false);return}
     const meta=(user.user_metadata||{}) as Record<string,unknown>
     const metaFullName=typeof meta.full_name==='string'?meta.full_name:null
     const metaUsername=typeof meta.username==='string'?meta.username:null
     const fallbackName=metaFullName||metaUsername||(user.email?user.email.split('@')[0]:t('defaultName'))
-    const {error:profileError}=await supabase.from('profiles').upsert({id:user.id,display_name:fallbackName,username:metaUsername},{onConflict:'id',ignoreDuplicates:true})
-    if(profileError&&profileError.code==='23505'){await supabase.from('profiles').upsert({id:user.id,display_name:fallbackName},{onConflict:'id',ignoreDuplicates:true})}
+    await ensureProfile(supabase,fallbackName,metaUsername,user.id)
     const {data}=await supabase.from('sports').select('id').eq('slug',sport).single(); if(!data){setMessage(t('sportUnavailable'));setSaving(false);return} const {error}=await supabase.from('player_sports').upsert({profile_id:user.id,sport_id:data.id,is_primary:true,is_discoverable:true,relationship:'primary',skill_level:null},{onConflict:'profile_id,sport_id'}); if(error)setMessage(toSafeMessage(error,'onboarding.saveSport')); else setMessage(t('done')); setSaving(false)}
   const features=[
     {Icon:Swords,title:t('featureRetosTitle'),body:t('featureRetosBody'),cta:t('featureRetosCta'),href:'/challenge/new'},
