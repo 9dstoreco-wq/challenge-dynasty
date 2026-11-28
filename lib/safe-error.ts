@@ -91,6 +91,11 @@ const KNOWN_RPC_MESSAGES: Record<string, string> = {
   INVALID_BOOKABLE_PRICE: 'El precio de eso no está configurado correctamente.',
   BOOKABLE_CURRENCY_REQUIRED: 'Falta configurar la moneda de eso.',
   MIXED_CURRENCY_BOOKING_NOT_ALLOWED: 'No puedes reservar varias cosas con monedas distintas en la misma reserva.',
+  // Triggers de horario/bloqueos (migracion 20261128043500) y de cupo (enforce_booking_capacity).
+  OUTSIDE_AVAILABILITY_HOURS: 'Ese horario está fuera del horario de atención del club. Elige otra hora.',
+  BOOKABLE_BLACKED_OUT: 'El club bloqueó ese horario (mantenimiento o evento). Elige otra fecha u hora.',
+  BOOKING_CAPACITY_EXCEEDED: 'Ese horario ya está ocupado. Elige otra hora.',
+  'Booking capacity exceeded': 'Ese horario ya está ocupado. Elige otra hora.',
 }
 
 // Mismo caso que invalid_status_transition: % -> % (transition_tournament_status interpola el

@@ -77,3 +77,15 @@ test('acepta strings, objetos con message y valores vacios', () => {
 test('usa el texto de respaldo propio cuando se pasa uno', () => {
   assert.equal(toSafeMessage(new Error('violates something'), 'test', 'Intenta más tarde'), 'Intenta más tarde')
 })
+
+test('los bloqueos de horario, cierre y cupo de reservas se muestran en espanol', () => {
+  const esperados = {
+    OUTSIDE_AVAILABILITY_HOURS: 'Ese horario está fuera del horario de atención del club. Elige otra hora.',
+    BOOKABLE_BLACKED_OUT: 'El club bloqueó ese horario (mantenimiento o evento). Elige otra fecha u hora.',
+    BOOKING_CAPACITY_EXCEEDED: 'Ese horario ya está ocupado. Elige otra hora.',
+    'Booking capacity exceeded': 'Ese horario ya está ocupado. Elige otra hora.',
+  }
+  for (const [raw, esperado] of Object.entries(esperados)) {
+    assert.equal(toSafeMessage(new Error(raw), 'test'), esperado, raw)
+  }
+})

@@ -22,6 +22,10 @@
 create or replace function public.check_booking_availability_hours()
 returns trigger
 language plpgsql
+-- SECURITY DEFINER: booking_blackouts solo es legible por el dueño del club (RLS). Sin esto,
+-- una reserva hecha con permisos del jugador veria 0 bloqueos y se saltaria la validacion.
+-- La funcion solo LEE esas tablas; search_path fijo.
+security definer
 set search_path to 'public', 'pg_temp'
 as $function$
 declare
@@ -37,6 +41,17 @@ declare
 begin
   -- Solo validar reservas que realmente ocupan el recurso.
   if new.status not in ('pending','confirmed') then
+    return new;
+  end if;
+
+  -- Pasar de pending -> confirmed (p.ej. el webhook de Wompi al aprobar el pago) sin mover
+  -- horario ni recurso NO se vuelve a validar: si el club agrega un bloqueo o cambia el
+  -- horario despues de que el jugador reservo, un pago ya hecho no puede fallar al guardarse.
+  if tg_op = 'UPDATE'
+     and old.status in ('pending','confirmed')
+     and new.bookable_id = old.bookable_id
+     and new.starts_at = old.starts_at
+     and new.ends_at = old.ends_at then
     return new;
   end if;
 
@@ -108,12 +123,25 @@ $function$;
 create or replace function public.check_booking_blackout()
 returns trigger
 language plpgsql
+-- SECURITY DEFINER: booking_blackouts solo es legible por el dueño del club (RLS). Sin esto,
+-- una reserva hecha con permisos del jugador veria 0 bloqueos y se saltaria la validacion.
+-- La funcion solo LEE esas tablas; search_path fijo.
+security definer
 set search_path to 'public', 'pg_temp'
 as $function$
 declare
   v_blackout_count integer;
 begin
   if new.status not in ('pending','confirmed') then
+    return new;
+  end if;
+
+  -- Mismo criterio que check_booking_availability_hours (pending -> confirmed no revalida).
+  if tg_op = 'UPDATE'
+     and old.status in ('pending','confirmed')
+     and new.bookable_id = old.bookable_id
+     and new.starts_at = old.starts_at
+     and new.ends_at = old.ends_at then
     return new;
   end if;
 
@@ -139,3 +167,6 @@ drop trigger if exists booking_blackout_guard on public.bookings;
 create trigger booking_blackout_guard
   before insert or update of bookable_id, starts_at, ends_at, status on public.bookings
   for each row execute function public.check_booking_blackout();
+
+revoke all on function public.check_booking_availability_hours() from public, anon, authenticated;
+revoke all on function public.check_booking_blackout() from public, anon, authenticated;
